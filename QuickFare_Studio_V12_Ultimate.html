@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuickFare Studio V12 | Pro Kit Engine</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <style>
+/* QuickFare Studio V12 — Premium Design System */
+@import url('https://fonts.googleapis.com/css2?family=Anton&family=Bebas+Neue&family=Cinzel:wght@700&family=Montserrat:ital,wght@0,400;0,700;0,900;1,900&family=Oswald:wght@500;700&family=Playfair+Display:ital,wght@0,700;1,700&family=Space+Grotesk:wght@700&family=Outfit:wght@300;500;700;900&display=swap');
+
+:root {
+  --bg: #06080C; --panel: rgba(12,14,22,0.92); --surface: rgba(255,255,255,0.04);
+  --accent: #00F0FF; --magic: #A855F7; --danger: #EF4444; --gold: #FBBF24;
+  --text: #ffffff; --text2: #94A3B8; --text3: #475569;
+  --border: rgba(255,255,255,0.08); --border2: rgba(255,255,255,0.15);
+  --radius: 10px; --radius-lg: 16px;
+  --shadow: 0 8px 32px rgba(0,0,0,0.6);
+  --glass: blur(20px);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.15);border-radius:10px}
+::-webkit-scrollbar-thumb:hover{background:var(--accent)}
+
+html,body{width:100%;height:100vh;background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;overflow:hidden;display:flex;flex-direction:column}
+
+/* === NAVBAR === */
+.navbar{height:56px;background:rgba(6,8,12,0.95);backdrop-filter:var(--glass);display:flex;align-items:center;padding:0 20px;border-bottom:1px solid var(--border);z-index:100;gap:12px;flex-shrink:0}
+.logo{font-size:18px;font-weight:900;letter-spacing:1.5px;text-transform:uppercase;margin-right:auto}
+.logo span{color:var(--accent);text-shadow:0 0 12px rgba(0,240,255,0.3)}
+.nav-group{display:flex;align-items:center;gap:8px}
+.nav-divider{width:1px;height:28px;background:var(--border);margin:0 4px}
+
+/* === BUTTONS === */
+.btn{padding:8px 14px;background:var(--surface);color:#fff;border:1px solid var(--border);border-radius:8px;font:700 12px/1 'Outfit',sans-serif;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:6px;text-transform:uppercase;letter-spacing:.5px;white-space:nowrap}
+.btn:hover{background:rgba(255,255,255,0.08);transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.3)}
+.btn-sm{padding:6px 10px;font-size:11px;border-radius:6px}
+.btn-icon{padding:8px;border-radius:8px;font-size:13px}
+.btn-primary{background:var(--accent);color:#000;border:none;font-weight:900;box-shadow:0 0 16px rgba(0,240,255,.25)}
+.btn-primary:hover{background:#fff;box-shadow:0 0 20px var(--accent)}
+.btn-magic{background:linear-gradient(135deg,var(--accent),var(--magic));color:#fff;border:none;font-weight:900;box-shadow:0 4px 20px rgba(168,85,247,.3)}
+.btn-magic:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(168,85,247,.45)}
+.btn-danger{background:rgba(239,68,68,.15);color:var(--danger);border-color:rgba(239,68,68,.3)}
+.btn-danger:hover{background:rgba(239,68,68,.25)}
+select.nav-select{background:rgba(0,0,0,.5);border:1px solid var(--border);color:#fff;padding:8px 10px;border-radius:8px;font:700 12px 'Outfit',sans-serif;outline:none;cursor:pointer}
+
+/* === LAYOUT === */
+.app-body{display:flex;flex:1;overflow:hidden}
+
+/* === LEFT PANEL === */
+.panel{width:400px;background:var(--panel);backdrop-filter:var(--glass);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;overflow:hidden}
+.panel-tabs{display:flex;border-bottom:1px solid var(--border);flex-shrink:0}
+.tab-btn{flex:1;padding:14px 0;text-align:center;background:none;border:none;color:var(--text3);font:800 11px/1 'Outfit',sans-serif;cursor:pointer;text-transform:uppercase;letter-spacing:1.5px;transition:.25s;position:relative}
+.tab-btn:hover{color:var(--text2)}
+.tab-btn.active{color:#fff}
+.tab-btn.active::after{content:'';position:absolute;bottom:0;left:20%;width:60%;height:2px;background:var(--accent);border-radius:2px;box-shadow:0 0 8px var(--accent)}
+.tab-body{flex:1;overflow-y:auto;overflow-x:hidden}
+.tab-pane{display:none;flex-direction:column;animation:fadeUp .3s ease}
+.tab-pane.active{display:flex}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* === SECTIONS === */
+.sec{padding:16px 20px;border-bottom:1px solid var(--border)}
+.sec-title{font-size:10px;text-transform:uppercase;color:var(--text3);letter-spacing:2px;font-weight:800;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.sec-title i{color:var(--accent);font-size:12px}
+.sec-highlight{background:rgba(168,85,247,.06);border-left:3px solid var(--magic)}
+.sec-highlight .sec-title{color:var(--magic)}
+.sec-highlight .sec-title i{color:var(--magic)}
+
+/* === ACCORDION === */
+details.acc{border-bottom:1px solid var(--border)}
+details.acc summary{padding:14px 20px;cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;font:800 10px/1 'Outfit',sans-serif;text-transform:uppercase;color:var(--text3);letter-spacing:2px;transition:.2s;user-select:none}
+details.acc summary:hover{color:var(--text2);background:rgba(255,255,255,.02)}
+details.acc summary::-webkit-details-marker{display:none}
+details.acc summary i.chevron{transition:transform .25s;font-size:10px}
+details.acc[open] summary i.chevron{transform:rotate(180deg);color:var(--accent)}
+details.acc .acc-body{padding:0 20px 16px}
+
+/* === INPUTS === */
+.field{margin-bottom:14px}
+.field label{display:flex;justify-content:space-between;font-size:10px;margin-bottom:6px;color:var(--text2);text-transform:uppercase;font-weight:700;letter-spacing:.8px}
+.field input[type="text"],.field input[type="number"],.field select,.field textarea{width:100%;padding:10px 12px;background:rgba(0,0,0,.35);border:1px solid var(--border);color:#fff;border-radius:8px;font:500 13px/1.4 'Outfit',sans-serif;outline:none;transition:.2s}
+.field input:focus,.field textarea:focus{border-color:var(--accent);box-shadow:0 0 8px rgba(0,240,255,.15);background:rgba(0,0,0,.5)}
+.field textarea{height:80px;resize:none;line-height:1.5}
+.field input[type="range"]{width:100%;accent-color:var(--accent);cursor:pointer}
+.field input[type="color"]{width:100%;height:36px;border:none;background:transparent;cursor:pointer;padding:0;border-radius:6px}
+.row{display:flex;gap:8px}
+.row>*{flex:1}
+
+/* === CHECKBOXES === */
+.check-item{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--surface);border:1px solid var(--border);border-radius:8px;cursor:pointer;transition:.2s;margin-bottom:8px}
+.check-item:hover{border-color:rgba(0,240,255,.3);background:rgba(0,240,255,.04)}
+.check-item input[type="checkbox"]{width:16px;height:16px;accent-color:var(--accent);cursor:pointer;flex-shrink:0}
+.check-item span{font-size:12px;font-weight:600;color:var(--text)}
+
+/* === TEMPLATE GRID === */
+.tpl-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.tpl-btn{background:rgba(0,0,0,.25);border:1px solid var(--border);color:#fff;padding:16px 8px;border-radius:var(--radius);cursor:pointer;font:700 11px 'Outfit',sans-serif;transition:.25s;text-align:center}
+.tpl-btn i{display:block;font-size:20px;margin-bottom:8px;color:var(--accent);transition:.2s}
+.tpl-btn:hover{border-color:var(--accent);background:rgba(0,240,255,.05);transform:translateY(-2px);box-shadow:var(--shadow)}
+
+/* === GALLERY === */
+.search-bar{display:flex;gap:6px;margin-bottom:12px}
+.search-bar input{flex:1;padding:10px 12px;background:rgba(0,0,0,.35);border:1px solid var(--border);color:#fff;border-radius:8px;font:500 13px 'Outfit',sans-serif;outline:none}
+.search-bar input:focus{border-color:var(--accent)}
+.search-bar button{padding:0 14px;background:var(--accent);color:#000;border:none;border-radius:8px;cursor:pointer;font-weight:bold;transition:.2s}
+.search-bar button:hover{background:#fff}
+.gallery{display:grid;grid-template-columns:1fr 1fr;gap:8px;max-height:320px;overflow-y:auto;padding-right:4px}
+.img-card{position:relative;border-radius:8px;overflow:hidden;border:1px solid var(--border);cursor:pointer;aspect-ratio:1;background:#000}
+.img-card img{width:100%;height:100%;object-fit:cover;display:block;transition:.4s;opacity:.85}
+.img-card:hover img{transform:scale(1.12);opacity:.3}
+.img-actions{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:6px;opacity:0;transition:.25s;transform:translateY(6px)}
+.img-card:hover .img-actions{opacity:1;transform:translateY(0)}
+.img-btn{background:rgba(0,0,0,.85);color:#fff;border:1px solid var(--accent);padding:7px;font:800 10px 'Outfit',sans-serif;border-radius:6px;cursor:pointer;width:82%;text-transform:uppercase;transition:.15s;backdrop-filter:blur(4px)}
+.img-btn:hover{background:var(--accent);color:#000}
+
+/* === LAYER LIST === */
+.layer-item{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:rgba(0,0,0,.3);border:1px solid var(--border);border-radius:8px;margin-bottom:6px;cursor:pointer;transition:.2s;font-size:11px;font-weight:700;color:var(--text2)}
+.layer-item:hover{background:rgba(255,255,255,.04);border-color:var(--border2)}
+.layer-item.active{background:rgba(0,240,255,.08);border-color:var(--accent);color:#fff}
+.layer-item i{margin-right:8px;width:14px;text-align:center;font-size:11px}
+.layer-item.active i{color:var(--accent)}
+.layer-del{background:none;border:none;color:var(--text3);cursor:pointer;padding:4px;transition:.15s;font-size:12px}
+.layer-del:hover{color:var(--danger)}
+
+/* === WORKSPACE === */
+.workspace{flex:1;background:#030305;background-image:radial-gradient(rgba(255,255,255,.04) 1px,transparent 1px);background-size:24px 24px;display:grid;place-items:center;overflow:auto;position:relative}
+#artboard-wrap{position:relative;box-shadow:0 0 0 1px rgba(255,255,255,.08),0 40px 80px rgba(0,0,0,.85);transition:transform .15s cubic-bezier(.1,.7,.1,1);transform-origin:center center}
+
+/* === FLOATING TOOLBAR === */
+#float-toolbar{position:fixed;display:none;z-index:500;background:rgba(10,12,18,.92);backdrop-filter:var(--glass);border:1px solid var(--border2);border-radius:12px;padding:6px 8px;box-shadow:0 12px 40px rgba(0,0,0,.7);align-items:center;gap:4px;animation:toolbarIn .2s ease}
+@keyframes toolbarIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+#float-toolbar .tb-sep{width:1px;height:24px;background:var(--border);margin:0 2px}
+#float-toolbar select{background:rgba(0,0,0,.5);border:1px solid var(--border);color:#fff;padding:4px 6px;border-radius:6px;font:700 11px 'Outfit',sans-serif;outline:none;cursor:pointer;max-width:110px}
+#float-toolbar input[type="number"]{width:56px;padding:4px 6px;background:rgba(0,0,0,.5);border:1px solid var(--border);color:#fff;border-radius:6px;font:700 11px 'Outfit',sans-serif;outline:none;text-align:center}
+#float-toolbar input[type="color"]{width:28px;height:28px;border:2px solid var(--border);border-radius:6px;cursor:pointer;padding:0;background:transparent}
+
+/* === KIT DASHBOARD OVERLAY === */
+#kit-dashboard{display:none;position:absolute;inset:0;background:rgba(6,8,12,.97);backdrop-filter:blur(8px);z-index:50;overflow-y:auto;padding:32px}
+.kit-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.kit-header h1{font-size:28px;color:var(--accent);font-weight:900;letter-spacing:1px}
+.kit-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-top:16px}
+.kit-card{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px;display:flex;flex-direction:column;gap:12px}
+.kit-card h3{margin:0;color:var(--accent);text-transform:uppercase;font-size:13px;letter-spacing:1px}
+.kit-card img{width:100%;height:auto;border-radius:var(--radius);box-shadow:var(--shadow)}
+.kit-card pre{background:#000;padding:12px;border-radius:var(--radius);font-size:11px;color:var(--text2);overflow-x:auto;white-space:pre-wrap;max-height:140px;overflow-y:auto}
+
+/* === LOADER === */
+#loader{display:none;position:fixed;inset:0;background:rgba(6,8,12,.96);backdrop-filter:blur(8px);z-index:9999;flex-direction:column;justify-content:center;align-items:center}
+.spinner{border:3px solid rgba(255,255,255,.08);border-top:3px solid var(--accent);border-radius:50%;width:48px;height:48px;animation:spin .8s linear infinite;margin-bottom:20px}
+@keyframes spin{to{transform:rotate(360deg)}}
+#loader-text{color:var(--accent);font:900 20px 'Outfit',sans-serif;letter-spacing:2px}
+#loader-sub{color:var(--text3);font-size:13px;margin-top:8px}
+
+/* === TOAST === */
+#toast{position:fixed;bottom:-80px;left:50%;transform:translateX(-50%);background:var(--accent);color:#000;padding:12px 28px;border-radius:50px;font:800 12px 'Outfit',sans-serif;box-shadow:0 10px 32px rgba(0,240,255,.35);transition:.45s cubic-bezier(.68,-.55,.265,1.55);z-index:10000;text-transform:uppercase;letter-spacing:.8px}
+#toast.show{bottom:32px}
+
+/* === PREVIEW MODAL === */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.92);backdrop-filter:blur(6px);z-index:1000;justify-content:center;align-items:center}
+.modal-box{background:var(--bg);padding:24px;border-radius:var(--radius-lg);border:1px solid var(--border);max-width:75vw;max-height:88vh;display:flex;flex-direction:column;align-items:center;box-shadow:0 20px 60px rgba(0,0,0,.8)}
+.modal-box img{max-width:100%;max-height:58vh;border:1px solid var(--border);border-radius:var(--radius);margin-bottom:20px}
+
+/* === UPLOAD === */
+.upload-wrap{position:relative;width:100%;overflow:hidden;display:flex;align-items:center;justify-content:center;margin-top:8px}
+.upload-wrap input[type="file"]{position:absolute;font-size:100px;opacity:0;right:0;top:0;cursor:pointer;height:100%;width:100%}
+
+/* === HIDDEN === */
+#hidden-render{position:absolute;top:-9999px;left:-9999px;visibility:hidden}
+
+/* === AI BOX === */
+.ai-box{background:rgba(0,0,0,.4);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-top:12px;font-size:13px;line-height:1.6;color:var(--text2);display:none}
+.ai-box h4{color:var(--accent);margin:16px 0 6px;font-size:11px;text-transform:uppercase;border-bottom:1px solid var(--border);padding-bottom:4px;letter-spacing:1px}
+.ai-box h4:first-child{margin-top:0}
+    </style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<div class="navbar">
+    <div class="logo">QuickFare <span>Studio</span></div>
+    <div class="nav-group">
+        <button class="btn btn-icon" onclick="QF.undo()" title="Undo"><i class="fas fa-undo"></i></button>
+        <button class="btn btn-icon" onclick="QF.redo()" title="Redo"><i class="fas fa-redo"></i></button>
+    </div>
+    <div class="nav-divider"></div>
+    <div class="nav-group">
+        <select id="preset-size" class="nav-select" onchange="QF.applyPreset()">
+            <option value="1080x1080">Post 1080×1080</option>
+            <option value="1080x1350">Portrait 1080×1350</option>
+            <option value="1080x1920">Reel 1080×1920</option>
+            <option value="1200x628">FB Ad 1200×628</option>
+            <option value="1748x2480">A5 Cover 1748×2480</option>
+        </select>
+    </div>
+    <div class="nav-divider"></div>
+    <div class="nav-group">
+        <select id="export-fmt" class="nav-select">
+            <option value="png">PNG</option>
+            <option value="jpeg">JPEG</option>
+        </select>
+        <button class="btn btn-primary" onclick="QF.exportDesign()"><i class="fas fa-download"></i> Export</button>
+        <button class="btn btn-magic" id="zip-btn" style="display:none" onclick="QF.downloadZip()"><i class="fas fa-file-archive"></i> ZIP Kit</button>
+    </div>
+</div>
+
+<!-- MAIN LAYOUT -->
+<div class="app-body">
+
+    <!-- LEFT PANEL -->
+    <div class="panel">
+        <div class="panel-tabs">
+            <button class="tab-btn active" data-tab="kit"><i class="fas fa-boxes-stacked"></i>&nbsp; Full Kit</button>
+            <button class="tab-btn" data-tab="editor"><i class="fas fa-pen-ruler"></i>&nbsp; Editor</button>
+        </div>
+        <div class="tab-body">
+
+            <!-- TAB: FULL KIT GEN -->
+            <div class="tab-pane active" id="pane-kit">
+                <div class="sec sec-highlight">
+                    <div class="sec-title"><i class="fas fa-bolt"></i> AI Campaign Kit</div>
+                    <p style="font-size:11px;color:var(--text3);line-height:1.5;margin-bottom:14px">Enter a niche. Qwen-72B writes copy, fetches cinematic Pexels images, renders designs in all dimensions, and packages as ZIP.</p>
+                    <div class="field">
+                        <label>Topic / Product</label>
+                        <textarea id="kit-topic" placeholder="e.g., Learn High-Ticket Freelancing and Escape the 9-5 Matrix..."></textarea>
+                    </div>
+                    <div class="sec-title" style="margin-top:8px"><i class="fas fa-list-check"></i> Deliverables</div>
+                    <label class="check-item"><input type="checkbox" id="chk-cover" checked><span>A5 E-Book Cover (1748×2480)</span></label>
+                    <label class="check-item"><input type="checkbox" id="chk-post" checked><span>Square Post (1080×1080)</span></label>
+                    <label class="check-item"><input type="checkbox" id="chk-reel" checked><span>Reel / Story (1080×1920)</span></label>
+                    <label class="check-item"><input type="checkbox" id="chk-adcopy" checked><span>Meta Ad Copy (.txt)</span></label>
+                    <label class="check-item"><input type="checkbox" id="chk-script" checked><span>Video Script (.txt)</span></label>
+                    <button class="btn btn-magic" style="width:100%;justify-content:center;padding:14px;font-size:13px;margin-top:12px" onclick="QF.generateKit()">
+                        <i class="fas fa-wand-magic-sparkles"></i> Generate Full Kit
+                    </button>
+                </div>
+                <!-- AI Strategist (fallback) -->
+                <details class="acc">
+                    <summary><span><i class="fas fa-brain"></i>&nbsp; AI Strategist</span><i class="fas fa-chevron-down chevron"></i></summary>
+                    <div class="acc-body">
+                        <p style="font-size:10px;color:var(--text3);line-height:1.5;margin-bottom:12px;padding:8px;background:rgba(0,0,0,.3);border-radius:6px">Generates marketing hooks via OpenRouter. Falls back to local engine if API blocked.</p>
+                        <div class="field">
+                            <label>Topic</label>
+                            <textarea id="ai-topic" placeholder="e.g. Avoiding Freelancing Scams"></textarea>
+                        </div>
+                        <button class="btn btn-primary" style="width:100%;justify-content:center;padding:12px" onclick="QF.aiCampaign()"><i class="fas fa-cogs"></i> Engage Strategy</button>
+                        <div id="ai-results" class="ai-box"></div>
+                    </div>
+                </details>
+            </div>
+
+            <!-- TAB: EDITOR -->
+            <div class="tab-pane" id="pane-editor">
+                <!-- Magic Auto-Create -->
+                <div class="sec sec-highlight">
+                    <div class="sec-title"><i class="fas fa-wand-magic-sparkles"></i> Magic Auto-Create</div>
+                    <div class="field">
+                        <input type="text" id="magic-topic" placeholder="e.g., SEO Guide 2026, Fit Body...">
+                    </div>
+                    <button class="btn btn-magic" style="width:100%;justify-content:center;padding:12px" onclick="QF.magicCreate()"><i class="fas fa-bolt"></i> 1-Click Generate</button>
+                </div>
+
+                <!-- Templates -->
+                <details class="acc">
+                    <summary><span><i class="fas fa-shapes"></i>&nbsp; Templates</span><i class="fas fa-chevron-down chevron"></i></summary>
+                    <div class="acc-body">
+                        <div class="tpl-grid">
+                            <button class="tpl-btn" onclick="QF.loadTemplate('cover')"><i class="fas fa-book"></i>E-Book Cover</button>
+                            <button class="tpl-btn" onclick="QF.loadTemplate('viral')"><i class="fas fa-fire"></i>Viral Reel</button>
+                            <button class="tpl-btn" onclick="QF.loadTemplate('quote')"><i class="fas fa-quote-left"></i>Quote Card</button>
+                            <button class="tpl-btn" onclick="QF.loadTemplate('split')"><i class="fas fa-columns"></i>Split Compare</button>
+                        </div>
+                    </div>
+                </details>
+
+                <!-- Elements -->
+                <details class="acc" open>
+                    <summary><span><i class="fas fa-plus-circle"></i>&nbsp; Add Elements</span><i class="fas fa-chevron-down chevron"></i></summary>
+                    <div class="acc-body">
+                        <div class="row" style="margin-bottom:8px">
+                            <button class="btn" style="justify-content:center" onclick="QF.addText()"><i class="fas fa-font"></i> Heading</button>
+                            <button class="btn" style="justify-content:center" onclick="QF.addCard()"><i class="fas fa-list-ul"></i> Subtext Box</button>
+                        </div>
+                        <div class="upload-wrap">
+                            <button class="btn" style="width:100%;justify-content:center;background:rgba(30,35,50,.8)"><i class="fas fa-image"></i> Upload Image</button>
+                            <input type="file" accept="image/*" onchange="QF.uploadImage(event)">
+                        </div>
+                    </div>
+                </details>
+
+                <!-- Layers -->
+                <details class="acc" open>
+                    <summary><span><i class="fas fa-layer-group"></i>&nbsp; Layers</span><i class="fas fa-chevron-down chevron"></i></summary>
+                    <div class="acc-body">
+                        <div id="layer-list"><div style="text-align:center;color:var(--text3);font-size:11px;padding:8px">No layers yet</div></div>
+                    </div>
+                </details>
+
+                <!-- Pillar Library -->
+                <details class="acc">
+                    <summary><span><i class="fas fa-database"></i>&nbsp; Offline Library</span><i class="fas fa-chevron-down chevron"></i></summary>
+                    <div class="acc-body">
+                        <div class="field" style="margin-bottom:8px">
+                            <select id="pillar-cat" onchange="QF.loadPillars()">
+                                <option value="finance">Finance & Wealth</option>
+                                <option value="tech">Technology & AI</option>
+                                <option value="ecom">E-Commerce</option>
+                                <option value="fitness">Health & Fitness</option>
+                                <option value="abstract">Cinematic / Abstract</option>
+                            </select>
+                        </div>
+                        <div class="gallery" id="pillar-gallery" style="max-height:180px"></div>
+                    </div>
+                </details>
+
+                <!-- Pexels Search -->
+                <div class="sec" style="border-bottom:none;flex:1">
+                    <div class="sec-title"><i class="fas fa-camera"></i> Pexels Search</div>
+                    <div class="search-bar">
+                        <select id="pexels-type" style="width:76px;padding:8px 4px;background:rgba(0,0,0,.35);border:1px solid var(--border);color:#fff;border-radius:8px;font:700 11px 'Outfit',sans-serif;outline:none">
+                            <option value="photos">Photos</option>
+                            <option value="videos">Videos</option>
+                        </select>
+                        <input type="text" id="pexels-q" placeholder="Search..." value="Dark luxury">
+                        <button onclick="QF.searchPexels(false)"><i class="fas fa-search"></i></button>
+                    </div>
+                    <div class="gallery" id="pexels-gallery" style="max-height:400px"></div>
+                    <button id="pexels-more" class="btn" style="width:100%;justify-content:center;margin-top:8px;display:none" onclick="QF.searchPexels(true)"><i class="fas fa-arrow-down"></i> Load More</button>
+                </div>
+
+                <!-- Background Filters -->
+                <details class="acc">
+                    <summary><span><i class="fas fa-sliders-h"></i>&nbsp; Background Filters</span><i class="fas fa-chevron-down chevron"></i></summary>
+                    <div class="acc-body">
+                        <div class="field"><label>Blur</label><input type="range" id="f-blur" min="0" max="20" value="0" oninput="QF.applyFilters()"></div>
+                        <div class="field"><label>Brightness</label><input type="range" id="f-bright" min="0" max="200" value="100" oninput="QF.applyFilters()"></div>
+                        <div class="field"><label>Grayscale</label><input type="range" id="f-gray" min="0" max="100" value="0" oninput="QF.applyFilters()"></div>
+                    </div>
+                </details>
+            </div>
+        </div>
+    </div>
+
+    <!-- WORKSPACE -->
+    <div class="workspace" id="workspace">
+        <div id="kit-dashboard">
+            <div class="kit-header">
+                <h1><i class="fas fa-check-circle"></i> Assets Ready</h1>
+                <button class="btn" onclick="QF.closeDash()"><i class="fas fa-times"></i> Close</button>
+            </div>
+            <p style="color:var(--text3);font-size:13px">Review below, then hit "ZIP Kit" in the navbar to download everything.</p>
+            <div class="kit-grid" id="kit-grid"></div>
+        </div>
+        <div id="artboard-wrap">
+            <canvas id="artboard" width="1080" height="1080"></canvas>
+        </div>
+    </div>
+</div>
+
+<!-- FLOATING TOOLBAR -->
+<div id="float-toolbar">
+    <select id="tb-font" onchange="QF.setFont(this.value)">
+        <option value="Anton">Anton</option>
+        <option value="Montserrat">Montserrat</option>
+        <option value="Oswald">Oswald</option>
+        <option value="Bebas Neue">Bebas Neue</option>
+        <option value="Space Grotesk">Space Grotesk</option>
+        <option value="Playfair Display">Playfair Display</option>
+        <option value="Cinzel">Cinzel</option>
+        <option value="Outfit">Outfit</option>
+    </select>
+    <div class="tb-sep"></div>
+    <input type="number" id="tb-size" value="100" min="8" max="600" onchange="QF.setSize(this.value)">
+    <div class="tb-sep"></div>
+    <input type="color" id="tb-color" value="#ffffff" oninput="QF.setColor(this.value)">
+    <div class="tb-sep"></div>
+    <button class="btn btn-sm btn-icon" onclick="QF.zIndex(1)" title="Bring Forward"><i class="fas fa-arrow-up"></i></button>
+    <button class="btn btn-sm btn-icon" onclick="QF.zIndex(-1)" title="Send Back"><i class="fas fa-arrow-down"></i></button>
+    <div class="tb-sep"></div>
+    <button class="btn btn-sm btn-icon btn-danger" onclick="QF.deleteActive()" title="Delete"><i class="fas fa-trash"></i></button>
+</div>
+
+<!-- HIDDEN RENDER CANVAS -->
+<div id="hidden-render"><canvas id="hidden-c" width="1080" height="1080"></canvas></div>
+
+<!-- LOADER -->
+<div id="loader">
+    <div class="spinner"></div>
+    <div id="loader-text">INITIALIZING...</div>
+    <div id="loader-sub">Please wait</div>
+</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<script>
+// QuickFare V12 Core Engine
+const CFG={
+  PEXELS:'c56L0l6NiI8lQhFccTdyyNwFg75mqhtaXKvWvimcSQVS00wqP1xdoftW',
+  QWEN:'YOUR_OPENROUTER_API_KEY',
+  OR:'YOUR_OPENROUTER_API_KEY',
+  FALLBACK:["https://images.unsplash.com/photo-1618045952959-1582e219736e?q=80&w=1920","https://images.unsplash.com/photo-1555949963-aa79dcee981c?q=80&w=1920"],
+  COLORS:["#00F0FF","#FF0050","#39FF14","#FFD700","#FF7B00"],
+  PILLARS:{
+    finance:[{n:"Stock Market",u:"https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=1080"},{n:"Gold Vault",u:"https://images.pexels.com/photos/259209/pexels-photo-259209.jpeg?auto=compress&cs=tinysrgb&w=1080"},{n:"Money",u:"https://images.pexels.com/photos/187041/pexels-photo-187041.jpeg?auto=compress&cs=tinysrgb&w=1080"}],
+    tech:[{n:"Code Matrix",u:"https://images.pexels.com/photos/546819/pexels-photo-546819.jpeg?auto=compress&cs=tinysrgb&w=1080"},{n:"AI Brain",u:"https://images.pexels.com/photos/1181675/pexels-photo-1181675.jpeg?auto=compress&cs=tinysrgb&w=1080"},{n:"Server Room",u:"https://images.pexels.com/photos/3861969/pexels-photo-3861969.jpeg?auto=compress&cs=tinysrgb&w=1080"}],
+    ecom:[{n:"Shopping",u:"https://images.pexels.com/photos/34577/pexels-photo.jpg?auto=compress&cs=tinysrgb&w=1080"},{n:"Boxes",u:"https://images.pexels.com/photos/298863/pexels-photo-298863.jpeg?auto=compress&cs=tinysrgb&w=1080"},{n:"Retail",u:"https://images.pexels.com/photos/1036808/pexels-photo-1036808.jpeg?auto=compress&cs=tinysrgb&w=1080"}],
+    fitness:[{n:"Dark Gym",u:"https://images.pexels.com/photos/841130/pexels-photo-841130.jpeg?auto=compress&cs=tinysrgb&w=1080"},{n:"Diet",u:"https://images.pexels.com/photos/2261477/pexels-photo-2261477.jpeg?auto=compress&cs=tinysrgb&w=1080"},{n:"Running",u:"https://images.pexels.com/photos/949126/pexels-photo-949126.jpeg?auto=compress&cs=tinysrgb&w=1080"}],
+    abstract:[{n:"Neon Glow",u:"https://images.pexels.com/photos/2832382/pexels-photo-2832382.jpeg?auto=compress&cs=tinysrgb&w=1080"},{n:"Cyberpunk",u:"https://images.pexels.com/photos/1743165/pexels-photo-1743165.jpeg?auto=compress&cs=tinysrgb&w=1080"},{n:"Dark Waves",u:"https://images.pexels.com/photos/3165335/pexels-photo-3165335.jpeg?auto=compress&cs=tinysrgb&w=1080"}]
+  }
+};
+
+// State
+let history=[],hIdx=-1,restoring=false,pexPage=1,kitAssets={},zip=new JSZip();
+const SK="QF_V12_State";
+
+// Canvas
+const cv=new fabric.Canvas('artboard',{preserveObjectStacking:true,backgroundColor:'#000',selection:true});
+const hc=new fabric.Canvas('hidden-c',{preserveObjectStacking:true,backgroundColor:'#000'});
+
+// Utils
+function toast(m,err){const t=document.getElementById('toast');t.innerText=m;t.style.background=err?'#EF4444':'#00F0FF';t.style.color=err?'#fff':'#000';t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000)}
+function loader(t,s){const l=document.getElementById('loader');l.style.display='flex';document.getElementById('loader-text').innerText=t;document.getElementById('loader-sub').innerText=s}
+function hideLoader(){document.getElementById('loader').style.display='none'}
+
+// State Management
+function saveState(){
+  if(restoring)return;
+  const s=cv.toJSON(['id','isBackground','selectable','evented','isOverlay']);
+  if(hIdx<history.length-1)history=history.slice(0,hIdx+1);
+  history.push(JSON.stringify(s));
+  if(history.length>50)history.shift();else hIdx++;
+  try{localStorage.setItem(SK,JSON.stringify({i:hIdx,d:history}))}catch(e){}
+}
+function restore(j){if(!j)return;restoring=true;cv.loadFromJSON(j,()=>{cv.renderAll();restoring=false;updateLayers()})}
+function loadSaved(){try{const s=localStorage.getItem(SK);if(s){const p=JSON.parse(s);history=p.d;hIdx=p.i;restore(history[hIdx]);return true}}catch(e){}return false}
+
+// Layers
+function updateLayers(){
+  const el=document.getElementById('layer-list');if(!el)return;
+  const objs=cv.getObjects();
+  if(!objs.length){el.innerHTML='<div style="text-align:center;color:#475569;font-size:11px;padding:8px">No layers</div>';return}
+  let h='';
+  for(let i=objs.length-1;i>=0;i--){
+    const o=objs[i];let ic='fa-layer-group',nm='Layer';
+    if(o.type==='textbox'){ic='fa-font';nm=(o.text||'Text').substring(0,18)}
+    else if(o.type==='image'){ic='fa-image';nm=o.isBackground?'Background':o.isOverlay?'Overlay':'Image'}
+    else if(o.type==='group'){ic='fa-object-group';nm='Card Group'}
+    else if(o.type==='rect'){ic='fa-square';nm=o.isOverlay?'Overlay':'Shape'}
+    const act=cv.getActiveObject()===o?'active':'';
+    h+=`<div class="layer-item ${act}" onclick="QF.selectLayer(${i})"><div><i class="fas ${ic}"></i>${nm}</div><button class="layer-del" onclick="event.stopPropagation();QF.delLayer(${i})"><i class="fas fa-trash"></i></button></div>`;
+  }
+  el.innerHTML=h;
+}
+
+// Floating Toolbar
+function showToolbar(){
+  const obj=cv.getActiveObject(),tb=document.getElementById('float-toolbar');
+  if(!obj||obj.isBackground||obj.isOverlay){tb.style.display='none';return}
+  const isText=obj.type==='textbox';
+  document.getElementById('tb-font').style.display=isText?'':'none';
+  document.getElementById('tb-size').style.display=isText?'':'none';
+  document.getElementById('tb-color').style.display=isText?'':'none';
+  tb.querySelectorAll('.tb-sep').forEach((s,i)=>{s.style.display=i<3?(isText?'':'none'):''});
+  if(isText){
+    document.getElementById('tb-font').value=obj.fontFamily||'Anton';
+    document.getElementById('tb-size').value=obj.fontSize||100;
+    document.getElementById('tb-color').value=obj.fill||'#ffffff';
+  }
+  positionToolbar();
+  tb.style.display='flex';
+}
+function positionToolbar(){
+  const obj=cv.getActiveObject(),tb=document.getElementById('float-toolbar');
+  if(!obj)return;
+  const br=obj.getBoundingRect(),wrap=document.getElementById('artboard-wrap');
+  const wr=wrap.getBoundingClientRect();
+  const scale=parseFloat(wrap.style.transform?.match(/scale\(([^)]+)\)/)?.[1]||1);
+  const x=wr.left+br.left*scale+br.width*scale/2-tb.offsetWidth/2;
+  let y=wr.top+br.top*scale-tb.offsetHeight-12;
+  if(y<60)y=wr.top+(br.top+br.height)*scale+12;
+  tb.style.left=Math.max(8,Math.min(x,window.innerWidth-tb.offsetWidth-8))+'px';
+  tb.style.top=Math.max(60,y)+'px';
+}
+function hideToolbar(){document.getElementById('float-toolbar').style.display='none'}
+
+// Canvas Events
+cv.on('object:added',()=>{if(!restoring){updateLayers();saveState()}});
+cv.on('object:modified',()=>{if(!restoring){saveState();positionToolbar()}});
+cv.on('object:removed',()=>{if(!restoring){updateLayers();saveState()}});
+cv.on('selection:created',()=>{updateLayers();showToolbar()});
+cv.on('selection:updated',()=>{updateLayers();showToolbar()});
+cv.on('selection:cleared',()=>{updateLayers();hideToolbar()});
+cv.on('object:moving',positionToolbar);
+cv.on('object:scaling',positionToolbar);
+
+// Fit Artboard
+function fitArtboard(){
+  const ws=document.getElementById('workspace'),wr=document.getElementById('artboard-wrap');
+  if(!ws||!wr)return;
+  const s=Math.min((ws.clientWidth-80)/cv.width,(ws.clientHeight-80)/cv.height);
+  wr.style.transform=`scale(${s})`;
+  window._scale=s;
+}
+
+// Canvas Object Helpers
+function setBg(url){
+  let old=null;cv.getObjects().forEach(o=>{if(o.isBackground)old=o});if(old)cv.remove(old);
+  fabric.Image.fromURL(url,img=>{
+    const s=Math.max(cv.width/img.width,cv.height/img.height);
+    img.set({scaleX:s,scaleY:s,left:cv.width/2,top:cv.height/2,originX:'center',originY:'center',selectable:false,evented:false,isBackground:true});
+    cv.insertAt(img,0);
+    let ov=null;cv.getObjects().forEach(o=>{if(o.isOverlay)ov=o});
+    if(!ov){
+      cv.insertAt(new fabric.Rect({width:cv.width,height:cv.height,left:0,top:0,fill:new fabric.Gradient({type:'linear',coords:{x1:0,y1:cv.height,x2:0,y2:0},colorStops:[{offset:0,color:'rgba(0,0,0,0.9)'},{offset:1,color:'rgba(0,0,0,0.3)'}]}),selectable:false,evented:false,isOverlay:true}),1);
+    }
+  },{crossOrigin:'anonymous'});
+}
+
+function addTextObj(text,top,left,width,size,font,color){
+  const t=new fabric.Textbox(text.replace(/<br>/gi,'\n').replace(/<[^>]*>/gm,''),{
+    left:parseInt(left)||80,top:parseInt(top)||300,width:parseInt(width)||900,
+    fontSize:parseInt(size)||100,fontFamily:font||'Anton',fill:color||'#fff',
+    textAlign:'left',lineHeight:1.1,charSpacing:0,
+    shadow:new fabric.Shadow({color:'rgba(0,0,0,0.9)',blur:30,offsetY:15})
+  });
+  cv.add(t);cv.setActiveObject(t);return t;
+}
+
+function addCardObj(text,top,left,width){
+  const w=parseInt(width)||600,clean=text.replace(/<br>/gi,'\n').replace(/<[^>]*>/gm,'');
+  const txt=new fabric.Textbox(clean,{width:w-80,fontSize:35,fill:'#fff',fontFamily:'Montserrat',left:40,top:40,originX:'left',originY:'top'});
+  const rect=new fabric.Rect({width:w,height:txt.height+80,fill:'rgba(10,12,18,0.85)',rx:20,ry:20,stroke:'rgba(255,255,255,0.1)',strokeWidth:1,originX:'left',originY:'top'});
+  const g=new fabric.Group([rect,txt],{left:parseInt(left)||80,top:parseInt(top)||600});
+  cv.add(g);cv.setActiveObject(g);return g;
+}
+
+function addImg(url,top,left,width){
+  fabric.Image.fromURL(url,img=>{
+    const s=parseInt(width||400)/img.width;
+    img.set({left:parseInt(left)||50,top:parseInt(top)||50,scaleX:s,scaleY:s});
+    cv.add(img);cv.setActiveObject(img);
+  },{crossOrigin:'anonymous'});
+}
+
+// QuickFare V12 — Features, API, UI (depends on core.js loaded first)
+
+// ========== PUBLIC API (QF namespace) ==========
+window.QF={
+  // State
+  undo(){if(hIdx<=0)return;hIdx--;restore(history[hIdx])},
+  redo(){if(hIdx>=history.length-1)return;hIdx++;restore(history[hIdx])},
+
+  // Preset size
+  applyPreset(){
+    const v=document.getElementById('preset-size').value;if(v==='custom')return;
+    const[w,h]=v.split('x').map(Number);
+    cv.setWidth(w);cv.setHeight(h);
+    cv.getObjects().forEach(o=>{
+      if(o.isBackground){const s=Math.max(w/o.width,h/o.height);o.set({scaleX:s,scaleY:s,left:w/2,top:h/2})}
+      if(o.isOverlay)o.set({width:w,height:h});
+    });
+    cv.renderAll();fitArtboard();saveState();
+  },
+
+  // Elements
+  addText(){addTextObj("TYPE HERE",300,80,900,100,"Anton","#fff")},
+  addCard(){addCardObj("Your compelling message goes here.\nClick to edit and customize.",600,80,700)},
+  uploadImage(e){
+    const f=e.target.files[0];if(!f)return;
+    const r=new FileReader();
+    r.onload=ev=>addImg(ev.target.result,50,50,400);
+    r.readAsDataURL(f);toast("Image uploaded");
+  },
+
+  // Floating toolbar controls
+  setFont(v){const o=cv.getActiveObject();if(o&&o.type==='textbox'){o.set('fontFamily',v);cv.requestRenderAll();saveState()}},
+  setSize(v){const o=cv.getActiveObject();if(o&&o.type==='textbox'){o.set('fontSize',parseInt(v));cv.requestRenderAll();saveState()}},
+  setColor(v){const o=cv.getActiveObject();if(o&&o.type==='textbox'){o.set('fill',v);cv.requestRenderAll();saveState()}},
+  zIndex(d){const o=cv.getActiveObject();if(o){d>0?cv.bringForward(o):cv.sendBackwards(o);saveState();updateLayers()}},
+  deleteActive(){const o=cv.getActiveObject();if(o){cv.remove(o);cv.discardActiveObject();hideToolbar();updateLayers();saveState()}},
+  selectLayer(i){const o=cv.getObjects()[i];if(o){cv.setActiveObject(o);cv.requestRenderAll()}},
+  delLayer(i){const o=cv.getObjects()[i];if(o){cv.remove(o);saveState()}},
+
+  // Filters
+  applyFilters(){
+    const bl=parseInt(document.getElementById('f-blur').value);
+    const br=parseInt(document.getElementById('f-bright').value)/100;
+    let bg=null;cv.getObjects().forEach(o=>{if(o.isBackground)bg=o});
+    if(bg){bg.filters=[];if(bl>0)bg.filters.push(new fabric.Image.filters.Blur({blur:bl/20}));bg.filters.push(new fabric.Image.filters.Brightness({brightness:br-1}));bg.applyFilters();cv.requestRenderAll();setTimeout(saveState,300)}
+  },
+
+  // Templates
+  loadTemplate(t){
+    cv.clear();cv.backgroundColor='#000';
+    if(t==='cover'){document.getElementById('preset-size').value='1748x2480';QF.applyPreset();addTextObj("ULTIMATE\nGUIDE",400,100,1500,200,"Anton","#00F0FF")}
+    else if(t==='viral'){document.getElementById('preset-size').value='1080x1920';QF.applyPreset();addTextObj("3 SECRET\nWEBSITES",300,50,980,150,"Anton","#FF0050")}
+    else if(t==='quote'){document.getElementById('preset-size').value='1080x1080';QF.applyPreset();addCardObj('"The best way to predict the future is to create it."',300,100,880)}
+    else{document.getElementById('preset-size').value='1080x1080';QF.applyPreset()}
+    toast("Template loaded");saveState();
+  },
+
+  // Magic Auto-Create
+  magicCreate(){
+    const mt=document.getElementById('magic-topic').value||"Default Launch Plan";
+    const mc=CFG.COLORS[Math.floor(Math.random()*CFG.COLORS.length)];
+    document.getElementById('preset-size').value='1080x1350';QF.applyPreset();
+    cv.clear();cv.backgroundColor='#000';
+    const k=mt.split(" ");const q=k.length>2?`${k[k.length-2]} ${k[k.length-1]} dark`:`${mt} dark`;
+    toast(`Generating: ${q}`);
+    addTextObj("THE EXCLUSIVE\n"+mt.substring(0,25).toUpperCase()+"...",120,80,920,90,"Oswald",mc);
+    addCardObj("Learn the methodology completely transforming digital strategies and generating exponential value.\n\nClick the link included inside!",850,80,900);
+    fetchPexelsAuto(q);saveState();
+  },
+
+  // Pexels Search
+  searchPexels:fetchPexels,
+
+  // Pillars
+  loadPillars(){
+    const cat=document.getElementById('pillar-cat')?.value||'finance';
+    const g=document.getElementById('pillar-gallery');if(!g)return;g.innerHTML='';
+    (CFG.PILLARS[cat]||[]).forEach(p=>{
+      g.insertAdjacentHTML('beforeend',`<div class="img-card"><img src="${p.u}" alt="${p.n}" loading="lazy"><div class="img-actions"><button class="img-btn" onclick="setBg('${p.u}')">Set Background</button></div></div>`);
+    });
+  },
+
+  // Export
+  exportDesign(){
+    toast("Rendering...");cv.discardActiveObject();hideToolbar();cv.renderAll();
+    setTimeout(()=>{
+      const fmt=document.getElementById('export-fmt').value;
+      const url=cv.toDataURL({format:fmt,quality:.92,multiplier:1});
+      const ov=document.createElement('div');ov.className='modal-overlay';ov.style.display='flex';
+      ov.innerHTML=`<div class="modal-box"><h3 style="color:var(--accent);margin:0 0 16px">Preview</h3><img src="${url}"><div class="row" style="width:100%"><button class="btn" style="justify-content:center" onclick="this.closest('.modal-overlay').remove()">Cancel</button><button class="btn btn-primary" style="justify-content:center" id="dl-btn"><i class="fas fa-download"></i> Download</button></div></div>`;
+      document.body.appendChild(ov);
+      document.getElementById('dl-btn').onclick=()=>{const a=document.createElement('a');a.download=`QuickFare_Export.${fmt}`;a.href=url;a.click();ov.remove();toast("Downloaded!")};
+    },100);
+  },
+
+  // ===== FULL KIT GENERATOR =====
+  async generateKit(){
+    const topic=document.getElementById('kit-topic').value;
+    if(!topic)return toast("Enter a topic first!",true);
+    const checks={cover:document.getElementById('chk-cover').checked,post:document.getElementById('chk-post').checked,reel:document.getElementById('chk-reel').checked,adcopy:document.getElementById('chk-adcopy').checked,script:document.getElementById('chk-script').checked};
+    if(!Object.values(checks).some(v=>v))return toast("Select at least one asset",true);
+    kitAssets={};zip=new JSZip();const imgF=zip.folder("Images"),docF=zip.folder("Strategy");
+
+    try{
+      // Step 1: Qwen AI
+      loader("ANALYZING WITH QWEN-72B...","Generating copy and visual prompts");
+      const schema=`{"pexels_query":"2 word dark cinematic description","ebook":{"title":"Main Title 2-3 words","subtitle":"Punchy subtitle","author":"QUICKFARE"},"post":{"hook":"Aggressive short hook","body":"Elaboration sentence"},"reel":{"hook":"STOP SCROLLING hook","cta":"Call to action"},"meta_ad":"Full PAS facebook ad copy","video_script":"30-second script with [Hook] [Body] [CTA]"}`;
+      const qRes=await fetch("https://openrouter.ai/api/v1/chat/completions",{
+        method:"POST",headers:{"Authorization":`Bearer ${CFG.QWEN}`,"Content-Type":"application/json"},
+        body:JSON.stringify({model:"qwen/qwen-2.5-72b-instruct",messages:[{role:"user",content:`Act as elite digital marketer. Launch kit for: "${topic}". Return ONLY valid JSON matching: ${schema}`}]})
+      });
+      if(!qRes.ok)throw new Error("Qwen API Failed");
+      const qData=await qRes.json();
+      const ai=JSON.parse(qData.choices[0].message.content.replace(/```json/g,'').replace(/```/g,'').trim());
+
+      // Step 2: Pexels
+      loader("SOURCING VISUALS...",`Searching: ${ai.pexels_query}`);
+      let bgUrl=CFG.FALLBACK[0];
+      try{
+        const pRes=await fetch(`https://api.pexels.com/v1/search?query=${ai.pexels_query}&per_page=5`,{headers:{Authorization:CFG.PEXELS}});
+        const pData=await pRes.json();
+        if(pData.photos?.length)bgUrl=pData.photos[Math.floor(Math.random()*pData.photos.length)].src.large2x;
+      }catch(e){}
+
+      // Step 3: Render
+      if(checks.cover){loader("RENDERING COVER...","A5 1748×2480");const d=await renderDesign(1748,2480,bgUrl,"cover",ai.ebook);kitAssets.cover=d;imgF.file("Cover_A5.png",d.split('base64,')[1],{base64:true})}
+      if(checks.post){loader("RENDERING POST...","1080×1080");const d=await renderDesign(1080,1080,bgUrl,"post",ai.post);kitAssets.post=d;imgF.file("Post_1x1.png",d.split('base64,')[1],{base64:true})}
+      if(checks.reel){loader("RENDERING REEL...","1080×1920");const d=await renderDesign(1080,1920,bgUrl,"reel",ai.reel);kitAssets.reel=d;imgF.file("Reel_9x16.png",d.split('base64,')[1],{base64:true})}
+      if(checks.adcopy){kitAssets.adcopy=ai.meta_ad;docF.file("Ad_Copy.txt",ai.meta_ad)}
+      if(checks.script){kitAssets.script=ai.video_script;docF.file("Video_Script.txt",ai.video_script)}
+
+      showDashboard();document.getElementById('zip-btn').style.display='inline-flex';
+      hideLoader();toast("Full Kit Generated!");
+    }catch(err){hideLoader();console.error(err);toast("Generation failed. Try different topic.",true)}
+  },
+
+  downloadZip(){
+    loader("PACKAGING...","Creating ZIP");
+    zip.generateAsync({type:"blob"}).then(b=>{saveAs(b,"QuickFare_Kit.zip");hideLoader();toast("ZIP Downloaded!")});
+  },
+
+  closeDash(){document.getElementById('kit-dashboard').style.display='none'},
+
+  // AI Strategist
+  async aiCampaign(){
+    const tp=document.getElementById('ai-topic').value;
+    const bx=document.getElementById('ai-results');
+    if(!tp)return toast("Enter a topic first",true);
+    bx.style.display='block';bx.innerHTML='<div style="text-align:center;padding:20px"><i class="fas fa-circle-notch fa-spin" style="font-size:20px;color:#00F0FF"></i><p style="margin-top:8px;font-size:12px">Connecting...</p></div>';
+    try{
+      const r=await fetch("https://openrouter.ai/api/v1/chat/completions",{
+        method:"POST",headers:{"Authorization":`Bearer ${CFG.OR}`,"Content-Type":"application/json","HTTP-Referer":"http://localhost"},
+        body:JSON.stringify({model:"meta-llama/llama-3-8b-instruct:free",messages:[{role:"system",content:"Produce elite marketing copy with sections: VIRAL HOOK, AD FRAMEWORK (Problem/Aggression/Solution), DEMOGRAPHICS, VISUAL NODE (3 word photo description)"},{role:"user",content:"Marketing config for: "+tp}]})
+      });
+      if(!r.ok)throw new Error("API blocked");
+      const d=await r.json();let html=d.choices[0].message.content.replace(/```(html)?/gi,'');
+      html+=`<button class="btn btn-magic" style="width:100%;margin-top:12px" onclick="QF.applyAI()"><i class="fas fa-plus-circle"></i> Apply to Canvas</button>`;
+      bx.innerHTML=html;toast("AI Strategy loaded");
+    }catch(e){
+      const mock=mockAI(tp);bx.innerHTML='<div style="font-size:10px;color:#6a6;background:#1b3d2b;padding:4px 8px;border-radius:4px;display:inline-block;margin-bottom:8px"><i class="fas fa-shield-alt"></i> LOCAL FALLBACK</div>'+mock;
+      toast("Using local fallback");
+    }
+  },
+
+  applyAI(){
+    const hook=document.querySelector('#ai-results p')?.innerText;
+    if(!hook)return toast("No AI data",true);
+    addTextObj(hook.substring(0,80).toUpperCase(),300,80,920,100,"Anton");
+    toast("Applied to canvas");saveState();
+  }
+};
+
+// Hidden Render Engine
+function renderDesign(w,h,bgUrl,type,data){
+  return new Promise(resolve=>{
+    hc.clear();hc.setWidth(w);hc.setHeight(h);
+    fabric.Image.fromURL(bgUrl,img=>{
+      const s=Math.max(w/img.width,h/img.height);
+      img.set({scaleX:s,scaleY:s,originX:'center',originY:'center',left:w/2,top:h/2});hc.add(img);
+      hc.add(new fabric.Rect({width:w,height:h,left:0,top:0,fill:new fabric.Gradient({type:'linear',coords:{x1:0,y1:h,x2:0,y2:0},colorStops:[{offset:0,color:'rgba(0,0,0,0.95)'},{offset:1,color:'rgba(0,0,0,0.4)'}]})}));
+      if(type==='cover'){
+        hc.add(new fabric.Textbox(data.title.toUpperCase(),{width:w-200,left:100,top:400,fontSize:180,fontFamily:'Anton',fill:'#00F0FF',shadow:new fabric.Shadow({color:'rgba(0,0,0,0.9)',blur:20,offsetY:10})}));
+        hc.add(new fabric.Textbox(data.subtitle,{width:w-200,left:100,top:700,fontSize:60,fontFamily:'Montserrat',fill:'#fff'}));
+        hc.add(new fabric.Textbox(data.author||"QUICKFARE",{width:w,left:0,top:h-150,fontSize:30,fontFamily:'Montserrat',fill:'#888',textAlign:'center'}));
+      }else if(type==='post'){
+        hc.add(new fabric.Textbox(data.hook.toUpperCase(),{width:900,left:90,top:150,fontSize:110,fontFamily:'Anton',fill:'#00F0FF',shadow:new fabric.Shadow({color:'rgba(0,0,0,0.9)',blur:20,offsetY:10})}));
+        hc.add(new fabric.Rect({width:900,height:350,left:90,top:520,fill:'rgba(15,17,26,0.85)',rx:20,ry:20,stroke:'rgba(255,255,255,0.2)',strokeWidth:2}));
+        hc.add(new fabric.Textbox(data.body,{width:800,left:140,top:560,fontSize:40,fontFamily:'Montserrat',fill:'#fff',lineHeight:1.4}));
+      }else if(type==='reel'){
+        hc.add(new fabric.Textbox(data.hook.toUpperCase(),{width:900,left:90,top:300,fontSize:130,fontFamily:'Anton',fill:'#FF0050',textAlign:'center',shadow:new fabric.Shadow({color:'rgba(0,0,0,0.9)',blur:30,offsetY:15})}));
+        hc.add(new fabric.Rect({width:800,height:140,left:140,top:1500,fill:'#00F0FF',rx:70,ry:70}));
+        hc.add(new fabric.Textbox(data.cta.toUpperCase(),{width:800,left:140,top:1535,fontSize:48,fontFamily:'Montserrat',fill:'#000',textAlign:'center',fontWeight:'bold'}));
+      }
+      hc.renderAll();
+      setTimeout(()=>resolve(hc.toDataURL({format:'png',quality:1})),250);
+    },{crossOrigin:'anonymous'});
+  });
+}
+
+// Dashboard
+function showDashboard(){
+  document.getElementById('kit-dashboard').style.display='block';
+  const g=document.getElementById('kit-grid');g.innerHTML='';
+  ['cover','post','reel'].forEach(t=>{
+    if(kitAssets[t])g.innerHTML+=`<div class="kit-card"><h3>${t} Graphic</h3><img src="${kitAssets[t]}"></div>`;
+  });
+  if(kitAssets.adcopy)g.innerHTML+=`<div class="kit-card"><h3>Ad Copy</h3><pre>${kitAssets.adcopy}</pre><button class="btn btn-sm" onclick="navigator.clipboard.writeText(kitAssets.adcopy);toast('Copied!')"><i class="fas fa-copy"></i> Copy</button></div>`;
+  if(kitAssets.script)g.innerHTML+=`<div class="kit-card"><h3>Video Script</h3><pre>${kitAssets.script}</pre><button class="btn btn-sm" onclick="navigator.clipboard.writeText(kitAssets.script);toast('Copied!')"><i class="fas fa-copy"></i> Copy</button></div>`;
+}
+
+// Pexels
+async function fetchPexels(paginate){
+  const g=document.getElementById('pexels-gallery'),q=document.getElementById('pexels-q').value||'dark abstract';
+  const type=document.getElementById('pexels-type')?.value||'photos',btn=document.getElementById('pexels-more');
+  if(paginate)pexPage++;else{pexPage=1;g.innerHTML='<div style="font-size:11px;color:#00F0FF;grid-column:span 2;text-align:center;padding:16px"><i class="fas fa-sync fa-spin"></i> Fetching...</div>';if(btn)btn.style.display='none'}
+  try{
+    const url=type==='videos'?`https://api.pexels.com/videos/search?query=${q}&per_page=12&page=${pexPage}`:`https://api.pexels.com/v1/search?query=${q}&per_page=12&page=${pexPage}`;
+    const r=await fetch(url,{headers:{Authorization:CFG.PEXELS}});if(!r.ok)throw new Error();
+    const d=await r.json();if(!paginate)g.innerHTML='';
+    const items=type==='videos'?d.videos:d.photos;
+    if(!items?.length){if(btn)btn.style.display='none';return}
+    items.forEach(p=>{
+      if(type==='photos')g.insertAdjacentHTML('beforeend',`<div class="img-card"><img src="${p.src.medium}" loading="lazy"><div class="img-actions"><button class="img-btn" onclick="setBg('${p.src.large2x}')">Background</button><button class="img-btn" onclick="addImg('${p.src.large2x}',50,50,400)">Add Layer</button></div></div>`);
+      else{const vf=p.video_files.find(f=>f.quality==='hd')||p.video_files[0];g.insertAdjacentHTML('beforeend',`<div class="img-card"><img src="${p.image}" loading="lazy"><div style="position:absolute;top:6px;right:6px;background:rgba(0,0,0,.8);padding:4px;border-radius:50%"><i class="fas fa-video" style="font-size:9px;color:#fff"></i></div><div class="img-actions"><button class="img-btn" onclick="setBg('${vf.link}')">Set Video BG</button></div></div>`)}
+    });
+    if(btn){btn.style.display='flex';btn.innerHTML='<i class="fas fa-arrow-down"></i> Load More'}
+  }catch(e){if(!paginate)g.innerHTML='<div style="grid-column:span 2;font-size:10px;color:#94A3B8;text-align:center;padding:12px;border:1px solid rgba(239,68,68,.2);border-radius:8px;background:rgba(239,68,68,.05)">Pexels API error. Try offline library.</div>'}
+}
+
+async function fetchPexelsAuto(q){
+  try{const r=await fetch(`https://api.pexels.com/v1/search?query=${q}&per_page=1`,{headers:{Authorization:CFG.PEXELS}});const d=await r.json();if(d.photos?.length)setBg(d.photos[0].src.large2x);else throw 0}
+  catch(e){setBg(CFG.FALLBACK[Math.floor(Math.random()*CFG.FALLBACK.length)])}
+}
+
+// Mock AI
+function mockAI(topic){
+  const t=topic.toLowerCase();let h,p;
+  if(t.includes('market')||t.includes('sale')){h="Your setup is bleeding money. Fix it.";p="Physical scaling burns cash."}
+  else if(t.includes('fit')||t.includes('health')){h="Everything about calories is wrong.";p="Diet industries sell lies."}
+  else{h="Execute this formula or someone else will.";p="Stagnation equals deletion."}
+  return `<h4>🔥 Viral Hook</h4><p style="color:#fff;font-weight:900">${h.toUpperCase()}</p><h4>🧠 Framework</h4><p><b>Problem:</b> ${p}<br><b>Solution:</b> Deploy the sequence inside.</p><button class="btn btn-magic" style="width:100%;margin-top:12px" onclick="QF.applyAI()"><i class="fas fa-plus-circle"></i> Apply to Canvas</button>`;
+}
+
+// ========== TABS ==========
+document.querySelectorAll('.tab-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('pane-'+btn.dataset.tab).classList.add('active');
+  });
+});
+
+// ========== INIT ==========
+window.onload=()=>{
+  fitArtboard();
+  window.addEventListener('resize',()=>{fitArtboard();if(cv.getActiveObject())positionToolbar()});
+  setTimeout(()=>QF.loadPillars(),300);
+
+  // Zoom
+  document.getElementById('workspace').addEventListener('wheel',e=>{
+    if(e.ctrlKey||e.metaKey){e.preventDefault();window._scale=Math.max(.1,Math.min((window._scale||1)+(e.deltaY>0?-.05:.05),3));document.getElementById('artboard-wrap').style.transform=`scale(${window._scale})`}
+  },{passive:false});
+
+  // Keyboard
+  window.addEventListener('keydown',e=>{
+    if(e.ctrlKey&&e.key==='z'){e.preventDefault();QF.undo()}
+    if(e.ctrlKey&&e.key==='y'){e.preventDefault();QF.redo()}
+    if(e.key==='Delete'&&cv.getActiveObject()&&!cv.getActiveObject().isEditing)QF.deleteActive();
+  });
+
+  // Load or default
+  if(!loadSaved()){
+    setBg("https://images.pexels.com/photos/1743165/pexels-photo-1743165.jpeg?auto=compress&cs=tinysrgb&w=1920");
+    setTimeout(()=>{addTextObj("QUICKFARE\nSTUDIO V12",300,80,900,130,"Anton","#fff");addCardObj("Fabric.js canvas — double-click text to edit.\nSelect any layer to see the floating toolbar.",620,80,850)},400);
+  }
+  toast("Studio V12 Ready");
+};
+</script>
+</body>
+</html>
