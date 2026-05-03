@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuickFare Ultimate Studio V12 | AI Design & Business Kit Engine</title>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Bebas+Neue&family=Cinzel:wght@700&family=Montserrat:ital,wght@0,400;0,700;0,900;1,900&family=Oswald:wght@500;700&family=Playfair+Display:ital,wght@0,700;1,700&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+</head>
+<body>
+
+    <div class="navbar">
+        <div class="logo">QuickFare <span>Studio V12</span></div>
+        <div class="nav-controls">
+            <!-- Canvas Controls -->
+            <span id="canvas-controls" style="display:flex; gap:12px; align-items:center;">
+                <button class="btn btn-icon" onclick="undo()" title="Undo"><i class="fas fa-undo"></i></button>
+                <button class="btn btn-icon" onclick="redo()" title="Redo"><i class="fas fa-redo"></i></button>
+                <button class="btn" onclick="clearCanvasElements()" style="background: #5a0c16; border-color: #aa0000; color:white;"><i class="fas fa-trash-alt"></i> Clean Canvas</button>
+                <select id="export-format" class="nav-select">
+                    <option value="image/png">Lossless PNG</option>
+                    <option value="image/jpeg">Optimized JPEG</option>
+                </select>
+                <button class="btn btn-primary" onclick="exportDesign()"><i class="fas fa-download"></i> Save Final Asset</button>
+            </span>
+            <!-- E-Book Controls -->
+            <span id="ebook-controls" style="display:none; gap:12px; align-items:center;">
+                <button class="btn btn-primary" onclick="window.print()"><i class="fas fa-file-pdf"></i> Export Full Kit (PDF)</button>
+            </span>
+        </div>
+    </div>
+
+    <div class="app-body">
+        <div class="sidebar">
+            <div class="sidebar-tabs">
+                <button class="tab-btn active" onclick="switchTab('design')"><i class="fas fa-layer-group"></i> Design Suite</button>
+                <button class="tab-btn" onclick="switchTab('strategist')"><i class="fas fa-bolt"></i> Auto Magic</button>
+                <button class="tab-btn" onclick="switchTab('ebook')"><i class="fas fa-book"></i> Business Kit</button>
+            </div>
+
+            <!-- TAB 1: DESIGN -->
+            <div id="tab-design" class="tab-content active">
+                <div class="section">
+                    <h3 class="section-title">Canvas Setup</h3>
+                    <div class="input-group">
+                        <select id="preset-size" onchange="applyPresetSize()">
+                            <option value="1080x1080">Insta/FB Post (1080x1080)</option>
+                            <option value="1080x1350">Portrait Feed (1080x1350)</option>
+                            <option value="1080x1920">Reel/Story (1080x1920)</option>
+                            <option value="1200x628">FB Ad Link (1200x628)</option>
+                            <option value="1748x2480">A5 (E-Book Cover) - 1748x2480</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="section" style="background: rgba(185, 0, 255, 0.1); border-left: 4px solid var(--magic);">
+                    <h3 class="section-title" style="color: var(--magic);">MAGIC AUTO-CREATE CANVAS</h3>
+                    <div class="input-group">
+                        <input type="text" id="magic-topic" placeholder="e.g., SEO Guide 2026, Fit Body...">
+                    </div>
+                    <button class="btn btn-magic" style="width: 100%; justify-content:center; padding:15px; font-size:13px;" onclick="magicAutoCreate()"><i class="fas fa-wand-magic-sparkles"></i> 1-CLICK GENERATE DESIGN</button>
+                </div>
+
+                <div class="section">
+                    <h3 class="section-title">Classic Templates</h3>
+                    <div class="template-grid">
+                        <button class="tpl-btn" onclick="loadTemplate('cover')"><i class="fas fa-book"></i> E-Book Cover</button>
+                        <button class="tpl-btn" onclick="loadTemplate('viral')"><i class="fas fa-fire"></i> Viral Reel (9:16)</button>
+                        <button class="tpl-btn" onclick="loadTemplate('quote')"><i class="fas fa-quote-left"></i> Authority Quote</button>
+                        <button class="tpl-btn" onclick="loadTemplate('split')"><i class="fas fa-columns"></i> Split Compare</button>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h3 class="section-title">Manual Elements</h3>
+                    <div class="row">
+                        <button class="btn" style="flex:1; justify-content:center;" onclick="addElement('text')"><i class="fas fa-font"></i> Heading</button>
+                        <button class="btn" style="flex:1; justify-content:center;" onclick="addElement('card')"><i class="fas fa-list-ul"></i> Subtext Box</button>
+                    </div>
+                    <div class="upload-wrapper">
+                        <button class="btn" style="width:100%; justify-content:center; background:#223; color:#fff; border-color:#446;"><i class="fas fa-image"></i> Local System Upload</button>
+                        <input type="file" accept="image/*" onchange="uploadLocalImage(event)">
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h3 class="section-title">Offline Pillar Library</h3>
+                    <div class="input-group" style="margin-bottom: 10px;">
+                        <select id="pillar-category" onchange="loadPillars()">
+                            <option value="finance">Finance & Wealth</option>
+                            <option value="tech">Technology & AI</option>
+                            <option value="ecom">E-Commerce & Retail</option>
+                            <option value="fitness">Health & Fitness</option>
+                            <option value="abstract">Cinematic / Abstract</option>
+                        </select>
+                    </div>
+                    <div class="gallery" id="pillar-gallery" style="max-height: 200px;"></div>
+                </div>
+
+                <div class="section" style="border-bottom: none; flex:1;">
+                    <h3 class="section-title" style="color: #00c4cc;"><i class="fas fa-paintbrush"></i> Canva Connect</h3>
+                    <p style="font-size: 11px; color: #888; margin-top: 0;">Integrate directly with Canva. Get your API key here: <a href="https://www.canva.com/developers/" target="_blank" style="color: #00c4cc; text-decoration: underline;">Canva Developer Portal</a></p>
+                    <div class="search-bar">
+                        <input type="password" id="canva-api-key" placeholder="Enter Canva API Token">
+                        <button onclick="saveCanvaKey()" style="background: #00c4cc; color: white;"><i class="fas fa-save"></i></button>
+                    </div>
+                    <button class="btn" style="width: 100%; justify-content: center; background:#00c4cc; color: white; border: none; font-weight: bold; margin-bottom: 10px;" onclick="exportToCanva()"><i class="fas fa-cloud-upload-alt"></i> Export Canvas to Canva</button>
+                    <button class="btn" style="width: 100%; justify-content: center; background:#222; border:1px dashed #00c4cc;" onclick="importFromCanva()"><i class="fas fa-cloud-download-alt"></i> Import Canva Assets</button>
+                </div>
+
+                <div class="section" style="border-bottom: none; flex:1;">
+                    <h3 class="section-title">Pexels Premium Search</h3>
+                    <div class="search-bar">
+                        <input type="text" id="pexels-search" placeholder="Type prompt (e.g. Neon City)" value="Dark office luxury">
+                        <button onclick="fetchPexels(false)"><i class="fas fa-search"></i></button>
+                    </div>
+                    <div class="gallery" id="pexels-gallery"></div>
+                    <button class="btn" style="width: 100%; justify-content: center; background:#222; border:1px dashed #555;" onclick="fetchPexels(true)">Load Endless Scroller</button>
+                </div>
+            </div>
+
+            <!-- TAB 2: STRATEGIST -->
+            <div id="tab-strategist" class="tab-content">
+                <div class="section" style="border-bottom: none;">
+                    <h3 class="section-title" style="color:var(--accent);"><i class="fas fa-brain"></i> OpenRouter Fallback Logic</h3>
+                    <p style="font-size: 11px; color: #888; margin-top: 0; line-height: 1.6; padding: 10px; background: rgba(0,0,0,0.5); border-radius:6px; border:1px solid #222;">Generates pure marketing hooks. If OpenRouter API hits a strict CORS rejection, the "Ghost Mock" engine flawlessly bridges data instead.</p>
+                    
+                    <div class="input-group" style="margin-top:20px;">
+                        <label style="color:white; font-size:11px;">Detailed Topic Entry:</label>
+                        <textarea id="ai-topic-strategy" placeholder="e.g. Avoiding Freelancing Scams" style="height: 100px; color:#00F0FF; padding:15px; border: 1px solid var(--border);"></textarea>
+                    </div>
+                    <button class="btn btn-primary" style="width: 100%; justify-content: center; padding: 18px; font-size: 13px;" onclick="triggerAICampaign()"><i class="fas fa-cogs"></i> ENGAGE STRATEGY</button>
+                    
+                    <div id="ai-results" class="ai-result-box" style="margin-top:25px;"></div>
+                </div>
+            </div>
+
+            <!-- TAB 3: AI BUSINESS KIT (E-BOOK) -->
+            <div id="tab-ebook" class="tab-content">
+                <div class="section" style="border-bottom: 2px solid var(--qwen); background: rgba(171, 104, 255, 0.05);">
+                    <h3 class="section-title" style="color: var(--qwen);"><i class="fas fa-robot"></i> QWEN AI GENERATOR</h3>
+                    
+                    <button class="btn-ai-secondary" onclick="suggestTopicsEbook()"><i class="fas fa-lightbulb"></i> Suggest Trending Topics</button>
+                    <div id="suggestions-box" class="ai-suggestions">
+                        <div style="font-weight: bold; margin-bottom: 5px; color: white;">Top Niches for Pakistan:</div>
+                        <ul id="suggestions-list"></ul>
+                    </div>
+
+                    <div class="input-group">
+                        <label style="color: var(--qwen);">Enter Your Business Kit Topic</label>
+                        <textarea id="ai-topic-ebook" placeholder="e.g., Freelancing, Weight Loss, WhatsApp Commerce..."></textarea>
+                    </div>
+                    
+                    <button class="btn-ai" onclick="generateEbook()"><i class="fas fa-magic"></i> Auto-Generate Business Kit</button>
+                    <p style="font-size: 10px; color: #888; text-align: center; margin: 0;">Powered by Qwen-72B via OpenRouter</p>
+                </div>
+
+                <div class="section">
+                    <h3 class="section-title">Design Settings</h3>
+                    <div class="input-group">
+                        <label>Kit Theme Color</label>
+                        <select id="theme-selector" onchange="changeThemeEbook()">
+                            <option value="#00F0FF">Cyan (Tech / Freelancing)</option>
+                            <option value="#FFD700">Gold (Finance / Religion)</option>
+                            <option value="#FF0050">Pink (E-Commerce / Social)</option>
+                            <option value="#39FF14">Green (Health / Wellness)</option>
+                            <option value="#FF7B00">Orange (Parenting / Safety)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="section" style="flex:1;">
+                    <h3 class="section-title">Pexels Visuals API</h3>
+                    <div class="search-bar">
+                        <input type="text" id="pexels-search-ebook" placeholder="Search Cover image...">
+                        <button onclick="fetchPexelsEbook()"><i class="fas fa-search"></i></button>
+                    </div>
+                    <div class="gallery" id="pexels-gallery-ebook"></div>
+                    <p style="font-size: 10px; color: #666; text-align: center;">Click 'SET COVER' to update Page 1.<br>Click 'SET OUTRO' to update last page.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- MAIN WORKSPACE -->
+        <div class="workspace" id="workspace">
+            
+            <!-- CANVAS WRAPPER -->
+            <div id="artboard-wrapper">
+                <div id="artboard">
+                    <img id="bg-img" class="layer-bg" src="https://images.unsplash.com/photo-1628156108169-f815598fb28c?q=80&w=1920&auto=format&fit=crop" crossorigin="anonymous" draggable="false">
+                    <div id="bg-overlay" class="layer-overlay" style="background: linear-gradient(to top, rgba(0,0,0,0.9), rgba(0,0,0,0.3));"></div>
+                    
+                    <div class="element el-text" id="el-default" style="top: 300px; left: 80px; width: 900px; color: #fff; z-index: 10; font-family: 'Anton', sans-serif; font-size: 130px;">QUICKFAIR<br><span style="color:#00F0FF;">V12 ALIVE.</span></div>
+                    
+                    <div class="element el-card" id="el-sub" style="top: 600px; left: 80px; width: 850px; background: rgba(20,20,25,0.7); backdrop-filter:blur(20px); border-radius:20px; padding:40px; border:1px solid rgba(255,255,255,0.2); color: white; font-family: 'Montserrat', sans-serif; font-size: 38px; font-weight:700;">Zero font overlaps during rendering.<br>Auto Magic creator available in Left Menu. Drag to customize perfectly.</div>
+                </div>
+            </div>
+
+            <!-- E-BOOK WRAPPER -->
+            <div id="business-kit-wrapper">
+                <!-- PAGE 1: COVER -->
+                <div class="page">
+                    <img id="cover-bg" src="https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?q=80&w=1200&auto=format&fit=crop" class="bg-img" crossorigin="anonymous" alt="Cover BG">
+                    <div class="gradient-overlay"></div>
+                    <div class="page-content" style="justify-content: center; align-items: center; text-align: center;">
+                        <div id="c-badge" contenteditable="true" style="background: var(--danger); color: white; padding: 5px 20px; font-family: 'Oswald', sans-serif; letter-spacing: 5px; font-size: 16px; margin-bottom: 30px; border-radius: 3px; font-weight: bold;">QUICKFARE PRODUCTIONS</div>
+                        <div id="c-title" class="h-title" contenteditable="true" style="font-size: 80px; margin-bottom: 10px;">AI SE <span>AZADI</span></div>
+                        <div id="c-sub" class="h-sub" contenteditable="true" style="color: white; font-size: 22px; letter-spacing: 2px; margin-bottom: 40px; opacity: 0.9;">THE $5,000/MONTH SYSTEMS ARCHITECT</div>
+                        
+                        <div style="margin-top: 50px; border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.6); padding: 25px; border-radius: 15px; backdrop-filter: blur(10px); width: 80%;">
+                            <div id="c-tag" contenteditable="true" style="color: var(--accent); font-size: 18px; margin-bottom: 5px; font-weight: 700; font-family: 'Montserrat', sans-serif;">FOR PAKISTANI FREELANCERS ONLY</div>
+                            <div id="c-desc" class="p-text" contenteditable="true" style="margin: 0; color: #ccc;">Manual "Gadha Mazdoori" Se Nikaal Kar<br>Automated Systems Banne Ka Mukammal Safar (2026 Edition)</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PAGE 2: WARNING -->
+                <div class="page">
+                    <div class="page-content" style="justify-content: center; align-items: center; text-align: center;">
+                        <div style="width: 80px; height: 80px; border: 4px solid var(--danger); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 30px;">
+                            <span id="w-badge" contenteditable="true" style="color: var(--danger); font-size: 30px; font-weight: bold; font-family: 'Oswald', sans-serif;">18+</span>
+                        </div>
+                        <div class="h-title" contenteditable="true" style="color: var(--danger); font-size: 50px;">WARNING</div>
+                        <div id="w-sub" class="h3" contenteditable="true" style="margin-bottom: 30px; font-size: 24px;">Yeh Masterclass kamzor dil walon ke liye nahi hai.</div>
+                        
+                        <div id="w-p1" class="p-text" contenteditable="true" style="font-size: 16px; max-width: 80%; line-height: 1.8; margin: 0 auto 20px auto;">Zindagi rewind nahi hoti. Jo waqt aapne $5 ki Fiverr gigs par zaya kar diya, wo wapas nahi aayega. 2026 mein rules badal chuke hain. AI aapki job nahi kha raha, woh insan aapki job kha raha hai jo AI ko system banana jaanta hai.</div>
+                        
+                        <div id="w-p2" class="p-text" contenteditable="true" style="font-size: 16px; max-width: 80%; line-height: 1.8; margin: 0 auto 20px auto;">Agar aap abhi bhi samajhte hain ke old methods kaam karenge toh is PDF ko band kar dein.</div>
+                        
+                        <div class="cinematic-box" style="margin-top: 40px; text-align: left; max-width: 80%;">
+                            <p id="w-quote" contenteditable="true">"Duniya badal chuki hai. AI manual jobs kha chuka hai. Ab 'Hard Work' ka zamana nahi raha, ab 'Smart Systems' ka zamana hai."</p>
+                        </div>
+                    </div>
+                    <div class="footer-num">02</div>
+                </div>
+
+                <!-- PAGE 3: TABLE OF CONTENTS -->
+                <div class="page">
+                    <div class="page-content">
+                        <div class="ep-badge" contenteditable="true">Season 1: The Episodes</div>
+                        <div class="h-title" contenteditable="true" style="color: white; margin-bottom: 10px;">BINGE READ THIS</div>
+                        <div class="p-text" contenteditable="true">Jaise aap Netflix par season dekhte hain, is e-book ko bhi wese hi step-by-step parhein.</div>
+
+                        <div class="mac-window" style="margin-top: 30px;">
+                            <div class="mac-header">
+                                <div class="mac-dot" style="background:#ff5f56;"></div><div class="mac-dot" style="background:#ffbd2e;"></div><div class="mac-dot" style="background:#27c93f;"></div>
+                                <div style="color: white; font-size: 12px; margin-left: 10px; opacity: 0.5;">index.html</div>
+                            </div>
+                            <div class="mac-body" style="padding: 30px;">
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 10px;">
+                                    <span id="t-1" style="color: white; font-weight: 700; font-size: 15px; font-family: 'Montserrat', sans-serif;" contenteditable="true">EP 01. The Matrix (Data vs Reality)</span> <span style="color: var(--accent); font-weight: bold;">Page 04</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 10px;">
+                                    <span id="t-2" style="color: white; font-weight: 700; font-size: 15px; font-family: 'Montserrat', sans-serif;" contenteditable="true">EP 02. The Characters (Two Mindsets)</span> <span style="color: var(--accent); font-weight: bold;">Page 05</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 10px;">
+                                    <span id="t-3" style="color: white; font-weight: 700; font-size: 15px; font-family: 'Montserrat', sans-serif;" contenteditable="true">EP 03. The Ecosystem Collapse</span> <span style="color: var(--accent); font-weight: bold;">Page 06</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 10px;">
+                                    <span id="t-4" style="color: white; font-weight: 700; font-size: 15px; font-family: 'Montserrat', sans-serif;" contenteditable="true">EP 04. Systems Architect Blueprint</span> <span style="color: var(--accent); font-weight: bold;">Page 07</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 10px;">
+                                    <span id="t-5" style="color: white; font-weight: 700; font-size: 15px; font-family: 'Montserrat', sans-serif;" contenteditable="true">EP 05. Voice Search Hacking</span> <span style="color: var(--accent); font-weight: bold;">Page 08</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 10px;">
+                                    <span id="t-6" style="color: white; font-weight: 700; font-size: 15px; font-family: 'Montserrat', sans-serif;" contenteditable="true">EP 06. The Digital Robots</span> <span style="color: var(--accent); font-weight: bold;">Page 09</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 10px;">
+                                    <span id="t-7" style="color: white; font-weight: 700; font-size: 15px; font-family: 'Montserrat', sans-serif;" contenteditable="true">EP 07. The Pre-Qualify Funnel</span> <span style="color: var(--accent); font-weight: bold;">Page 10</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 10px;">
+                                    <span id="t-8" style="color: white; font-weight: 700; font-size: 15px; font-family: 'Montserrat', sans-serif;" contenteditable="true">EP 08. Automated Social Commerce</span> <span style="color: var(--accent); font-weight: bold;">Page 11</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 10px;">
+                                    <span id="t-9" style="color: white; font-weight: 700; font-size: 15px; font-family: 'Montserrat', sans-serif;" contenteditable="true">EP 09. Digital Payment Gateways</span> <span style="color: var(--accent); font-weight: bold;">Page 12</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span id="t-10" style="color: white; font-weight: 700; font-size: 15px; font-family: 'Montserrat', sans-serif;" contenteditable="true">EP 10. The 30-Day Escape Plan</span> <span style="color: var(--accent); font-weight: bold;">Page 14</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="footer-num">03</div>
+                </div>
+
+                <!-- PAGE 4: THE DATA (CHART) -->
+                <div class="page">
+                    <div class="page-content">
+                        <div class="ep-header"><span>Episode 01</span><span>The Matrix</span></div>
+                        <div id="d-title" class="h-title" contenteditable="true" style="color: white;">THE SURGE</div>
+                        <div id="d-desc" class="p-text" contenteditable="true">Yeh reality check hai jise ignore nahi kiya ja sakta.</div>
+
+                        <div class="chart-container" style="margin-top: 40px;">
+                            <div id="d-chart" class="h3" style="text-align: center; margin-top: 0; margin-bottom: 20px;" contenteditable="true">Stats Overview</div>
+                            
+                            <div class="bar-wrap">
+                                <div class="bar-label"><span id="d-l1" contenteditable="true">Old Stat</span><span id="d-v1" contenteditable="true">50%</span></div>
+                                <div class="bar-bg"><div class="bar-fill fill-accent" style="width: 50%;"></div></div>
+                            </div>
+                            <div class="bar-wrap">
+                                <div class="bar-label"><span id="d-l2" contenteditable="true">Cost</span><span id="d-v2" contenteditable="true">45%</span></div>
+                                <div class="bar-bg"><div class="bar-fill fill-danger" style="width: 45%;"></div></div>
+                            </div>
+                            <div style="height: 30px;"></div>
+                            <div class="bar-wrap">
+                                <div class="bar-label"><span id="d-l3" contenteditable="true">New Stat</span><span id="d-v3" contenteditable="true">55%</span></div>
+                                <div class="bar-bg"><div class="bar-fill fill-accent" style="width: 55%;"></div></div>
+                            </div>
+                            <div class="bar-wrap">
+                                <div class="bar-label"><span id="d-l4" style="color: var(--danger);" contenteditable="true">Danger Stat</span><span id="d-v4" style="color: var(--danger);" contenteditable="true">85%</span></div>
+                                <div class="bar-bg"><div class="bar-fill fill-danger" style="width: 85%;"></div></div>
+                            </div>
+                        </div>
+
+                        <div class="glow-box">
+                            <div id="d-qtitle" class="h3" contenteditable="true" style="margin-top: 0; color: white;">The Brutal Reality</div>
+                            <div id="d-qdesc" class="p-text" contenteditable="true" style="margin: 0;">Gadha-mazdoori is no longer an option. Aapko high-ticket systems bechne padenge.</div>
+                        </div>
+                    </div>
+                    <div class="footer-num">04</div>
+                </div>
+
+                <!-- PAGE 5: CHARACTERS -->
+                <div class="page">
+                    <div class="page-content">
+                        <div class="ep-header"><span>Episode 02</span><span>Choose Your Fighter</span></div>
+                        <div class="h-title" contenteditable="true" style="color: white;">PERSONA A VS PERSONA B</div>
+                        <div class="p-text" contenteditable="true">Let's meet two professionals. Dekhein aap in mein se kis mindset mein hain.</div>
+
+                        <div class="grid-2" style="margin-top: 30px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                            <div class="mac-window">
+                                <div class="mac-body" style="padding-top: 40px;">
+                                    <div id="char1-title" class="h3" style="color: var(--danger); margin-top: 0;" contenteditable="true">THE VICTIM (Manual)</div>
+                                    <div id="char1-desc" class="p-text" style="font-size: 13px;" contenteditable="true">Ye shakhs 14 ghante online rehta hai. Raat bhar jagta hai.</div>
+                                    <div id="char1-traits" class="p-text" style="font-size: 13px; color: var(--text-muted); margin-bottom: 0;" contenteditable="true">
+                                        <b>Status:</b> High Stress
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mac-window" style="border-color: var(--accent);">
+                                <div class="mac-body" style="padding-top: 40px;">
+                                    <div id="char2-title" class="h3" style="color: var(--accent); margin-top: 0;" contenteditable="true">THE ARCHITECT (System)</div>
+                                    <div id="char2-desc" class="p-text" style="font-size: 13px;" contenteditable="true">Ye shakhs din mein sirf 3 ghante kaam karta hai aur automation use karta hai.</div>
+                                    <div id="char2-traits" class="p-text" style="font-size: 13px; color: var(--text-muted); margin-bottom: 0;" contenteditable="true">
+                                        <b>Status:</b> Financial Freedom
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="footer-num">05</div>
+                </div>
+
+                <!-- PAGE 14: ROADMAP -->
+                <div class="page">
+                    <div class="page-content">
+                        <div class="ep-header"><span>Action</span><span>The Roadmap</span></div>
+                        <div class="h-title" contenteditable="true" style="color: white;">30-DAY ESCAPE PLAN</div>
+                        <div class="p-text" contenteditable="true">Knowledge bina action ke kachra hai. Yeh raha apka blueprint:</div>
+
+                        <div style="border-left: 2px solid var(--accent); padding-left: 25px; margin-top: 40px; margin-left: 10px;">
+                            <div style="position: relative; margin-bottom: 35px;">
+                                <div style="position: absolute; left: -34px; top: 0; width: 14px; height: 14px; background: var(--bg-dark); border: 2px solid var(--accent); border-radius: 50%;"></div>
+                                <div id="rm1-title" class="h3" style="color: var(--accent); margin: 0 0 8px 0;" contenteditable="true">Days 1-10: Phase 1</div>
+                                <div id="rm1-desc" class="p-text" style="margin: 0;" contenteditable="true">Setup your initial systems.</div>
+                            </div>
+                            
+                            <div style="position: relative; margin-bottom: 35px;">
+                                <div style="position: absolute; left: -34px; top: 0; width: 14px; height: 14px; background: var(--bg-dark); border: 2px solid var(--accent); border-radius: 50%;"></div>
+                                <div id="rm2-title" class="h3" style="color: var(--accent); margin: 0 0 8px 0;" contenteditable="true">Days 11-20: Phase 2</div>
+                                <div id="rm2-desc" class="p-text" style="margin: 0;" contenteditable="true">Build the automation pipeline.</div>
+                            </div>
+
+                            <div style="position: relative; margin-bottom: 35px;">
+                                <div style="position: absolute; left: -34px; top: 0; width: 14px; height: 14px; background: var(--bg-dark); border: 2px solid var(--accent); border-radius: 50%;"></div>
+                                <div id="rm3-title" class="h3" style="color: var(--accent); margin: 0 0 8px 0;" contenteditable="true">Days 21-25: Phase 3</div>
+                                <div id="rm3-desc" class="p-text" style="margin: 0;" contenteditable="true">Connect gateways and finalize.</div>
+                            </div>
+
+                            <div style="position: relative;">
+                                <div style="position: absolute; left: -34px; top: 0; width: 14px; height: 14px; background: var(--accent); border: 2px solid var(--accent); border-radius: 50%; box-shadow: 0 0 15px var(--accent);"></div>
+                                <div id="rm4-title" class="h3" style="color: var(--accent); margin: 0 0 8px 0;" contenteditable="true">Days 26-30: The Launch</div>
+                                <div id="rm4-desc" class="p-text" style="margin: 0;" contenteditable="true">Drive traffic and scale.</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="footer-num">14</div>
+                </div>
+
+                <!-- PAGE 15: OUTRO -->
+                <div class="page">
+                    <img id="outro-bg" src="https://images.unsplash.com/photo-1618045952959-1582e219736e?q=80&w=1200&auto=format&fit=crop" class="bg-img" crossorigin="anonymous" alt="Outro">
+                    <div class="gradient-overlay"></div>
+                    <div class="page-content" style="justify-content: center; text-align: center;">
+                        
+                        <div id="o-title" class="h-title" contenteditable="true" style="font-size: 50px;">WELCOME TO THE 1%</div>
+                        <div id="o-desc" class="p-text" contenteditable="true" style="font-size: 18px; max-width: 80%; margin: 0 auto 40px auto; color: white;">Aapne yeh eBook parh li hai. Ab aapke paas 2 raste hain. Ya toh wapis ja kar manual hustle karein, ya is System ko aaj hi build karna shuru karein.</div>
+
+                        <div style="background: rgba(0,0,0,0.8); border: 1px solid var(--accent); padding: 40px; border-radius: 15px; display: inline-block;">
+                            <div id="o-box" class="h3" contenteditable="true" style="color: var(--accent); margin-top: 0; font-size: 24px; text-transform:uppercase;">JOIN THE EXCLUSIVE CLUB</div>
+                            <div class="p-text" contenteditable="true" style="font-size: 14px; margin-bottom: 20px;">Humari private community join karein jahan hum live automations banate hain.</div>
+                            <div contenteditable="true" style="font-size: 12px; color: var(--danger); margin-bottom: 0; font-weight: bold; font-family: 'Montserrat', sans-serif;">(LIMITED SEATS AVAILABLE)</div>
+                        </div>
+                    </div>
+                    <div class="footer-num">15</div>
+                </div>
+
+                <!-- PAGE 16: MARKETING POSTS & STRATEGY -->
+                <div class="page">
+                    <div class="page-content">
+                        <div class="ep-header"><span>Bonus</span><span>Marketing Kit</span></div>
+                        <div class="h-title" style="color: white;">LAUNCH STRATEGY & POSTS</div>
+                        
+                        <div class="h3" style="color: var(--accent); margin-top: 20px;"><i class="fas fa-users"></i> Target Audience</div>
+                        <div id="strategy-audience" class="p-text" contenteditable="true">Define who you are targeting here...</div>
+
+                        <div class="h3" style="color: var(--danger);"><i class="fas fa-bullseye"></i> Core Hook</div>
+                        <div id="strategy-hook" class="p-text" contenteditable="true">Write the main hook that grabs attention...</div>
+
+                        <div class="h3" style="color: #1877F2; margin-top: 20px;"><i class="fab fa-facebook"></i> Facebook Post</div>
+                        <div class="glass-panel" id="post-fb" contenteditable="true" style="font-size:14px;">Facebook post copy will appear here...</div>
+
+                        <div class="h3" style="color: #E1306C;"><i class="fab fa-instagram"></i> Instagram Post</div>
+                        <div class="glass-panel" id="post-ig" contenteditable="true" style="font-size:14px;">Instagram post copy will appear here...</div>
+                    </div>
+                    <div class="footer-num">16</div>
+                </div>
+
+                <!-- PAGE 17: VIRAL REEL SCRIPT -->
+                <div class="page">
+                    <div class="page-content">
+                        <div class="ep-header"><span>Bonus</span><span>Video Marketing</span></div>
+                        <div class="h-title" style="color: white;">VIRAL REEL SCRIPT</div>
+                        <div class="p-text" contenteditable="true">A 20-30 second short-form video script to drive massive traffic to your offer.</div>
+                        
+                        <div class="glow-box">
+                            <div class="h3" style="color: var(--danger); margin-top: 0;">[0:00 - 0:03] THE HOOK</div>
+                            <div id="reel-hook" class="p-text" contenteditable="true" style="margin: 0; font-size: 16px; font-weight: bold;">Hook script goes here...</div>
+                        </div>
+
+                        <div class="glow-box" style="border-color: var(--accent);">
+                            <div class="h3" style="color: var(--accent); margin-top: 0;">[0:03 - 0:15] THE VALUE (BODY)</div>
+                            <div id="reel-body" class="p-text" contenteditable="true" style="margin: 0; line-height: 1.8;">Provide value, share the core concept, build tension...</div>
+                        </div>
+
+                        <div class="glow-box" style="border-color: var(--qwen);">
+                            <div class="h3" style="color: var(--qwen); margin-top: 0;">[0:15 - 0:20] THE CALL TO ACTION</div>
+                            <div id="reel-cta" class="p-text" contenteditable="true" style="margin: 0; font-weight: bold; color: white;">Tell them exactly what to do next (e.g., Click the link in bio)...</div>
+                        </div>
+                    </div>
+                    <div class="footer-num">17</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="properties-panel" id="properties-panel">
+            <div class="section">
+                <h3 class="section-title">Background Filters</h3>
+                <div class="input-group">
+                    <label>Blur</label>
+                    <input type="range" id="filter-blur" min="0" max="20" value="0" oninput="applyFilters()">
+                </div>
+                <div class="input-group">
+                    <label>Brightness</label>
+                    <input type="range" id="filter-brightness" min="0" max="200" value="100" oninput="applyFilters()">
+                </div>
+                <div class="input-group">
+                    <label>Grayscale</label>
+                    <input type="range" id="filter-grayscale" min="0" max="100" value="0" oninput="applyFilters()">
+                </div>
+            </div>
+            <div id="layer-properties" style="border-top: 1px solid var(--border); margin-top: 10px;">
+                <div style="text-align: center; color: #555; margin-top: 80px; font-size: 12px; line-height: 1.6;">
+                    <i class="fas fa-mouse-pointer" style="font-size: 40px; margin-bottom: 20px; color:var(--accent); opacity:0.5;"></i><br>Select Layer Matrix on Canvas<br>To Open Config Panel.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- LOADER -->
+    <div id="loader">
+        <div class="spinner"></div>
+        <div id="loader-text" style="color: var(--qwen); font-family: 'Montserrat'; font-weight: 900; font-size: 20px; letter-spacing: 2px;">QWEN IS WRITING YOUR BUSINESS KIT...</div>
+        <div style="color: #888; font-size: 12px; margin-top: 10px;">Please wait 10-30 seconds. Generating E-Book, Strategy, Posts, and Reel Scripts.</div>
+    </div>
+
+    <div id="toast">SYSTEM INITIALIZATION SUCCESSFUL</div>
+
+    <!-- MAIN APP BOOTSTRAP -->
+    <script type="module">
+        import { initUI } from './js/ui.js';
+        import { loadInitialState, saveState } from './js/state.js';
+        import { makeDrag } from './js/canvas.js';
+        import './js/api.js';
+
+        // Initialize UI events
+        initUI();
+
+        // Try to load state, otherwise setup default elements and save initial state
+        if (!loadInitialState()) {
+            document.querySelectorAll('.element').forEach(makeDrag);
+            saveState(); // Save initial blank state
+        }
+    </script>
+</body>
+</html>
