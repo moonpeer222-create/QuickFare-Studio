@@ -7,7 +7,7 @@
 export const CONFIG = {
     CANVA_CLIENT_ID: 'OC-AZ3vyzIPn78C',
     PEXELS_KEY: 'c56L0l6NiI8lQhFccTdyyNwFg75mqhtaXKvWvimcSQVS00wqP1xdoftW',
-    OR_KEY: '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',
+    OR_KEY: 'YOUR_OPENROUTER_API_KEY',
     FALLBACK_URLS: [
         "https://images.unsplash.com/photo-1542838132-92c53300491e?q=80&w=1080",
         "https://images.unsplash.com/photo-1518546305927-5a555bb7020d?q=80&w=1080"
