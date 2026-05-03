@@ -388,11 +388,10 @@ window.startCanvaAuth = async function() {
     
     const codeChallenge = await generateCodeChallenge(codeVerifier);
     const clientId = CONFIG.CANVA_CLIENT_ID;
-    const redirectUri = encodeURIComponent(window.location.href.split('?')[0]);
     
     const scope = "brandtemplate:content:write brandtemplate:content:read comment:read folder:permission:write design:content:read asset:read asset:write design:permission:read design:permission:write comment:write app:read folder:permission:read folder:write design:meta:read app:write design:content:write folder:read brandtemplate:meta:read";
     
-    const authUrl = `https://www.canva.com/api/oauth/authorize?code_challenge_method=s256&response_type=code&client_id=${clientId}&scope=${encodeURIComponent(scope)}&code_challenge=${codeChallenge}&redirect_uri=${redirectUri}`;
+    const authUrl = `https://www.canva.com/api/oauth/authorize?code_challenge_method=s256&response_type=code&client_id=${clientId}&scope=${encodeURIComponent(scope)}&code_challenge=${codeChallenge}`;
     
     window.location.href = authUrl;
 }
