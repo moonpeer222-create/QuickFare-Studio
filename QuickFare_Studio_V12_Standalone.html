@@ -1,0 +1,1798 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuickFare Ultimate Studio V12 | AI Design & Business Kit Engine</title>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Bebas+Neue&family=Cinzel:wght@700&family=Montserrat:ital,wght@0,400;0,700;0,900;1,900&family=Oswald:wght@500;700&family=Playfair+Display:ital,wght@0,700;1,700&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+/* QuickFare Studio Styles */
+:root {
+    --bg-dark: #0a0c10;
+    --panel-bg: #141722;
+    --accent: #00F0FF;
+    --text-main: #ffffff;
+    --border: #2c3145;
+    --danger: #FF0050;
+    --magic: #b900ff;
+    --qwen: #ab68ff;
+    --text-muted: #94a3b8;
+}
+
+* { box-sizing: border-box; }
+body, html { margin: 0; padding: 0; width: 100%; height: 100vh; background-color: var(--bg-dark); color: var(--text-main); font-family: 'Montserrat', sans-serif; overflow: hidden; display: flex; flex-direction: column; }
+
+/* NAVBAR */
+.navbar { height: 65px; background: #000; display: flex; justify-content: space-between; align-items: center; padding: 0 25px; border-bottom: 1px solid var(--border); z-index: 100; box-shadow: 0 4px 30px rgba(0,0,0,0.7); }
+.logo { font-size: 22px; font-weight: 900; letter-spacing: 1.5px; text-transform: uppercase; }
+.logo span { color: var(--accent); }
+.nav-controls { display: flex; gap: 12px; align-items: center; }
+
+.btn { padding: 10px 18px; background: #222; color: white; border: 1px solid #444; border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 8px; font-size: 12px; }
+.btn:hover { background: #333; }
+.btn-primary { background: var(--accent); color: #000; border: none; font-weight: 900; text-transform: uppercase; }
+.btn-primary:hover { background: #fff; box-shadow: 0 0 15px var(--accent); transform: translateY(-2px); }
+.btn-magic { background: linear-gradient(45deg, #00F0FF, var(--magic)); color: white; border: none; font-weight: 900; text-transform: uppercase;}
+.btn-magic:hover { opacity: 0.9; box-shadow: 0 0 20px var(--magic); }
+.btn-icon { padding: 10px; font-size: 14px; border-radius: 50%; } /* For undo/redo */
+
+.btn-ai { background: linear-gradient(45deg, #7b2cbf, #ab68ff); color: white; border: none; padding: 12px; width: 100%; border-radius: 6px; font-weight: 900; cursor: pointer; text-transform: uppercase; font-size: 12px; box-shadow: 0 5px 15px rgba(171, 104, 255, 0.3); margin-bottom: 10px; transition: 0.3s;}
+.btn-ai:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(171, 104, 255, 0.5); }
+.btn-ai-secondary { background: #222; color: #ab68ff; border: 1px solid #ab68ff; padding: 10px; width: 100%; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 12px; margin-bottom: 15px;}
+
+select.nav-select { background: #111; border: 1px solid #444; color: white; padding: 10px; border-radius: 6px; font-weight: bold; font-size: 12px; outline: none; cursor: pointer;}
+
+/* MAIN LAYOUT */
+.app-body { display: flex; flex: 1; height: calc(100vh - 65px); overflow: hidden; }
+
+/* PANELS */
+.sidebar { width: 360px; background: var(--panel-bg); border-right: 1px solid var(--border); display: flex; flex-direction: column; overflow-y: auto; padding-bottom: 20px; }
+.properties-panel { width: 340px; background: var(--panel-bg); border-left: 1px solid var(--border); display: flex; flex-direction: column; overflow-y: auto; padding: 20px; padding-bottom: 50px; }
+
+/* TABS */
+.sidebar-tabs { display: flex; border-bottom: 1px solid var(--border); background: #000; flex-shrink: 0; }
+.tab-btn { flex: 1; padding: 18px 0; text-align: center; background: none; border: none; color: #777; font-weight: bold; cursor: pointer; text-transform: uppercase; font-size: 11px; transition: 0.2s; }
+.tab-btn.active { color: white; border-bottom: 2px solid var(--accent); background: var(--panel-bg); }
+
+.tab-content { flex: 1; display: none; flex-direction: column; }
+.tab-content.active { display: flex; }
+.section { padding: 20px; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+.section-title { font-size: 12px; text-transform: uppercase; color: #888; letter-spacing: 1.5px; margin: 0 0 15px 0; font-weight: bold; display: flex; justify-content: space-between; align-items: center;}
+
+/* INPUTS */
+.input-group { margin-bottom: 15px; }
+.input-group label { display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 6px; color: #bbb; text-transform: uppercase; font-weight: bold; }
+.input-group input[type="text"], .input-group input[type="number"], .input-group select, .input-group textarea, .input-group input[type="range"] { width: 100%; padding: 12px; background: #0b0c10; border: 1px solid #333; color: white; border-radius: 6px; font-family: inherit; font-size: 13px; outline: none; transition: 0.2s; }
+.input-group input:focus, .input-group textarea:focus { border-color: var(--accent); box-shadow: 0 0 5px rgba(0, 240, 255, 0.2); }
+.input-group textarea { height: 90px; resize: vertical; line-height: 1.5; }
+.input-group input[type="color"] { width: 100%; height: 40px; border: none; background: transparent; cursor: pointer; padding: 0; }
+.row { display: flex; gap: 10px; }
+.row .input-group { flex: 1; }
+.row .btn { flex: 1; justify-content: center;}
+
+/* TEMPLATES GRID */
+.template-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.tpl-btn { background: #08090c; border: 1px solid #333; color: white; padding: 15px 10px; border-radius: 8px; cursor: pointer; font-size: 11px; font-weight: bold; transition: 0.2s; text-align: center; }
+.tpl-btn i { display: block; font-size: 22px; margin-bottom: 10px; color: var(--accent); }
+.tpl-btn:hover { border-color: var(--accent); background: #111; transform: translateY(-2px); }
+
+/* GALLERY & SEARCH */
+.search-bar { display: flex; gap: 5px; margin-bottom: 15px; }
+.search-bar input { flex: 1; padding: 12px; background: #08090c; border: 1px solid #333; color: white; border-radius: 6px; }
+.search-bar button { padding: 10px 15px; background: var(--accent); color: #000; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
+.gallery { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; max-height: 400px; overflow-y: auto; padding-right: 5px; }
+.img-card { position: relative; border-radius: 8px; overflow: hidden; border: 2px solid transparent; cursor: pointer; aspect-ratio: 1; background:#000; }
+.img-card img { width: 100%; height: 100%; object-fit: cover; display: block; transition: 0.3s; opacity: 0.8;}
+.img-card:hover img { transform: scale(1.1); opacity: 0.4; }
+.img-actions { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 8px; opacity: 0; transition: 0.3s; }
+.img-card:hover .img-actions { opacity: 1; }
+.img-btn { background: rgba(0,0,0,0.9); color: white; border: 1px solid var(--accent); padding: 8px; font-size: 10px; border-radius: 4px; cursor: pointer; font-weight: bold; width: 85%; text-transform: uppercase;}
+
+/* UPLOAD WRAPPER */
+.upload-wrapper { position: relative; width: 100%; overflow: hidden; display: flex; align-items: center; justify-content: center; margin-top: 15px;}
+.upload-wrapper input[type="file"] { position: absolute; font-size: 100px; opacity: 0; right: 0; top: 0; cursor: pointer; height:100%; width:100%; }
+
+/* AI STRATEGIST BOX */
+.ai-result-box { background: #0b0c10; border: 1px solid #333; border-radius: 8px; padding: 20px; margin-top: 15px; font-size: 13px; line-height: 1.6; color: #ddd; display: none; }
+.ai-result-box h4 { color: var(--accent); margin: 20px 0 8px 0; font-size: 12px; text-transform: uppercase; border-bottom: 1px dashed #333; padding-bottom: 5px; }
+.ai-result-box h4:first-child { margin-top: 0; }
+.tag-pill { display: inline-block; background: rgba(0, 240, 255, 0.1); color: var(--accent); padding: 3px 8px; border-radius: 4px; font-size: 11px; border: 1px solid rgba(0, 240, 255, 0.3); margin: 4px 4px 0 0; font-weight: bold;}
+.ai-suggestions { background: #0b0d12; padding: 10px; border-radius: 6px; font-size: 12px; color: #ccc; margin-bottom: 15px; display: none; border: 1px dashed var(--qwen);}
+.ai-suggestions ul { margin: 5px 0 0 0; padding-left: 20px; }
+.ai-suggestions li { margin-bottom: 5px; cursor: pointer; color: var(--qwen); }
+.ai-suggestions li:hover { text-decoration: underline; }
+
+/* WORKSPACE & CANVAS */
+.workspace { flex: 1; background: #040405; background-image: radial-gradient(#222 1px, transparent 1px); background-size: 25px 25px; display: flex; justify-content: center; align-items: center; overflow: auto; position: relative; }
+#artboard-wrapper { position: relative; box-shadow: 0 0 0 1px #333, 0 40px 100px rgba(0,0,0,0.9); transition: transform 0.1s ease-out; transform-origin: center center; margin: auto;}
+
+#artboard { width: 1080px; height: 1080px; background-color: #000; position: relative; overflow: hidden; }
+
+.layer-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; transition: filter 0.2s; pointer-events: none;}
+.layer-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: transparent; z-index: 2; pointer-events: none; }
+
+/* DRAGGABLES */
+.element { position: absolute; z-index: 10; cursor: move; user-select: none; box-sizing: border-box; }
+.element::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; border: 2px dashed transparent; pointer-events: none; transition: 0.2s; z-index: 999; }
+.element:hover::before { border-color: rgba(255,255,255,0.3); }
+.element.active::before { border-color: var(--accent); border-style: solid; box-shadow: 0 0 15px rgba(0,240,255,0.3); }
+.element[contenteditable="true"] { outline: 2px dashed var(--accent); cursor: text !important; user-select: auto; }
+
+.el-text { font-family: 'Anton', sans-serif; font-size: 100px; color: white; white-space: pre-wrap; word-wrap: break-word; line-height: 1.1; text-transform: uppercase; text-shadow: 0px 10px 20px rgba(0,0,0,0.8); -webkit-text-stroke: 0px transparent; margin: 0; padding: 0; }
+.el-card { background: rgba(15, 15, 20, 0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.15); border-radius: 20px; padding: 40px; width: 600px; color: white; font-family: 'Montserrat', sans-serif; font-size: 35px; line-height: 1.5; box-shadow: 0 30px 60px rgba(0,0,0,0.9); white-space: pre-wrap; word-wrap: break-word; }
+.el-image { width: 400px; height: auto; object-fit: cover; display: block; box-shadow: 0 15px 40px rgba(0,0,0,0.7); border-radius: 0px; }
+
+/* BUSINESS KIT SPECIFIC STYLES (V8) */
+#business-kit-wrapper { display: none; flex-direction: column; align-items: center; gap: 40px; padding: 40px 0; width: 100%; min-height: 100%; }
+.page { width: 210mm; height: 297mm; background: var(--bg-dark); position: relative; overflow: hidden; box-sizing: border-box; box-shadow: 0 10px 40px rgba(0,0,0,0.8); flex-shrink: 0; border: 1px solid #222; }
+.page-content { padding: 25mm 20mm; height: 100%; box-sizing: border-box; display: flex; flex-direction: column; position: relative; z-index: 2; }
+[contenteditable="true"] { outline: none; transition: background 0.2s; border-radius: 4px; }
+[contenteditable="true"]:hover { background: rgba(255,255,255,0.05); box-shadow: 0 0 0 4px rgba(255,255,255,0.05); cursor: text; }[contenteditable="true"]:focus { background: rgba(0, 240, 255, 0.1); box-shadow: 0 0 0 4px rgba(0, 240, 255, 0.1); }
+.h-title { font-family: 'Oswald', sans-serif; font-size: 46px; text-transform: uppercase; margin: 0 0 15px 0; line-height: 1.1; color: #fff; letter-spacing: 1px;}
+.h-title span { color: var(--accent); }
+.h-sub { font-family: 'Oswald', sans-serif; font-size: 30px; margin: 0 0 15px 0; color: var(--accent); text-transform: uppercase; letter-spacing: 1px;}
+.h3 { font-size: 20px; color: white; margin-bottom: 10px; font-weight: 700; font-family: 'Montserrat', sans-serif;}
+.p-text { font-size: 14px; line-height: 1.7; color: var(--text-muted); margin-bottom: 20px; font-weight: 500; font-family: 'Montserrat', sans-serif;}
+.ep-header { display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px; margin-bottom: 30px; font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: var(--accent); font-weight: 700; font-family: 'Montserrat', sans-serif;}
+.ep-badge { display: inline-block; background: var(--danger); color: white; padding: 5px 15px; font-family: 'Oswald', sans-serif; font-size: 16px; letter-spacing: 2px; margin-bottom: 20px; text-transform: uppercase; }
+.glass-panel { background: rgba(21, 24, 33, 0.7); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.05); padding: 25px; border-radius: 15px; margin-bottom: 25px; }
+.glow-box { border-left: 4px solid var(--accent); background: linear-gradient(90deg, rgba(0,240,255,0.05) 0%, transparent 100%); padding: 20px; margin: 20px 0; }
+.cinematic-box { border-left: 4px solid var(--danger); background: linear-gradient(90deg, rgba(229,9,20,0.1) 0%, transparent 100%); padding: 20px; margin-bottom: 25px; }
+.footer-num { position: absolute; bottom: 20px; right: 20px; color: rgba(255,255,255,0.2); font-family: 'Oswald', sans-serif; font-size: 24px; }
+.bg-img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; opacity: 0.20; filter: grayscale(40%); }
+.gradient-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to bottom, rgba(7,8,11,0.2) 0%, rgba(7,8,11,1) 90%); z-index: 1; }
+.mac-window { background: var(--panel-bg); border-radius: 10px; border: 1px solid #333; overflow: hidden; margin-bottom: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+.mac-header { background: #1f2430; padding: 10px 15px; display: flex; gap: 8px; align-items: center; border-bottom: 1px solid #333; }
+.mac-dot { width: 12px; height: 12px; border-radius: 50%; }
+.mac-body { padding: 20px; }
+.chart-container { background: var(--panel-bg); padding: 20px; border-radius: 12px; border: 1px solid #333; margin-bottom: 25px;}
+.bar-wrap { margin-bottom: 15px; }
+.bar-label { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 5px; font-weight: bold; color: white; font-family: 'Montserrat', sans-serif;}
+.bar-bg { width: 100%; background: #222; height: 25px; border-radius: 5px; overflow: hidden; }
+.bar-fill { height: 100%; display: flex; align-items: center; padding-left: 10px; font-size: 12px; font-weight: bold; color: #000; font-family: 'Montserrat', sans-serif;}
+.fill-accent { background: var(--accent); }
+.fill-danger { background: var(--danger); color: white;}
+
+/* LOADER, TOAST & MODAL */
+#loader { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 9999; flex-direction: column; justify-content: center; align-items: center; }
+.spinner { width: 80px; height: 80px; border: 4px solid #222; border-top-color: var(--accent); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 25px; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+#toast { position: fixed; bottom: -100px; left: 50%; transform: translateX(-50%); background: var(--accent); color: #000; padding: 15px 30px; border-radius: 8px; font-weight: bold; font-size: 14px; box-shadow: 0 10px 30px rgba(0,0,0,0.6); transition: 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55); z-index: 10000; text-transform: uppercase;}
+#toast.show { bottom: 50px; }
+
+/* Preview Modal */
+.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 1000; justify-content: center; align-items: center; }
+.modal-content { background: var(--panel-bg); padding: 20px; border-radius: 12px; border: 1px solid var(--border); max-width: 80vw; max-height: 90vh; display: flex; flex-direction: column; align-items: center; }
+.modal-content img { max-width: 100%; max-height: 60vh; border: 1px solid #333; margin-bottom: 20px; }
+
+@media print {
+    body, html { height: auto !important; overflow: visible !important; background: #07080b !important; }
+    .navbar, .sidebar, .properties-panel, #artboard-wrapper { display: none !important; }
+    .workspace { padding: 0 !important; background: none !important; display: block !important; height: auto !important; overflow: visible !important;}
+    .page { margin: 0 !important; box-shadow: none !important; border: none !important; page-break-after: always; break-after: page; }
+    @page { size: A4; margin: 0; }
+    * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+}
+
+</style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+</head>
+<body>
+
+    <div class="navbar">
+        <div class="logo">QuickFare <span>Studio V12</span></div>
+        <div class="nav-controls">
+            <!-- Canvas Controls -->
+            <span id="canvas-controls" style="display:flex; gap:12px; align-items:center;">
+                <button class="btn btn-icon" onclick="undo()" title="Undo"><i class="fas fa-undo"></i></button>
+                <button class="btn btn-icon" onclick="redo()" title="Redo"><i class="fas fa-redo"></i></button>
+                <button class="btn" onclick="clearCanvasElements()" style="background: #5a0c16; border-color: #aa0000; color:white;"><i class="fas fa-trash-alt"></i> Clean Canvas</button>
+                <select id="export-format" class="nav-select">
+                    <option value="image/png">Lossless PNG</option>
+                    <option value="image/jpeg">Optimized JPEG</option>
+                </select>
+                <button class="btn btn-primary" onclick="exportDesign()"><i class="fas fa-download"></i> Save Final Asset</button>
+            </span>
+            <!-- E-Book Controls -->
+            <span id="ebook-controls" style="display:none; gap:12px; align-items:center;">
+                <button class="btn btn-primary" onclick="window.print()"><i class="fas fa-file-pdf"></i> Export Full Kit (PDF)</button>
+            </span>
+        </div>
+    </div>
+
+    <div class="app-body">
+        <div class="sidebar">
+            <div class="sidebar-tabs">
+                <button class="tab-btn active" onclick="switchTab('design')"><i class="fas fa-layer-group"></i> Design Suite</button>
+                <button class="tab-btn" onclick="switchTab('strategist')"><i class="fas fa-bolt"></i> Auto Magic</button>
+                <button class="tab-btn" onclick="switchTab('ebook')"><i class="fas fa-book"></i> Business Kit</button>
+            </div>
+
+            <!-- TAB 1: DESIGN -->
+            <div id="tab-design" class="tab-content active">
+                <div class="section">
+                    <h3 class="section-title">Canvas Setup</h3>
+                    <div class="input-group">
+                        <select id="preset-size" onchange="applyPresetSize()">
+                            <option value="1080x1080">Insta/FB Post (1080x1080)</option>
+                            <option value="1080x1350">Portrait Feed (1080x1350)</option>
+                            <option value="1080x1920">Reel/Story (1080x1920)</option>
+                            <option value="1200x628">FB Ad Link (1200x628)</option>
+                            <option value="1748x2480">A5 (E-Book Cover) - 1748x2480</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="section" style="background: rgba(185, 0, 255, 0.1); border-left: 4px solid var(--magic);">
+                    <h3 class="section-title" style="color: var(--magic);">MAGIC AUTO-CREATE CANVAS</h3>
+                    <div class="input-group">
+                        <input type="text" id="magic-topic" placeholder="e.g., SEO Guide 2026, Fit Body...">
+                    </div>
+                    <button class="btn btn-magic" style="width: 100%; justify-content:center; padding:15px; font-size:13px;" onclick="magicAutoCreate()"><i class="fas fa-wand-magic-sparkles"></i> 1-CLICK GENERATE DESIGN</button>
+                </div>
+
+                <div class="section">
+                    <h3 class="section-title">Classic Templates</h3>
+                    <div class="template-grid">
+                        <button class="tpl-btn" onclick="loadTemplate('cover')"><i class="fas fa-book"></i> E-Book Cover</button>
+                        <button class="tpl-btn" onclick="loadTemplate('viral')"><i class="fas fa-fire"></i> Viral Reel (9:16)</button>
+                        <button class="tpl-btn" onclick="loadTemplate('quote')"><i class="fas fa-quote-left"></i> Authority Quote</button>
+                        <button class="tpl-btn" onclick="loadTemplate('split')"><i class="fas fa-columns"></i> Split Compare</button>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h3 class="section-title">Manual Elements</h3>
+                    <div class="row">
+                        <button class="btn" style="flex:1; justify-content:center;" onclick="addElement('text')"><i class="fas fa-font"></i> Heading</button>
+                        <button class="btn" style="flex:1; justify-content:center;" onclick="addElement('card')"><i class="fas fa-list-ul"></i> Subtext Box</button>
+                    </div>
+                    <div class="upload-wrapper">
+                        <button class="btn" style="width:100%; justify-content:center; background:#223; color:#fff; border-color:#446;"><i class="fas fa-image"></i> Local System Upload</button>
+                        <input type="file" accept="image/*" onchange="uploadLocalImage(event)">
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h3 class="section-title">Offline Pillar Library</h3>
+                    <div class="input-group" style="margin-bottom: 10px;">
+                        <select id="pillar-category" onchange="loadPillars()">
+                            <option value="finance">Finance & Wealth</option>
+                            <option value="tech">Technology & AI</option>
+                            <option value="ecom">E-Commerce & Retail</option>
+                            <option value="fitness">Health & Fitness</option>
+                            <option value="abstract">Cinematic / Abstract</option>
+                        </select>
+                    </div>
+                    <div class="gallery" id="pillar-gallery" style="max-height: 200px;"></div>
+                </div>
+
+                <div class="section" style="border-bottom: none; flex:1;">
+                    <h3 class="section-title">Pexels Premium Search</h3>
+                    <div class="search-bar">
+                        <input type="text" id="pexels-search" placeholder="Type prompt (e.g. Neon City)" value="Dark office luxury">
+                        <button onclick="fetchPexels(false)"><i class="fas fa-search"></i></button>
+                    </div>
+                    <div class="gallery" id="pexels-gallery"></div>
+                    <button class="btn" style="width: 100%; justify-content: center; background:#222; border:1px dashed #555;" onclick="fetchPexels(true)">Load Endless Scroller</button>
+                </div>
+            </div>
+
+            <!-- TAB 2: STRATEGIST -->
+            <div id="tab-strategist" class="tab-content">
+                <div class="section" style="border-bottom: none;">
+                    <h3 class="section-title" style="color:var(--accent);"><i class="fas fa-brain"></i> OpenRouter Fallback Logic</h3>
+                    <p style="font-size: 11px; color: #888; margin-top: 0; line-height: 1.6; padding: 10px; background: rgba(0,0,0,0.5); border-radius:6px; border:1px solid #222;">Generates pure marketing hooks. If OpenRouter API hits a strict CORS rejection, the "Ghost Mock" engine flawlessly bridges data instead.</p>
+                    
+                    <div class="input-group" style="margin-top:20px;">
+                        <label style="color:white; font-size:11px;">Detailed Topic Entry:</label>
+                        <textarea id="ai-topic-strategy" placeholder="e.g. Avoiding Freelancing Scams" style="height: 100px; color:#00F0FF; padding:15px; border: 1px solid var(--border);"></textarea>
+                    </div>
+                    <button class="btn btn-primary" style="width: 100%; justify-content: center; padding: 18px; font-size: 13px;" onclick="triggerAICampaign()"><i class="fas fa-cogs"></i> ENGAGE STRATEGY</button>
+                    
+                    <div id="ai-results" class="ai-result-box" style="margin-top:25px;"></div>
+                </div>
+            </div>
+
+            <!-- TAB 3: AI BUSINESS KIT (E-BOOK) -->
+            <div id="tab-ebook" class="tab-content">
+                <div class="section" style="border-bottom: 2px solid var(--qwen); background: rgba(171, 104, 255, 0.05);">
+                    <h3 class="section-title" style="color: var(--qwen);"><i class="fas fa-robot"></i> QWEN AI GENERATOR</h3>
+                    
+                    <button class="btn-ai-secondary" onclick="suggestTopicsEbook()"><i class="fas fa-lightbulb"></i> Suggest Trending Topics</button>
+                    <div id="suggestions-box" class="ai-suggestions">
+                        <div style="font-weight: bold; margin-bottom: 5px; color: white;">Top Niches for Pakistan:</div>
+                        <ul id="suggestions-list"></ul>
+                    </div>
+
+                    <div class="input-group">
+                        <label style="color: var(--qwen);">Enter Your Business Kit Topic</label>
+                        <textarea id="ai-topic-ebook" placeholder="e.g., Freelancing, Weight Loss, WhatsApp Commerce..."></textarea>
+                    </div>
+                    
+                    <button class="btn-ai" onclick="generateEbook()"><i class="fas fa-magic"></i> Auto-Generate Business Kit</button>
+                    <p style="font-size: 10px; color: #888; text-align: center; margin: 0;">Powered by Qwen-72B via OpenRouter</p>
+                </div>
+
+                <div class="section">
+                    <h3 class="section-title">Design Settings</h3>
+                    <div class="input-group">
+                        <label>Kit Theme Color</label>
+                        <select id="theme-selector" onchange="changeThemeEbook()">
+                            <option value="#00F0FF">Cyan (Tech / Freelancing)</option>
+                            <option value="#FFD700">Gold (Finance / Religion)</option>
+                            <option value="#FF0050">Pink (E-Commerce / Social)</option>
+                            <option value="#39FF14">Green (Health / Wellness)</option>
+                            <option value="#FF7B00">Orange (Parenting / Safety)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="section" style="flex:1;">
+                    <h3 class="section-title">Pexels Visuals API</h3>
+                    <div class="search-bar">
+                        <input type="text" id="pexels-search-ebook" placeholder="Search Cover image...">
+                        <button onclick="fetchPexelsEbook()"><i class="fas fa-search"></i></button>
+                    </div>
+                    <div class="gallery" id="pexels-gallery-ebook"></div>
+                    <p style="font-size: 10px; color: #666; text-align: center;">Click 'SET COVER' to update Page 1.<br>Click 'SET OUTRO' to update last page.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- MAIN WORKSPACE -->
+        <div class="workspace" id="workspace">
+            
+            <!-- CANVAS WRAPPER -->
+            <div id="artboard-wrapper">
+                <div id="artboard">
+                    <img id="bg-img" class="layer-bg" src="https://images.unsplash.com/photo-1628156108169-f815598fb28c?q=80&w=1920&auto=format&fit=crop" crossorigin="anonymous" draggable="false">
+                    <div id="bg-overlay" class="layer-overlay" style="background: linear-gradient(to top, rgba(0,0,0,0.9), rgba(0,0,0,0.3));"></div>
+                    
+                    <div class="element el-text" id="el-default" style="top: 300px; left: 80px; width: 900px; color: #fff; z-index: 10; font-family: 'Anton', sans-serif; font-size: 130px;">QUICKFAIR<br><span style="color:#00F0FF;">V12 ALIVE.</span></div>
+                    
+                    <div class="element el-card" id="el-sub" style="top: 600px; left: 80px; width: 850px; background: rgba(20,20,25,0.7); backdrop-filter:blur(20px); border-radius:20px; padding:40px; border:1px solid rgba(255,255,255,0.2); color: white; font-family: 'Montserrat', sans-serif; font-size: 38px; font-weight:700;">Zero font overlaps during rendering.<br>Auto Magic creator available in Left Menu. Drag to customize perfectly.</div>
+                </div>
+            </div>
+
+            <!-- E-BOOK WRAPPER -->
+            <div id="business-kit-wrapper">
+                <!-- PAGE 1: COVER -->
+                <div class="page">
+                    <img id="cover-bg" src="https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?q=80&w=1200&auto=format&fit=crop" class="bg-img" crossorigin="anonymous" alt="Cover BG">
+                    <div class="gradient-overlay"></div>
+                    <div class="page-content" style="justify-content: center; align-items: center; text-align: center;">
+                        <div id="c-badge" contenteditable="true" style="background: var(--danger); color: white; padding: 5px 20px; font-family: 'Oswald', sans-serif; letter-spacing: 5px; font-size: 16px; margin-bottom: 30px; border-radius: 3px; font-weight: bold;">QUICKFARE PRODUCTIONS</div>
+                        <div id="c-title" class="h-title" contenteditable="true" style="font-size: 80px; margin-bottom: 10px;">AI SE <span>AZADI</span></div>
+                        <div id="c-sub" class="h-sub" contenteditable="true" style="color: white; font-size: 22px; letter-spacing: 2px; margin-bottom: 40px; opacity: 0.9;">THE $5,000/MONTH SYSTEMS ARCHITECT</div>
+                        
+                        <div style="margin-top: 50px; border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.6); padding: 25px; border-radius: 15px; backdrop-filter: blur(10px); width: 80%;">
+                            <div id="c-tag" contenteditable="true" style="color: var(--accent); font-size: 18px; margin-bottom: 5px; font-weight: 700; font-family: 'Montserrat', sans-serif;">FOR PAKISTANI FREELANCERS ONLY</div>
+                            <div id="c-desc" class="p-text" contenteditable="true" style="margin: 0; color: #ccc;">Manual "Gadha Mazdoori" Se Nikaal Kar<br>Automated Systems Banne Ka Mukammal Safar (2026 Edition)</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PAGE 2: WARNING -->
+                <div class="page">
+                    <div class="page-content" style="justify-content: center; align-items: center; text-align: center;">
+                        <div style="width: 80px; height: 80px; border: 4px solid var(--danger); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 30px;">
+                            <span id="w-badge" contenteditable="true" style="color: var(--danger); font-size: 30px; font-weight: bold; font-family: 'Oswald', sans-serif;">18+</span>
+                        </div>
+                        <div class="h-title" contenteditable="true" style="color: var(--danger); font-size: 50px;">WARNING</div>
+                        <div id="w-sub" class="h3" contenteditable="true" style="margin-bottom: 30px; font-size: 24px;">Yeh Masterclass kamzor dil walon ke liye nahi hai.</div>
+                        
+                        <div id="w-p1" class="p-text" contenteditable="true" style="font-size: 16px; max-width: 80%; line-height: 1.8; margin: 0 auto 20px auto;">Zindagi rewind nahi hoti. Jo waqt aapne $5 ki Fiverr gigs par zaya kar diya, wo wapas nahi aayega. 2026 mein rules badal chuke hain. AI aapki job nahi kha raha, woh insan aapki job kha raha hai jo AI ko system banana jaanta hai.</div>
+                        
+                        <div id="w-p2" class="p-text" contenteditable="true" style="font-size: 16px; max-width: 80%; line-height: 1.8; margin: 0 auto 20px auto;">Agar aap abhi bhi samajhte hain ke old methods kaam karenge toh is PDF ko band kar dein.</div>
+                        
+                        <div class="cinematic-box" style="margin-top: 40px; text-align: left; max-width: 80%;">
+                            <p id="w-quote" contenteditable="true">"Duniya badal chuki hai. AI manual jobs kha chuka hai. Ab 'Hard Work' ka zamana nahi raha, ab 'Smart Systems' ka zamana hai."</p>
+                        </div>
+                    </div>
+                    <div class="footer-num">02</div>
+                </div>
+
+                <!-- PAGE 3: TABLE OF CONTENTS -->
+                <div class="page">
+                    <div class="page-content">
+                        <div class="ep-badge" contenteditable="true">Season 1: The Episodes</div>
+                        <div class="h-title" contenteditable="true" style="color: white; margin-bottom: 10px;">BINGE READ THIS</div>
+                        <div class="p-text" contenteditable="true">Jaise aap Netflix par season dekhte hain, is e-book ko bhi wese hi step-by-step parhein.</div>
+
+                        <div class="mac-window" style="margin-top: 30px;">
+                            <div class="mac-header">
+                                <div class="mac-dot" style="background:#ff5f56;"></div><div class="mac-dot" style="background:#ffbd2e;"></div><div class="mac-dot" style="background:#27c93f;"></div>
+                                <div style="color: white; font-size: 12px; margin-left: 10px; opacity: 0.5;">index.html</div>
+                            </div>
+                            <div class="mac-body" style="padding: 30px;">
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 10px;">
+                                    <span id="t-1" style="color: white; font-weight: 700; font-size: 15px; font-family: 'Montserrat', sans-serif;" contenteditable="true">EP 01. The Matrix (Data vs Reality)</span> <span style="color: var(--accent); font-weight: bold;">Page 04</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 10px;">
+                                    <span id="t-2" style="color: white; font-weight: 700; font-size: 15px; font-family: 'Montserrat', sans-serif;" contenteditable="true">EP 02. The Characters (Two Mindsets)</span> <span style="color: var(--accent); font-weight: bold;">Page 05</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 10px;">
+                                    <span id="t-3" style="color: white; font-weight: 700; font-size: 15px; font-family: 'Montserrat', sans-serif;" contenteditable="true">EP 03. The Ecosystem Collapse</span> <span style="color: var(--accent); font-weight: bold;">Page 06</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 10px;">
+                                    <span id="t-4" style="color: white; font-weight: 700; font-size: 15px; font-family: 'Montserrat', sans-serif;" contenteditable="true">EP 04. Systems Architect Blueprint</span> <span style="color: var(--accent); font-weight: bold;">Page 07</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 10px;">
+                                    <span id="t-5" style="color: white; font-weight: 700; font-size: 15px; font-family: 'Montserrat', sans-serif;" contenteditable="true">EP 05. Voice Search Hacking</span> <span style="color: var(--accent); font-weight: bold;">Page 08</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 10px;">
+                                    <span id="t-6" style="color: white; font-weight: 700; font-size: 15px; font-family: 'Montserrat', sans-serif;" contenteditable="true">EP 06. The Digital Robots</span> <span style="color: var(--accent); font-weight: bold;">Page 09</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 10px;">
+                                    <span id="t-7" style="color: white; font-weight: 700; font-size: 15px; font-family: 'Montserrat', sans-serif;" contenteditable="true">EP 07. The Pre-Qualify Funnel</span> <span style="color: var(--accent); font-weight: bold;">Page 10</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 10px;">
+                                    <span id="t-8" style="color: white; font-weight: 700; font-size: 15px; font-family: 'Montserrat', sans-serif;" contenteditable="true">EP 08. Automated Social Commerce</span> <span style="color: var(--accent); font-weight: bold;">Page 11</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 10px;">
+                                    <span id="t-9" style="color: white; font-weight: 700; font-size: 15px; font-family: 'Montserrat', sans-serif;" contenteditable="true">EP 09. Digital Payment Gateways</span> <span style="color: var(--accent); font-weight: bold;">Page 12</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span id="t-10" style="color: white; font-weight: 700; font-size: 15px; font-family: 'Montserrat', sans-serif;" contenteditable="true">EP 10. The 30-Day Escape Plan</span> <span style="color: var(--accent); font-weight: bold;">Page 14</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="footer-num">03</div>
+                </div>
+
+                <!-- PAGE 4: THE DATA (CHART) -->
+                <div class="page">
+                    <div class="page-content">
+                        <div class="ep-header"><span>Episode 01</span><span>The Matrix</span></div>
+                        <div id="d-title" class="h-title" contenteditable="true" style="color: white;">THE SURGE</div>
+                        <div id="d-desc" class="p-text" contenteditable="true">Yeh reality check hai jise ignore nahi kiya ja sakta.</div>
+
+                        <div class="chart-container" style="margin-top: 40px;">
+                            <div id="d-chart" class="h3" style="text-align: center; margin-top: 0; margin-bottom: 20px;" contenteditable="true">Stats Overview</div>
+                            
+                            <div class="bar-wrap">
+                                <div class="bar-label"><span id="d-l1" contenteditable="true">Old Stat</span><span id="d-v1" contenteditable="true">50%</span></div>
+                                <div class="bar-bg"><div class="bar-fill fill-accent" style="width: 50%;"></div></div>
+                            </div>
+                            <div class="bar-wrap">
+                                <div class="bar-label"><span id="d-l2" contenteditable="true">Cost</span><span id="d-v2" contenteditable="true">45%</span></div>
+                                <div class="bar-bg"><div class="bar-fill fill-danger" style="width: 45%;"></div></div>
+                            </div>
+                            <div style="height: 30px;"></div>
+                            <div class="bar-wrap">
+                                <div class="bar-label"><span id="d-l3" contenteditable="true">New Stat</span><span id="d-v3" contenteditable="true">55%</span></div>
+                                <div class="bar-bg"><div class="bar-fill fill-accent" style="width: 55%;"></div></div>
+                            </div>
+                            <div class="bar-wrap">
+                                <div class="bar-label"><span id="d-l4" style="color: var(--danger);" contenteditable="true">Danger Stat</span><span id="d-v4" style="color: var(--danger);" contenteditable="true">85%</span></div>
+                                <div class="bar-bg"><div class="bar-fill fill-danger" style="width: 85%;"></div></div>
+                            </div>
+                        </div>
+
+                        <div class="glow-box">
+                            <div id="d-qtitle" class="h3" contenteditable="true" style="margin-top: 0; color: white;">The Brutal Reality</div>
+                            <div id="d-qdesc" class="p-text" contenteditable="true" style="margin: 0;">Gadha-mazdoori is no longer an option. Aapko high-ticket systems bechne padenge.</div>
+                        </div>
+                    </div>
+                    <div class="footer-num">04</div>
+                </div>
+
+                <!-- PAGE 5: CHARACTERS -->
+                <div class="page">
+                    <div class="page-content">
+                        <div class="ep-header"><span>Episode 02</span><span>Choose Your Fighter</span></div>
+                        <div class="h-title" contenteditable="true" style="color: white;">PERSONA A VS PERSONA B</div>
+                        <div class="p-text" contenteditable="true">Let's meet two professionals. Dekhein aap in mein se kis mindset mein hain.</div>
+
+                        <div class="grid-2" style="margin-top: 30px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                            <div class="mac-window">
+                                <div class="mac-body" style="padding-top: 40px;">
+                                    <div id="char1-title" class="h3" style="color: var(--danger); margin-top: 0;" contenteditable="true">THE VICTIM (Manual)</div>
+                                    <div id="char1-desc" class="p-text" style="font-size: 13px;" contenteditable="true">Ye shakhs 14 ghante online rehta hai. Raat bhar jagta hai.</div>
+                                    <div id="char1-traits" class="p-text" style="font-size: 13px; color: var(--text-muted); margin-bottom: 0;" contenteditable="true">
+                                        <b>Status:</b> High Stress
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mac-window" style="border-color: var(--accent);">
+                                <div class="mac-body" style="padding-top: 40px;">
+                                    <div id="char2-title" class="h3" style="color: var(--accent); margin-top: 0;" contenteditable="true">THE ARCHITECT (System)</div>
+                                    <div id="char2-desc" class="p-text" style="font-size: 13px;" contenteditable="true">Ye shakhs din mein sirf 3 ghante kaam karta hai aur automation use karta hai.</div>
+                                    <div id="char2-traits" class="p-text" style="font-size: 13px; color: var(--text-muted); margin-bottom: 0;" contenteditable="true">
+                                        <b>Status:</b> Financial Freedom
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="footer-num">05</div>
+                </div>
+
+                <!-- PAGE 14: ROADMAP -->
+                <div class="page">
+                    <div class="page-content">
+                        <div class="ep-header"><span>Action</span><span>The Roadmap</span></div>
+                        <div class="h-title" contenteditable="true" style="color: white;">30-DAY ESCAPE PLAN</div>
+                        <div class="p-text" contenteditable="true">Knowledge bina action ke kachra hai. Yeh raha apka blueprint:</div>
+
+                        <div style="border-left: 2px solid var(--accent); padding-left: 25px; margin-top: 40px; margin-left: 10px;">
+                            <div style="position: relative; margin-bottom: 35px;">
+                                <div style="position: absolute; left: -34px; top: 0; width: 14px; height: 14px; background: var(--bg-dark); border: 2px solid var(--accent); border-radius: 50%;"></div>
+                                <div id="rm1-title" class="h3" style="color: var(--accent); margin: 0 0 8px 0;" contenteditable="true">Days 1-10: Phase 1</div>
+                                <div id="rm1-desc" class="p-text" style="margin: 0;" contenteditable="true">Setup your initial systems.</div>
+                            </div>
+                            
+                            <div style="position: relative; margin-bottom: 35px;">
+                                <div style="position: absolute; left: -34px; top: 0; width: 14px; height: 14px; background: var(--bg-dark); border: 2px solid var(--accent); border-radius: 50%;"></div>
+                                <div id="rm2-title" class="h3" style="color: var(--accent); margin: 0 0 8px 0;" contenteditable="true">Days 11-20: Phase 2</div>
+                                <div id="rm2-desc" class="p-text" style="margin: 0;" contenteditable="true">Build the automation pipeline.</div>
+                            </div>
+
+                            <div style="position: relative; margin-bottom: 35px;">
+                                <div style="position: absolute; left: -34px; top: 0; width: 14px; height: 14px; background: var(--bg-dark); border: 2px solid var(--accent); border-radius: 50%;"></div>
+                                <div id="rm3-title" class="h3" style="color: var(--accent); margin: 0 0 8px 0;" contenteditable="true">Days 21-25: Phase 3</div>
+                                <div id="rm3-desc" class="p-text" style="margin: 0;" contenteditable="true">Connect gateways and finalize.</div>
+                            </div>
+
+                            <div style="position: relative;">
+                                <div style="position: absolute; left: -34px; top: 0; width: 14px; height: 14px; background: var(--accent); border: 2px solid var(--accent); border-radius: 50%; box-shadow: 0 0 15px var(--accent);"></div>
+                                <div id="rm4-title" class="h3" style="color: var(--accent); margin: 0 0 8px 0;" contenteditable="true">Days 26-30: The Launch</div>
+                                <div id="rm4-desc" class="p-text" style="margin: 0;" contenteditable="true">Drive traffic and scale.</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="footer-num">14</div>
+                </div>
+
+                <!-- PAGE 15: OUTRO -->
+                <div class="page">
+                    <img id="outro-bg" src="https://images.unsplash.com/photo-1618045952959-1582e219736e?q=80&w=1200&auto=format&fit=crop" class="bg-img" crossorigin="anonymous" alt="Outro">
+                    <div class="gradient-overlay"></div>
+                    <div class="page-content" style="justify-content: center; text-align: center;">
+                        
+                        <div id="o-title" class="h-title" contenteditable="true" style="font-size: 50px;">WELCOME TO THE 1%</div>
+                        <div id="o-desc" class="p-text" contenteditable="true" style="font-size: 18px; max-width: 80%; margin: 0 auto 40px auto; color: white;">Aapne yeh eBook parh li hai. Ab aapke paas 2 raste hain. Ya toh wapis ja kar manual hustle karein, ya is System ko aaj hi build karna shuru karein.</div>
+
+                        <div style="background: rgba(0,0,0,0.8); border: 1px solid var(--accent); padding: 40px; border-radius: 15px; display: inline-block;">
+                            <div id="o-box" class="h3" contenteditable="true" style="color: var(--accent); margin-top: 0; font-size: 24px; text-transform:uppercase;">JOIN THE EXCLUSIVE CLUB</div>
+                            <div class="p-text" contenteditable="true" style="font-size: 14px; margin-bottom: 20px;">Humari private community join karein jahan hum live automations banate hain.</div>
+                            <div contenteditable="true" style="font-size: 12px; color: var(--danger); margin-bottom: 0; font-weight: bold; font-family: 'Montserrat', sans-serif;">(LIMITED SEATS AVAILABLE)</div>
+                        </div>
+                    </div>
+                    <div class="footer-num">15</div>
+                </div>
+
+                <!-- PAGE 16: MARKETING POSTS & STRATEGY -->
+                <div class="page">
+                    <div class="page-content">
+                        <div class="ep-header"><span>Bonus</span><span>Marketing Kit</span></div>
+                        <div class="h-title" style="color: white;">LAUNCH STRATEGY & POSTS</div>
+                        
+                        <div class="h3" style="color: var(--accent); margin-top: 20px;"><i class="fas fa-users"></i> Target Audience</div>
+                        <div id="strategy-audience" class="p-text" contenteditable="true">Define who you are targeting here...</div>
+
+                        <div class="h3" style="color: var(--danger);"><i class="fas fa-bullseye"></i> Core Hook</div>
+                        <div id="strategy-hook" class="p-text" contenteditable="true">Write the main hook that grabs attention...</div>
+
+                        <div class="h3" style="color: #1877F2; margin-top: 20px;"><i class="fab fa-facebook"></i> Facebook Post</div>
+                        <div class="glass-panel" id="post-fb" contenteditable="true" style="font-size:14px;">Facebook post copy will appear here...</div>
+
+                        <div class="h3" style="color: #E1306C;"><i class="fab fa-instagram"></i> Instagram Post</div>
+                        <div class="glass-panel" id="post-ig" contenteditable="true" style="font-size:14px;">Instagram post copy will appear here...</div>
+                    </div>
+                    <div class="footer-num">16</div>
+                </div>
+
+                <!-- PAGE 17: VIRAL REEL SCRIPT -->
+                <div class="page">
+                    <div class="page-content">
+                        <div class="ep-header"><span>Bonus</span><span>Video Marketing</span></div>
+                        <div class="h-title" style="color: white;">VIRAL REEL SCRIPT</div>
+                        <div class="p-text" contenteditable="true">A 20-30 second short-form video script to drive massive traffic to your offer.</div>
+                        
+                        <div class="glow-box">
+                            <div class="h3" style="color: var(--danger); margin-top: 0;">[0:00 - 0:03] THE HOOK</div>
+                            <div id="reel-hook" class="p-text" contenteditable="true" style="margin: 0; font-size: 16px; font-weight: bold;">Hook script goes here...</div>
+                        </div>
+
+                        <div class="glow-box" style="border-color: var(--accent);">
+                            <div class="h3" style="color: var(--accent); margin-top: 0;">[0:03 - 0:15] THE VALUE (BODY)</div>
+                            <div id="reel-body" class="p-text" contenteditable="true" style="margin: 0; line-height: 1.8;">Provide value, share the core concept, build tension...</div>
+                        </div>
+
+                        <div class="glow-box" style="border-color: var(--qwen);">
+                            <div class="h3" style="color: var(--qwen); margin-top: 0;">[0:15 - 0:20] THE CALL TO ACTION</div>
+                            <div id="reel-cta" class="p-text" contenteditable="true" style="margin: 0; font-weight: bold; color: white;">Tell them exactly what to do next (e.g., Click the link in bio)...</div>
+                        </div>
+                    </div>
+                    <div class="footer-num">17</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="properties-panel" id="properties-panel">
+            <div class="section">
+                <h3 class="section-title">Background Filters</h3>
+                <div class="input-group">
+                    <label>Blur</label>
+                    <input type="range" id="filter-blur" min="0" max="20" value="0" oninput="applyFilters()">
+                </div>
+                <div class="input-group">
+                    <label>Brightness</label>
+                    <input type="range" id="filter-brightness" min="0" max="200" value="100" oninput="applyFilters()">
+                </div>
+                <div class="input-group">
+                    <label>Grayscale</label>
+                    <input type="range" id="filter-grayscale" min="0" max="100" value="0" oninput="applyFilters()">
+                </div>
+            </div>
+            <div id="layer-properties" style="border-top: 1px solid var(--border); margin-top: 10px;">
+                <div style="text-align: center; color: #555; margin-top: 80px; font-size: 12px; line-height: 1.6;">
+                    <i class="fas fa-mouse-pointer" style="font-size: 40px; margin-bottom: 20px; color:var(--accent); opacity:0.5;"></i><br>Select Layer Matrix on Canvas<br>To Open Config Panel.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- LOADER -->
+    <div id="loader">
+        <div class="spinner"></div>
+        <div id="loader-text" style="color: var(--qwen); font-family: 'Montserrat'; font-weight: 900; font-size: 20px; letter-spacing: 2px;">QWEN IS WRITING YOUR BUSINESS KIT...</div>
+        <div style="color: #888; font-size: 12px; margin-top: 10px;">Please wait 10-30 seconds. Generating E-Book, Strategy, Posts, and Reel Scripts.</div>
+    </div>
+
+    <div id="toast">SYSTEM INITIALIZATION SUCCESSFUL</div>
+
+    <!-- MAIN APP BOOTSTRAP -->
+    <script>
+// ==========================================
+// SYSTEM CORE: Variables & API Keys
+// ==========================================
+
+// WARNING: In a production environment, these keys should NOT be exposed in client-side code.
+// They should be fetched from a secure backend or injected via environment variables during a build process.
+const CONFIG = {
+    PEXELS_KEY: 'c56L0l6NiI8lQhFccTdyyNwFg75mqhtaXKvWvimcSQVS00wqP1xdoftW',
+    OR_KEY: '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',
+    FALLBACK_URLS: [
+        "https://images.unsplash.com/photo-1542838132-92c53300491e?q=80&w=1080",
+        "https://images.unsplash.com/photo-1518546305927-5a555bb7020d?q=80&w=1080"
+    ],
+    FB_SAFER_URLS: [
+        "https://images.unsplash.com/photo-1555949963-aa79dcee981c?q=80&w=1080",
+        "https://images.unsplash.com/photo-1542404554-4638d15d6d84?q=80&w=1080",
+        "https://images.unsplash.com/photo-1490645935967-10de6ba17061?q=80&w=1080"
+    ],
+    MAGIC_COLORS: ["#00F0FF", "#FF0050", "#39FF14", "#FFD700", "#FF7B00"],
+    IMAGE_PILLARS: {
+        finance:[
+            { name: "Neon Stock Market", url: "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?q=80&w=1080&auto=format&fit=crop" },
+            { name: "Gold Coins Vault", url: "https://images.unsplash.com/photo-1605792657660-596af9009e82?q=80&w=1080&auto=format&fit=crop" },
+            { name: "Stressed Bills", url: "https://images.unsplash.com/photo-1541888073145-207019d08434?q=80&w=1080&auto=format&fit=crop" },
+            { name: "Money Matrix", url: "https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?q=80&w=1080&auto=format&fit=crop" },
+            { name: "Crypto Bitcoin", url: "https://images.unsplash.com/photo-1518546305927-5a555bb7020d?q=80&w=1080&auto=format&fit=crop" },
+            { name: "Calculator Audit", url: "https://images.unsplash.com/photo-1554672408-730436b60dde?q=80&w=1080&auto=format&fit=crop" },
+            { name: "Dark Wallet", url: "https://images.unsplash.com/photo-1628156108169-f815598fb28c?q=80&w=1080&auto=format&fit=crop" },
+            { name: "Laptop Finance", url: "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?q=80&w=1080&auto=format&fit=crop" },
+            { name: "Graph Arrow Down", url: "https://images.unsplash.com/photo-1612012871329-873fdb8c104e?q=80&w=1080&auto=format&fit=crop" },
+            { name: "Luxury Cityscape", url: "https://images.unsplash.com/photo-1449844908441-8829872d2607?q=80&w=1080&auto=format&fit=crop" }
+        ],
+        tech:[
+            { name: "Cyber Code Matrix", url: "https://images.unsplash.com/photo-1555949963-aa79dcee981c?q=80&w=1080&auto=format&fit=crop" },
+            { name: "AI Brain Node", url: "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?q=80&w=1080&auto=format&fit=crop" },
+            { name: "Hacker Hood", url: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?q=80&w=1080&auto=format&fit=crop" },
+            { name: "Robot Hand AI", url: "https://images.unsplash.com/photo-1614064641936-3bce5c5928ea?q=80&w=1080&auto=format&fit=crop" },
+            { name: "Server Room", url: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?q=80&w=1080&auto=format&fit=crop" },
+            { name: "Dark Laptop Code", url: "https://images.unsplash.com/photo-1517048676732-d65bc937f952?q=80&w=1080&auto=format&fit=crop" },
+            { name: "Smartphone Glow", url: "https://images.unsplash.com/photo-1517677129300-07b130802f46?q=80&w=1080&auto=format&fit=crop" },
+            { name: "Abstract Circuit", url: "https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=1080&auto=format&fit=crop" },
+            { name: "Voice UI Search", url: "https://images.unsplash.com/photo-1589254065878-42c9da997008?q=80&w=1080&auto=format&fit=crop" },
+            { name: "Tech Glasses", url: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=1080&auto=format&fit=crop" }
+        ],
+        ecom:[
+            { name: "Neon Shopping Cart", url: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?q=80&w=1080&auto=format&fit=crop" },
+            { name: "Boxes Shipping", url: "https://images.unsplash.com/photo-1580828369019-2224b74aa8bd?q=80&w=1080&auto=format&fit=crop" },
+            { name: "Phone Social Buy", url: "https://images.unsplash.com/photo-1611162617474-5b21e879e113?q=80&w=1080&auto=format&fit=crop" },
+            { name: "Stripe/Cards", url: "https://images.unsplash.com/photo-1563013544-824ae1b704d3?q=80&w=1080&auto=format&fit=crop" },
+            { name: "Retail Shelves Dark", url: "https://images.unsplash.com/photo-1555529771-835f59fc5efe?q=80&w=1080&auto=format&fit=crop" },
+            { name: "Courier Delivery", url: "https://images.unsplash.com/photo-1615460549969-36fa19521a4f?q=80&w=1080&auto=format&fit=crop" },
+            { name: "Shopify Laptop", url: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=1080&auto=format&fit=crop" },
+            { name: "Customer Service Bot", url: "https://images.unsplash.com/photo-1534536281715-e28d76689b4d?q=80&w=1080&auto=format&fit=crop" },
+            { name: "WhatsApp Icon Screen", url: "https://images.unsplash.com/photo-1614680376573-df3480f0c6ff?q=80&w=1080&auto=format&fit=crop" },
+            { name: "Digital Marketing", url: "https://images.unsplash.com/photo-1432888498266-38ffec3eaf0a?q=80&w=1080&auto=format&fit=crop" }
+        ],
+        fitness:[
+            { name: "Green Salad Bowl", url: "https://images.unsplash.com/photo-1490645935967-10de6ba17061?q=80&w=1080&auto=format&fit=crop" },
+            { name: "Dark Gym Iron", url: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=1080&auto=format&fit=crop" },
+            { name: "Measuring Tape Diet", url: "https://images.unsplash.com/photo-1515023115689-589c33041d3c?q=80&w=1080&auto=format&fit=crop" },
+            { name: "Healthy Ingredients", url: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?q=80&w=1080&auto=format&fit=crop" },
+            { name: "Belly Core Fit", url: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=80&w=1080&auto=format&fit=crop" },
+            { name: "Supplements/Pills", url: "https://images.unsplash.com/photo-1584308666744-24d5e4a87e5b?q=80&w=1080&auto=format&fit=crop" },
+            { name: "Running Outdoors", url: "https://images.unsplash.com/photo-1476480862126-209bfaa8edc8?q=80&w=1080&auto=format&fit=crop" },
+            { name: "Water Splash", url: "https://images.unsplash.com/photo-1523362628745-0c100150b504?q=80&w=1080&auto=format&fit=crop" },
+            { name: "Fruits Plate", url: "https://images.unsplash.com/photo-1481349518771-20055b2a7b24?q=80&w=1080&auto=format&fit=crop" },
+            { name: "Mindset Meditation", url: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?q=80&w=1080&auto=format&fit=crop" }
+        ],
+        abstract:[
+            { name: "Black & Neon Glow", url: "https://images.unsplash.com/photo-1618045952959-1582e219736e?q=80&w=1080&auto=format&fit=crop" },
+            { name: "Red Warning Smoke", url: "https://images.unsplash.com/photo-1509114397022-ed747cca3f65?q=80&w=1080&auto=format&fit=crop" },
+            { name: "Cyberpunk City", url: "https://images.unsplash.com/photo-1515630278258-407f66498911?q=80&w=1080&auto=format&fit=crop" },
+            { name: "Islamic Gold Arch", url: "https://images.unsplash.com/photo-1542404554-4638d15d6d84?q=80&w=1080&auto=format&fit=crop" },
+            { name: "Dark Fluid Waves", url: "https://images.unsplash.com/photo-1604871000636-074fa5117945?q=80&w=1080&auto=format&fit=crop" },
+            { name: "Mecca/Kaaba Digital", url: "https://images.unsplash.com/photo-1565552645632-d725f8bfc19a?q=80&w=1080&auto=format&fit=crop" },
+            { name: "Neon Lines Speed", url: "https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=1080&auto=format&fit=crop" },
+            { name: "Danger Lock Alert", url: "https://images.unsplash.com/photo-1633613286991-611fe299c4be?q=80&w=1080&auto=format&fit=crop" },
+            { name: "Broken Glass", url: "https://images.unsplash.com/photo-1515255384510-23e8b6a6cb3c?q=80&w=1080&auto=format&fit=crop" },
+            { name: "Luxury Marble Dark", url: "https://images.unsplash.com/photo-1501166222995-ff4cead2b11d?q=80&w=1080&auto=format&fit=crop" }
+        ]
+    }
+};
+
+
+// --- --- ---
+
+// ==========================================
+// STATE MANAGEMENT (Undo/Redo & Auto-Save)
+// ==========================================
+
+
+
+const STATE_KEY = 'quickfare_canvas_state';
+let history = [];
+let historyIndex = -1;
+let isRestoring = false;
+
+// Call this after any modification to the canvas
+function saveState() {
+    if (isRestoring) return;
+    
+    const artboard = document.getElementById('artboard');
+    if (!artboard) return;
+
+    // Remove active classes before saving so we don't save selection state
+    const activeEl = document.querySelector('.element.active');
+    if (activeEl) activeEl.classList.remove('active');
+
+    // Serialize elements
+    const state = {
+        html: artboard.innerHTML,
+        mxZ: window.mxZ || 20,
+        elCount: window.elCount || 1000
+    };
+
+    // Restore active class
+    if (activeEl) activeEl.classList.add('active');
+
+    // Remove future history if we're branching
+    if (historyIndex < history.length - 1) {
+        history = history.slice(0, historyIndex + 1);
+    }
+
+    history.push(state);
+    
+    // Keep max 50 states
+    if (history.length > 50) {
+        history.shift();
+    } else {
+        historyIndex++;
+    }
+
+    // Save to localStorage
+    try {
+        localStorage.setItem(STATE_KEY, JSON.stringify(state));
+    } catch(e) {
+        console.warn("Could not save to localStorage (quota exceeded or disabled).");
+    }
+}
+
+function undo() {
+    if (historyIndex <= 0) return; // Cannot undo past initial state
+    historyIndex--;
+    restoreState(history[historyIndex]);
+}
+
+function redo() {
+    if (historyIndex >= history.length - 1) return;
+    historyIndex++;
+    restoreState(history[historyIndex]);
+}
+
+function restoreState(state) {
+    if (!state) return;
+    isRestoring = true;
+    
+    const artboard = document.getElementById('artboard');
+    artboard.innerHTML = state.html;
+    window.mxZ = state.mxZ;
+    window.elCount = state.elCount;
+    window.activeEl = null;
+
+    // Rebind events to new DOM elements
+    artboard.querySelectorAll('.element').forEach(el => {
+        makeDrag(el);
+    });
+
+    document.getElementById('layer-properties').innerHTML = `
+        <div style="text-align: center; color: #555; margin-top: 80px; font-size: 12px; line-height: 1.6;">
+            <i class="fas fa-mouse-pointer" style="font-size: 40px; margin-bottom: 20px; color:var(--accent); opacity:0.5;"></i><br>Select Layer Matrix on Canvas<br>To Open Config Panel.
+        </div>`;
+
+    isRestoring = false;
+}
+
+function loadInitialState() {
+    try {
+        const saved = localStorage.getItem(STATE_KEY);
+        if (saved) {
+            const state = JSON.parse(saved);
+            history.push(state);
+            historyIndex = 0;
+            restoreState(state);
+            return true;
+        }
+    } catch(e) {
+        console.warn("Failed to load from localStorage.");
+    }
+    return false;
+}
+
+function clearState() {
+    localStorage.removeItem(STATE_KEY);
+    history = [];
+    historyIndex = -1;
+}
+
+
+// --- --- ---
+
+
+
+
+window.elCount = 1000;
+window.mxZ = 20;
+
+const artboard = document.getElementById('artboard');
+
+function clearCanvasElements() { 
+    artboard.querySelectorAll('.element').forEach(z => z.remove()); 
+    saveState();
+}
+window.clearCanvasElements = clearCanvasElements;
+
+window.addElement = function(t) { 
+    if(t === 'text') addTextObj("TYPE NOW", "200px", "100px", "800px", "100px", "Anton"); 
+    else addCardObj("Highlight target logic here clearly to engage readers seamlessly with your new output.", "400px", "100px", "600px");
+    saveState();
+}
+
+function addTextObj(htm, tp, lft, wd, fs, fm, cl="#fff", ls="0px", lh="1.1", al="left", stk="0px transparent") {
+    let dv = document.createElement('div'); 
+    dv.className = 'element el-text'; 
+    dv.id = 'el-' + window.elCount++;
+    dv.innerHTML = htm; 
+    dv.style.top = tp; 
+    dv.style.left = lft; 
+    dv.style.width = wd; 
+    dv.style.fontSize = fs; 
+    dv.style.fontFamily = fm; 
+    dv.style.color = cl; 
+    dv.style.letterSpacing = ls; 
+    dv.style.lineHeight = lh; 
+    dv.style.textAlign = al; 
+    dv.style.webkitTextStroke = stk; 
+    dv.style.zIndex = ++window.mxZ; 
+    
+    document.getElementById('artboard').appendChild(dv); 
+    makeDrag(dv); 
+    sEl(dv); 
+    return dv;
+}
+window.addTextObj = addTextObj;
+
+function addCardObj(htm, tp, lft, wd, br="20px", clrB="rgba(18,20,25,0.85)") {
+    let cp = document.createElement('div'); 
+    cp.className = 'element el-card'; 
+    cp.id = 'el-' + window.elCount++; 
+    cp.innerHTML = htm; 
+    cp.style.top = tp; 
+    cp.style.left = lft; 
+    cp.style.width = wd; 
+    cp.style.borderRadius = br; 
+    cp.style.background = clrB; 
+    cp.style.zIndex = ++window.mxZ; 
+    
+    document.getElementById('artboard').appendChild(cp); 
+    makeDrag(cp); 
+    sEl(cp); 
+    return cp;
+}
+window.addCardObj = addCardObj;
+
+function addImage(url, tp, lft, wd, br="0px"){
+    let mg = document.createElement('img'); 
+    mg.crossOrigin = 'anonymous'; 
+    mg.draggable = false; 
+    mg.className = 'element el-image'; 
+    mg.id = 'el-' + window.elCount++; 
+    mg.src = url; 
+    mg.style.top = tp; 
+    mg.style.left = lft; 
+    mg.style.width = wd; 
+    mg.style.borderRadius = br; 
+    mg.style.zIndex = ++window.mxZ; 
+    
+    document.getElementById('artboard').appendChild(mg); 
+    makeDrag(mg); 
+    sEl(mg); 
+    return mg;
+}
+window.addImage = addImage;
+
+function bg(url) { 
+    let b = document.getElementById('bg-img'); 
+    if(!b) return;
+    b.crossOrigin = 'anonymous'; 
+    b.src = url; 
+    setTimeout(saveState, 500); // Wait for image to start loading
+}
+window.bg = bg;
+
+window.uploadLocalImage = function(ev){ 
+    let iFn = ev.target.files[0]; 
+    if(!iFn) return; 
+    let rdLObj = new FileReader(); 
+    rdLObj.onload = z => {
+        addImage(z.target.result, "50px", "50px", "400px", "0px");
+        saveState();
+    };
+    rdLObj.readAsDataURL(iFn); 
+    showToast("Upload Active.");
+}
+
+// DRAGGING LOGIC
+function makeDrag(el) {
+    let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+    let hasMoved = false;
+    if (el.tagName === 'IMG') el.draggable = false;
+    
+    el.onmousedown = dragMouseDown;
+
+    function dragMouseDown(e) {
+        if (el.contentEditable === "true") return; // Don't drag while editing
+        e.preventDefault();
+        e.stopPropagation();
+        if (e.target !== el && e.target.nodeName === 'BUTTON') return;
+        
+        sEl(el);
+        el.style.zIndex = ++window.mxZ;
+        hasMoved = false;
+
+        pos3 = e.clientX;
+        pos4 = e.clientY;
+        document.onmouseup = closeDragElement;
+        document.onmousemove = elementDrag;
+    }
+
+    el.ondblclick = function(e) {
+        if (el.classList.contains('el-image')) return;
+        el.contentEditable = "true";
+        el.focus();
+        el.style.cursor = "text";
+        document.execCommand('selectAll', false, null);
+    };
+
+    el.onblur = function() {
+        el.contentEditable = "false";
+        el.style.cursor = "move";
+        saveState(); // Save text changes
+    };
+
+    function elementDrag(e) {
+        e.preventDefault();
+        hasMoved = true;
+        let currentZoom = window.currScale || 1;
+        pos1 = (pos3 - e.clientX) / currentZoom;
+        pos2 = (pos4 - e.clientY) / currentZoom;
+        pos3 = e.clientX;
+        pos4 = e.clientY;
+        el.style.top = (el.offsetTop - pos2) + "px";
+        el.style.left = (el.offsetLeft - pos1) + "px";
+    }
+
+    function closeDragElement() {
+        document.onmouseup = null;
+        document.onmousemove = null;
+        if (hasMoved) saveState();
+    }
+}
+
+// TEMPLATES SETUP
+window.loadTemplate = function(type) {
+    clearCanvasElements();
+    if (type === 'cover') {
+        document.getElementById('preset-size').value = "1748x2480"; window.applyPresetSize();
+        bg("https://images.unsplash.com/photo-1628156108169-f815598fb28c?q=80&w=1920");
+        addTextObj("ULTIMATE<br>GUIDE", "400px", "100px", "1500px", "200px", "Anton", "#00F0FF");
+    } else if (type === 'viral') {
+        document.getElementById('preset-size').value = "1080x1920"; window.applyPresetSize();
+        addTextObj("3 SECRET<br>WEBSITES", "300px", "50px", "980px", "150px", "Anton", "#FF0050");
+    } else if (type === 'quote') {
+        document.getElementById('preset-size').value = "1080x1080"; window.applyPresetSize();
+        addCardObj('"The best way to predict the future is to create it."', "300px", "100px", "880px", "20px", "rgba(0,0,0,0.8)");
+    } else {
+        document.getElementById('preset-size').value = "1080x1080"; window.applyPresetSize();
+    }
+    showToast("Template Loaded.");
+    saveState();
+}
+
+// EXPORT FUNCTION (html2canvas)
+window.exportDesign = function() {
+    showToast("Rendering Final Asset...");
+    if(window.activeEl) window.activeEl.classList.remove('active');
+    
+    let format = document.getElementById('export-format').value;
+    let ext = format === 'image/jpeg' ? 'jpg' : 'png';
+    
+    setTimeout(() => {
+        const artboard = document.getElementById('artboard');
+        const wrapper = document.getElementById('artboard-wrapper');
+        
+        // Unscale the wrapper temporarily to prevent transformation bugs during rendering
+        const oldTransform = wrapper.style.transform;
+        wrapper.style.transform = 'scale(1)';
+
+        html2canvas(artboard, {
+            useCORS: true,
+            allowTaint: false,
+            backgroundColor: "#000000",
+            scale: 2, // High resolution export
+            logging: false
+        }).then(canvas => {
+            // Restore scale
+            wrapper.style.transform = oldTransform;
+
+            // Show preview modal
+            const overlay = document.createElement('div');
+            overlay.className = 'modal-overlay';
+            overlay.style.display = 'flex';
+            
+            const dataUrl = canvas.toDataURL(format, 0.9);
+            
+            overlay.innerHTML = `
+                <div class="modal-content">
+                    <h3 style="color:var(--accent); margin-top:0;">PREVIEW RENDER</h3>
+                    <img src="${dataUrl}" alt="Preview" style="max-height: 60vh; border: 1px solid #333; margin-bottom: 20px;">
+                    <div style="display:flex; gap:10px; width:100%;">
+                        <button class="btn" style="flex:1; justify-content:center;" onclick="this.closest('.modal-overlay').remove()">Cancel</button>
+                        <button class="btn btn-primary" style="flex:1; justify-content:center;" id="btn-confirm-download"><i class="fas fa-download"></i> Download HD Asset</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(overlay);
+
+            document.getElementById('btn-confirm-download').onclick = () => {
+                let link = document.createElement('a');
+                link.download = `QuickFare_Export.${ext}`;
+                link.href = dataUrl;
+                link.click();
+                overlay.remove();
+                showToast("Asset Downloaded Successfully!");
+            };
+
+        }).catch(err => {
+            wrapper.style.transform = oldTransform;
+            showToast("Export failed: " + err.message, true);
+            console.error("Export Error:", err);
+        });
+    }, 100);
+}
+
+// Apply background filters
+window.applyFilters = function() {
+    const blur = document.getElementById('filter-blur').value;
+    const brightness = document.getElementById('filter-brightness').value;
+    const grayscale = document.getElementById('filter-grayscale').value;
+    
+    const bgImg = document.getElementById('bg-img');
+    if (bgImg) {
+        bgImg.style.filter = `blur(${blur}px) brightness(${brightness}%) grayscale(${grayscale}%)`;
+        window.debounceSave();
+    }
+}
+
+
+// --- --- ---
+
+
+
+
+
+
+window.activeEl = null;
+
+// TOAST NOTIFICATION
+function showToast(msg, isErr=false) {
+    const t = document.getElementById('toast'); 
+    t.innerText = msg;
+    t.style.background = isErr ? "var(--danger)" : "var(--accent)"; 
+    t.style.color = isErr ? "#fff" : "#000";
+    t.classList.add('show'); 
+    setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// TAB SWITCHER
+window.switchTab = function(t) {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    
+    const btn = document.querySelector(`.tab-btn[onclick="switchTab('${t}')"]`);
+    if(btn) btn.classList.add('active'); 
+    document.getElementById('tab-' + t).classList.add('active');
+
+    // UI toggles based on active tool mode
+    const artboardWrapper = document.getElementById('artboard-wrapper');
+    const bkWrapper = document.getElementById('business-kit-wrapper');
+    const propsPanel = document.getElementById('properties-panel');
+    const canvasControls = document.getElementById('canvas-controls');
+    const ebookControls = document.getElementById('ebook-controls');
+
+    if (t === 'ebook') {
+        if(artboardWrapper) artboardWrapper.style.display = 'none';
+        if(propsPanel) propsPanel.style.display = 'none';
+        if(canvasControls) canvasControls.style.display = 'none';
+        
+        if(bkWrapper) bkWrapper.style.display = 'flex';
+        if(ebookControls) ebookControls.style.display = 'flex';
+    } else {
+        if(bkWrapper) bkWrapper.style.display = 'none';
+        if(ebookControls) ebookControls.style.display = 'none';
+        
+        if(artboardWrapper) artboardWrapper.style.display = 'block';
+        if(propsPanel) propsPanel.style.display = 'flex';
+        if(canvasControls) canvasControls.style.display = 'flex';
+        fitArtboard();
+    }
+}
+
+// PERFECT ZOOM FIT SCALING
+function fitArtboard() {
+    const workspace = document.getElementById('workspace');
+    const artboard = document.getElementById('artboard');
+    const wrapper = document.getElementById('artboard-wrapper');
+    if(!workspace || !artboard || !wrapper || wrapper.style.display === 'none') return;
+
+    window.currScale = Math.min((workspace.clientWidth - 100) / artboard.clientWidth, (workspace.clientHeight - 100) / artboard.clientHeight);
+    wrapper.style.transform = `scale(${window.currScale})`;
+}
+
+// CANVAS SIZING
+window.applyPresetSize = function() { 
+    const artboard = document.getElementById('artboard');
+    let v = document.getElementById('preset-size').value; 
+    if(v === 'custom') return; 
+    artboard.style.width = v.split('x')[0] + 'px'; 
+    artboard.style.height = v.split('x')[1] + 'px'; 
+    fitArtboard(); 
+    saveState();
+}
+
+// LAYER SELECTION & PROPERTIES
+function sEl(el) {
+    if (window.activeEl) window.activeEl.classList.remove('active');
+    window.activeEl = el;
+    el.classList.add('active');
+    
+    const isImage = el.classList.contains('el-image');
+    
+    document.getElementById('layer-properties').innerHTML = `
+        <div style="padding-bottom: 20px;">
+            <h3 style="color:var(--accent); font-size:14px; text-transform:uppercase; margin-bottom: 20px;">Layer Properties</h3>
+            
+            <div class="row" style="margin-bottom:15px;">
+                <button class="btn" style="flex:1; justify-content:center; background:#334;" onclick="changeZIndex(1)"><i class="fas fa-arrow-up"></i> Bring Forward</button>
+                <button class="btn" style="flex:1; justify-content:center; background:#334;" onclick="changeZIndex(-1)"><i class="fas fa-arrow-down"></i> Send Backward</button>
+            </div>
+
+            <button class="btn" style="width:100%; margin-bottom:15px; justify-content:center; background:#5a0c16; border-color:#aa0000;" onclick="deleteActiveEl()">
+                <i class="fas fa-trash-alt"></i> Delete Selected Layer
+            </button>
+            
+            ${!isImage ? `
+            <div class="input-group">
+                <label>Font Family</label>
+                <select id="font-picker" onchange="changeFont(this.value)">
+                    <option value="Anton" ${el.style.fontFamily.includes('Anton') ? 'selected' : ''}>Anton</option>
+                    <option value="Montserrat" ${el.style.fontFamily.includes('Montserrat') ? 'selected' : ''}>Montserrat</option>
+                    <option value="Oswald" ${el.style.fontFamily.includes('Oswald') ? 'selected' : ''}>Oswald</option>
+                    <option value="Bebas Neue" ${el.style.fontFamily.includes('Bebas Neue') ? 'selected' : ''}>Bebas Neue</option>
+                    <option value="Space Grotesk" ${el.style.fontFamily.includes('Space Grotesk') ? 'selected' : ''}>Space Grotesk</option>
+                    <option value="Playfair Display" ${el.style.fontFamily.includes('Playfair') ? 'selected' : ''}>Playfair Display</option>
+                    <option value="Cinzel" ${el.style.fontFamily.includes('Cinzel') ? 'selected' : ''}>Cinzel</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label>Font Size</label>
+                <input type="number" value="${parseInt(el.style.fontSize) || 40}" oninput="window.activeEl.style.fontSize = this.value + 'px'; debounceSave()">
+            </div>
+            <div class="input-group">
+                <label>Text Color</label>
+                <input type="color" value="${rgbToHex(el.style.color) || '#ffffff'}" oninput="window.activeEl.style.color = this.value; debounceSave()">
+            </div>
+            <p style="font-size: 11px; color: #888;">Tip: Double-click the text on the canvas to edit it directly.</p>
+            ` : `
+            <p style="font-size: 11px; color: #888;">Image selected. Use corners to resize (coming soon) or drag to move.</p>
+            `}
+        </div>
+    `;
+}
+
+window.changeZIndex = function(direction) {
+    if (window.activeEl) {
+        let currentZ = parseInt(window.activeEl.style.zIndex) || 10;
+        window.activeEl.style.zIndex = currentZ + direction;
+        saveState();
+    }
+}
+
+window.changeFont = function(fontName) {
+    if (window.activeEl) {
+        window.activeEl.style.fontFamily = fontName;
+        saveState();
+    }
+}
+
+let saveTimeout;
+window.debounceSave = function() {
+    clearTimeout(saveTimeout);
+    saveTimeout = setTimeout(saveState, 500);
+}
+
+function rgbToHex(rgb) {
+    if (!rgb || !rgb.startsWith('rgb')) return rgb;
+    const parts = rgb.match(/\d+/g);
+    if (!parts) return rgb;
+    return "#" + parts.slice(0, 3).map(x => {
+        const hex = parseInt(x).toString(16);
+        return hex.length === 1 ? "0" + hex : hex;
+    }).join("");
+}
+
+window.deleteActiveEl = function() {
+    if (window.activeEl) {
+        window.activeEl.remove();
+        window.activeEl = null;
+        document.getElementById('layer-properties').innerHTML = `
+            <div style="text-align: center; color: #555; margin-top: 80px; font-size: 12px; line-height: 1.6;">
+                <i class="fas fa-mouse-pointer" style="font-size: 40px; margin-bottom: 20px; color:var(--accent); opacity:0.5;"></i><br>Select Layer Matrix on Canvas<br>To Open Config Panel.
+            </div>`;
+        saveState();
+    }
+}
+
+// Global UI bindings
+window.undo = undo;
+window.redo = redo;
+
+// Pillar System Logic
+function loadPillars() {
+    const cat = document.getElementById('pillar-category')?.value || 'finance';
+    const gBox = document.getElementById('pillar-gallery');
+    if (!gBox) return;
+    
+    gBox.innerHTML = '';
+    const images = CONFIG.IMAGE_PILLARS[cat] || [];
+    
+    images.forEach(ip => {
+        gBox.insertAdjacentHTML('beforeend', `
+            <div class="img-card">
+                <img src="${ip.url}" alt="${ip.name}">
+                <div class="img-actions">
+                    <button class="img-btn" onclick="bg('${ip.url}')">Set Background</button>
+                </div>
+            </div>
+        `);
+    });
+}
+window.loadPillars = loadPillars;
+
+// Initialize Workspace Events
+function initUI() {
+    const workspace = document.getElementById('workspace');
+    window.addEventListener('resize', fitArtboard); 
+    setTimeout(fitArtboard, 100);
+    setTimeout(loadPillars, 500); // Load initial pillars
+
+    workspace.addEventListener('wheel', e => {
+        if(e.ctrlKey || e.metaKey){ 
+            e.preventDefault(); 
+            if(document.getElementById('artboard-wrapper').style.display !== 'none') {
+                window.currScale = Math.max(0.1, Math.min(window.currScale + (e.deltaY > 0 ? -0.05 : 0.05), 3)); 
+                document.getElementById('artboard-wrapper').style.transform = `scale(${window.currScale})`; 
+            }
+        }
+    }, {passive: false});
+
+    // Deselect on bg click
+    document.getElementById('workspace').addEventListener('mousedown', e => {
+        if(e.target.id === 'bg-img' || e.target.id === 'bg-overlay' || e.target.id === 'artboard' || e.target.id === 'workspace') {
+            if(window.activeEl) {
+                window.activeEl.classList.remove('active');
+                window.activeEl = null;
+                document.getElementById('layer-properties').innerHTML = `
+                    <div style="text-align: center; color: #555; margin-top: 80px; font-size: 12px; line-height: 1.6;">
+                        <i class="fas fa-mouse-pointer" style="font-size: 40px; margin-bottom: 20px; color:var(--accent); opacity:0.5;"></i><br>Select Layer Matrix on Canvas<br>To Open Config Panel.
+                    </div>`;
+            }
+        }
+    });
+
+    // Keyboard Shortcuts (Delete element)
+    document.addEventListener('keydown', e => {
+        if((e.key === 'Delete' || e.key === 'Backspace') && window.activeEl) {
+            // Prevent deleting if user is typing in an input or contenteditable
+            if(e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.contentEditable === "true") return;
+            window.deleteActiveEl();
+        }
+    });
+}
+
+
+// --- --- ---
+
+
+
+
+
+
+let pexPage = 1;
+
+// ==========================================
+// 1. MOCKED AI FALLBACK STRATEGIST (CANVAS)
+// ==========================================
+function mockedAIResponse(topic) {
+    topic = topic.toLowerCase(); 
+    let hook="", pt="", hkg="", sr="";
+    if(topic.includes('market') || topic.includes('finan') || topic.includes('ecommerce') || topic.includes('sale')) {
+        hook = "Your current setup is literally bleeding money. Fix it in 3 clicks."; 
+        pt = "Physical scaling burns through cash."; 
+        hkg="#ScaleDigitally #NoInventory #Ecommerce"; 
+        sr = "Luxury business abstract dark";
+    } else if(topic.includes('fit') || topic.includes('health') || topic.includes('diet')) {
+        hook = "Everything they told you about calories is mathematically wrong."; 
+        pt = "Diet industries sell lies, not results."; 
+        hkg="#RealFitness #BioHacking #DietFacts"; 
+        sr = "dark green healthy organic food";
+    } else {
+        hook = "If you don't execute this formula today, someone else will."; 
+        pt = "Stagnation is equal to deletion in the modern era."; 
+        hkg="#FutureProof #SystemScale #Automation"; 
+        sr = "Dark futuristic neon space";
+    }
+    return `<h4>🔥 VIRAL TRIGGER HOOK</h4><p id="ai-hook" style='color:#fff;font-size:16px;font-weight:900;'>${hook.toUpperCase()}</p><h4>🧠 DIRECT AD FRAMEWORK</h4><p id="ai-frame"><b>PROBLEM MAP:</b> ${pt}<br><b>AGGRESSION LIMIT:</b> Action takers consume entire segments daily avoiding manual friction.<br><b>SOLUTION ROADMAP:</b> Deploy the specific sequence inside mitigating negative resistance.</p><h4>🎯 DEMOGRAPHIC TARGET DIRECTIVES</h4><p>${hkg}</p><h4>🖼️ VISUAL INITIATION NODE</h4><p>Target System Background String Output : <span style='color:var(--accent); font-weight:bold;'>${sr}</span></p><button class="btn btn-magic" style="width:100%; margin-top:15px;" onclick="applyAIResultsToCanvas()"><i class="fas fa-plus-circle"></i> APPLY TO CANVAS</button>`;
+}
+
+window.applyAIResultsToCanvas = function() {
+    const hook = document.getElementById('ai-hook')?.innerText;
+    const frame = document.getElementById('ai-frame')?.innerText;
+    if (!hook) return showToast("No AI data to apply", true);
+
+    addTextObj(hook, "300px", "80px", "920px", "100px", "Anton");
+    if (frame) {
+        addCardObj(frame, "600px", "80px", "850px");
+    }
+    showToast("AI Strategy Synced to Canvas!");
+    saveState();
+}
+
+window.triggerAICampaign = async function() {
+    let tp = document.getElementById('ai-topic-strategy').value; 
+    let bx = document.getElementById('ai-results');
+    if(!tp) return showToast("Provide a detailed topic segment first", true);
+    
+    bx.style.display = "block"; 
+    bx.innerHTML = `<div style="text-align:center;padding:30px;"><i class="fas fa-circle-notch fa-spin" style="font-size:25px;color:cyan;margin-bottom:10px;"></i><p>Pinging OpenRouter AI Engines...</p></div>`;
+
+    const schema = `
+{
+  "hook": "VIRAL TRIGGER HOOK (1 punchy sentence)",
+  "problem_map": "Short description of the problem",
+  "aggression_limit": "Why action is needed now",
+  "solution_roadmap": "The core solution path",
+  "demographic_tags": "#tag1 #tag2 #tag3",
+  "visual_node": "3 visual word descriptors of background photo"
+}`;
+
+    const prompt = `Act as an elite copywriter. Create a direct ad framework for the topic: "${tp}". You MUST return ONLY a valid JSON object matching this exact schema, with no markdown, no backticks: ${schema}`;
+
+    try {
+        let resultText = await robustAIFetch(prompt);
+        let data = extractJSON(resultText);
+        
+        let finalHtml = `
+            <h4>🔥 VIRAL TRIGGER HOOK</h4>
+            <p id="ai-hook" style='color:#fff;font-size:16px;font-weight:900;'>${data.hook}</p>
+            <h4>🧠 DIRECT AD FRAMEWORK</h4>
+            <p id="ai-frame"><b>PROBLEM MAP:</b> ${data.problem_map}<br><b>AGGRESSION LIMIT:</b> ${data.aggression_limit}<br><b>SOLUTION ROADMAP:</b> ${data.solution_roadmap}</p>
+            <h4>🎯 DEMOGRAPHIC TARGET DIRECTIVES</h4>
+            <p>${data.demographic_tags}</p>
+            <h4>🖼️ VISUAL INITIATION NODE</h4>
+            <p>Target System Background String Output : <span style='color:var(--accent); font-weight:bold;'>${data.visual_node}</span></p>
+            <button class="btn btn-magic" style="width:100%; margin-top:15px;" onclick="applyAIResultsToCanvas()"><i class="fas fa-plus-circle"></i> APPLY TO CANVAS</button>
+        `;
+        
+        bx.innerHTML = finalHtml;
+        showToast("Real AI Neural Integration Accepted.");
+
+        if(data.visual_node) {
+            document.getElementById('pexels-search').value = data.visual_node;
+            window.fetchPexels(false);
+        }
+
+    } catch (err) {
+        console.warn("Deploying Fallback Brain due to CORS or Limit Block...");
+        let mockResponse = mockedAIResponse(tp);
+        bx.innerHTML = `<div style="margin-bottom:10px; font-size:10px; color:#5a6; background:#1b3d2b; padding:4px 8px; border-radius:4px; display:inline-block;"><i class="fas fa-shield-alt"></i> OPENROUTER BLOCKED: PROXY FALLBACK LAUNCHED</div>` + mockResponse;
+        showToast("Connection Proxy Redirected To Safe Local Storage.", false);
+        
+        let fallbackMatch = /Output :.*?<span.*?>([^<]+)<\/span>/i.exec(mockResponse);
+        if(fallbackMatch) { 
+            document.getElementById('pexels-search').value = fallbackMatch[1]; 
+            window.fetchPexels(false);
+        }
+    }
+}
+
+// ==========================================
+// 2. MAGIC AUTO CREATE CANVAS ENGINE
+// ==========================================
+window.magicAutoCreate = async function() {
+    let mt = document.getElementById('magic-topic').value || "Default Launch Plan";
+    let magC = CONFIG.MAGIC_COLORS[Math.floor(Math.random() * CONFIG.MAGIC_COLORS.length)];
+    
+    document.getElementById('preset-size').value = "1080x1350"; 
+    window.applyPresetSize();
+    clearCanvasElements();
+
+    showToast(`AI Generating Magic Canvas...`, false);
+    
+    const schema = `
+{
+  "title": "Short punchy Title (max 4 words)",
+  "subtitle": "Short descriptive subtitle (max 15 words)",
+  "bg_keyword": "2 word abstract background search term (e.g. dark neon, luxury city)"
+}`;
+
+    const prompt = `Act as an elite designer. Generate a poster layout for: "${mt}". You MUST return ONLY a valid JSON object matching this exact schema: ${schema}`;
+
+    try {
+        let resultText = await robustAIFetch(prompt);
+        let data = extractJSON(resultText);
+
+        document.getElementById('pexels-search').value = data.bg_keyword;
+        document.getElementById('bg-overlay').style.background = `linear-gradient(to top, #000 0%, transparent 60%, rgba(0,0,0,0.8) 100%)`;
+        
+        addTextObj(data.title.toUpperCase(), "120px", "80px", "920px", "90px", "Oswald", magC);
+        let mSubBObjSystem = addCardObj(data.subtitle + `<br><br><span style='font-weight:900; color:${magC};'>Discover the framework inside.</span>`, "850px", "80px", "900px", "20px", "rgba(10,12,18,0.85)"); 
+        mSubBObjSystem.style.borderLeft = "4px solid " + magC;
+        
+        fetchPexelsAutoM(data.bg_keyword);
+        saveState();
+    } catch (err) {
+        // Fallback
+        console.warn("Magic auto create fallback used");
+        let kArr = mt.split(" "); 
+        let mKey = kArr.length > 2 ? `${kArr[kArr.length-2]} ${kArr[kArr.length-1]} dark` : `${mt} dark aesthetics`;
+        
+        document.getElementById('pexels-search').value = mKey;
+        document.getElementById('bg-overlay').style.background = `linear-gradient(to top, #000 0%, transparent 60%, rgba(0,0,0,0.8) 100%)`;
+        
+        addTextObj("THE EXCLUSIVE<br><span style='color:"+magC+"; text-transform:uppercase;'>"+mt.substring(0,25)+"...</span>", "120px", "80px", "920px", "90px", "Oswald");
+        let mSubBObjSystem = addCardObj("Learn the highly specific methodology frameworks completely transforming digital arrays and generating exponential value streams directly without friction...<br><br><span style='font-weight:900;'>Click Link Included Inside Output Render!</span>", "850px", "80px", "900px", "20px", "rgba(10,12,18,0.85)"); 
+        mSubBObjSystem.style.borderLeft = "4px solid " + magC;
+        
+        fetchPexelsAutoM(mKey);
+        saveState();
+    }
+}
+
+async function fetchPexelsAutoM(kyw) {
+    try {
+        let nr = await fetch(`https://api.pexels.com/v1/search?query=${kyw}&per_page=1`, { headers:{Authorization: CONFIG.PEXELS_KEY}});
+        let jd = await nr.json();
+        if(jd.photos && jd.photos.length > 0) bg(jd.photos[0].src.large2x);
+        else throw new Error("empty");
+    } catch(ed){ 
+        bg(CONFIG.FALLBACK_URLS[Math.floor(Math.random() * CONFIG.FALLBACK_URLS.length)]); 
+    }
+    showToast("Magic Setup Done.");
+}
+
+// ==========================================
+// 3. PEXELS API FOR CANVAS
+// ==========================================
+window.fetchPexels = async function(pgn=false) {
+    let gBox = document.getElementById('pexels-gallery'); 
+    let qr = document.getElementById('pexels-search').value || "coding";
+    
+    if(pgn) pexPage++; else pexPage=1;
+    if(!pgn) gBox.innerHTML='<div style="font-size:12px;color:cyan;grid-column:span 2;text-align:center;"><i class="fas fa-sync fa-spin"></i> Getting Premium Art...</div>';
+    
+    try {
+        let ppR = pgn ? pexPage : (Math.floor(Math.random()*4)+1);
+        let qd = await fetch(`https://api.pexels.com/v1/search?query=${qr}&per_page=12&page=${ppR}`, { headers:{Authorization: CONFIG.PEXELS_KEY}});
+        if(!qd.ok) throw new Error("limit");
+        let md = await qd.json(); 
+        if(!pgn) gBox.innerHTML='';
+        if(md.photos.length===0 && !pgn) throw new Error("nada");
+        
+        md.photos.forEach(ip => {
+            gBox.insertAdjacentHTML('beforeend',`<div class="img-card"><img src="${ip.src.medium}"><div class="img-actions"><button class="img-btn" onclick="bg('${ip.src.large2x}')">Set Background</button><button class="img-btn" style="background:#222;" onclick="addImage('${ip.src.large2x}', '50px','50px','400px')">Spawn Canvas Node</button></div></div>`);
+        });
+    } catch (x) {
+        if(!pgn) {
+            gBox.innerHTML = `<div style="grid-column:span 2; font-size:10px; color:#aaa; text-align:center; padding:10px; border:1px solid #444; border-radius:5px; margin-bottom:5px;">Pexels Quota Limited.<br>Using Offline Studio Reserve...</div>`;
+            CONFIG.FB_SAFER_URLS.forEach(url => gBox.insertAdjacentHTML('beforeend', `<div class="img-card"><img src="${url}"><div class="img-actions"><button class="img-btn" onclick="bg('${url}')">Set Base Surface</button></div></div>`));
+        }
+    }
+}
+
+
+// ==========================================
+// 4. QWEN AI BUSINESS KIT (E-BOOK) ENGINE
+// ==========================================
+
+async function robustAIFetch(prompt) {
+    // A list of reliable OpenRouter models (mixing premium and high-quality free models as fallbacks)
+    const modelsToTry = [
+        "qwen/qwen-2.5-72b-instruct",
+        "google/gemini-2.5-flash-free",
+        "meta-llama/llama-3-8b-instruct:free",
+        "mistralai/mistral-7b-instruct:free"
+    ];
+
+    let lastError = null;
+
+    for (const model of modelsToTry) {
+        try {
+            console.log("Attempting AI generation with model: " + model);
+            const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+                method: "POST",
+                headers: {
+                    "Authorization": `Bearer ${CONFIG.OR_KEY}`,
+                    "Content-Type": "application/json",
+                    "HTTP-Referer": window.location.href || "http://localhost",
+                    "X-Title": "QuickFare Studio V12"
+                },
+                body: JSON.stringify({
+                    model: model,
+                    messages:[{ "role": "user", "content": prompt }]
+                })
+            });
+
+            const data = await response.json();
+            
+            if (data.error) {
+                throw new Error(data.error.message || "OpenRouter API Error");
+            }
+            
+            if (data.choices && data.choices.length > 0) {
+                return data.choices[0].message.content;
+            }
+            throw new Error("No choices returned from AI");
+        } catch (err) {
+            console.warn(`Model ${model} failed:`, err.message);
+            lastError = err;
+        }
+    }
+    throw lastError || new Error("All AI models failed due to limits or network issues.");
+}
+
+function extractJSON(text) {
+    try {
+        // Attempt 1: Standard clean
+        let cleaned = text.replace(/```json/gi, '').replace(/```/g, '').trim();
+        return JSON.parse(cleaned);
+    } catch (e) {
+        // Attempt 2: Regex extraction (find first { } or [ ])
+        try {
+            const match = text.match(/\{[\s\S]*\}|\[[\s\S]*\]/);
+            if (match) {
+                return JSON.parse(match[0]);
+            }
+        } catch (e2) {}
+        throw new Error("Failed to parse JSON from AI response.");
+    }
+}
+
+window.suggestTopicsEbook = async function() {
+    const suggBox = document.getElementById('suggestions-box');
+    const list = document.getElementById('suggestions-list');
+    suggBox.style.display = 'block';
+    list.innerHTML = '<li><i>Thinking... (Trying AI Models)</i></li>';
+
+    const prompt = `Act as an elite digital marketer. Suggest 5 highly profitable, trendy e-book topics right now. Return ONLY a JSON array of strings. Example:["How to start Dropshipping", "Freelancing without Fiverr"]`;
+
+    try {
+        const resultText = await robustAIFetch(prompt);
+        const topics = extractJSON(resultText);
+        
+        list.innerHTML = '';
+        if (Array.isArray(topics)) {
+            topics.forEach(t => {
+                const li = document.createElement('li');
+                li.innerText = t;
+                li.onclick = () => { document.getElementById('ai-topic-ebook').value = t; };
+                list.appendChild(li);
+            });
+        } else {
+            throw new Error("Result is not an array");
+        }
+
+    } catch (err) {
+        list.innerHTML = '<li style="color:var(--danger); font-size:11px;">Error: API limits reached or network failed. Try again.</li>';
+        console.error("AI Topic Error:", err);
+    }
+}
+
+window.generateEbook = async function() {
+    const topic = document.getElementById('ai-topic-ebook').value;
+    if(!topic) return showToast("Please enter a topic first!", true);
+
+    const loader = document.getElementById('loader');
+    loader.style.display = 'flex';
+    document.getElementById('loader-text').innerText = "AI IS WRITING YOUR BUSINESS KIT...";
+
+    const schema = `
+{
+"c_badge": "Agency Name or Alert",
+"c_title": "Main Title (2 words)",
+"c_sub": "Subtitle / Tagline",
+"c_tag": "Target Audience",
+"c_desc": "Short description of the book",
+"w_badge": "18+ or ALERT",
+"w_sub": "Harsh reality title",
+"w_p1": "Paragraph 1 explaining the brutal truth.",
+"w_p2": "Paragraph 2 explaining why old methods fail.",
+"w_quote": "A catchy motivational quote.",
+"t_1": "EP 01. Title", "t_2": "EP 02. Title", "t_3": "EP 03. Title", "t_4": "EP 04. Title", "t_5": "EP 05. Title", "t_6": "EP 06. Title", "t_7": "EP 07. Title", "t_8": "EP 08. Title", "t_9": "EP 09. Title", "t_10": "EP 10. Title",
+"d_title": "Data Title",
+"d_desc": "Data description",
+"d_chart": "Chart Title",
+"d_l1": "Stat 1 Label", "d_v1": "Stat 1 Value",
+"d_l2": "Stat 2 Label", "d_v2": "Stat 2 Value",
+"d_l3": "Stat 3 Label", "d_v3": "Stat 3 Value",
+"d_l4": "Stat 4 Label", "d_v4": "Stat 4 Value",
+"d_qtitle": "Reality Check Title",
+"d_qdesc": "Reality check description",
+"char1_title": "Persona A Name", "char1_desc": "Persona A description (loser mindset)", "char1_traits": "Traits",
+"char2_title": "Persona B Name", "char2_desc": "Persona B description (winner mindset)", "char2_traits": "Traits",
+"rm1_title": "Days 1-10", "rm1_desc": "Action 1",
+"rm2_title": "Days 11-20", "rm2_desc": "Action 2",
+"rm3_title": "Days 21-25", "rm3_desc": "Action 3",
+"rm4_title": "Days 26-30", "rm4_desc": "Action 4",
+"o_title": "Outro Title",
+"o_desc": "Outro description",
+"o_box": "Call to action text",
+"strategy_audience": "Target Audience description (2 sentences)",
+"strategy_hook": "Core Marketing Hook (1 strong sentence)",
+"post_fb": "Facebook Post copy (engaging, persuasive, with emojis)",
+"post_ig": "Instagram Post copy (aesthetic, value-driven, with hashtags)",
+"reel_hook": "Reel Hook script (First 3 seconds spoken text)",
+"reel_body": "Reel Body script (Middle 15 seconds spoken text)",
+"reel_cta": "Reel CTA script (Last 5 seconds spoken text)",
+"pexels_query": "A highly specific 2-word English search term for background images (e.g. 'dark matrix' or 'neon city')"
+}`;
+
+    const prompt = `Act as an elite copywriter and business strategist. Write the text content for a 15-page e-book and a complete marketing kit on the topic: "${topic}". 
+Tone: highly persuasive, addressing pain points (inflation, lack of skills, scams). 
+You MUST return ONLY a valid JSON object matching this exact schema, with no markdown, no backticks, no extra text:
+${schema}`;
+
+    try {
+        const resultText = await robustAIFetch(prompt);
+        const ebookData = extractJSON(resultText);
+        
+        populateEbookDOM(ebookData);
+
+        // Auto fetch new background images based on AI suggestion
+        document.getElementById('pexels-search-ebook').value = ebookData.pexels_query || "dark abstract";
+        fetchPexelsEbook();
+
+        loader.style.display = 'none';
+        showToast("Business Kit Generation Complete!");
+
+    } catch (err) {
+        loader.style.display = 'none';
+        showToast("AI Generation failed. Check API limits or format.", true);
+        console.error("AI Generation Error:", err);
+    }
+}
+
+function populateEbookDOM(data) {
+    const setHTML = (id, html) => { if(document.getElementById(id)) document.getElementById(id).innerHTML = html; };
+    
+    Object.keys(data).forEach(key => {
+        let domId = key.replace(/_/g, '-'); 
+        setHTML(domId, data[key]);
+    });
+    
+    if(document.getElementById('c-title')) {
+        let parts = data.c_title.split(' ');
+        if(parts.length > 1) {
+            let last = parts.pop();
+            document.getElementById('c-title').innerHTML = `${parts.join(' ')} <span>${last}</span>`;
+        }
+    }
+}
+
+window.fetchPexelsEbook = async function() {
+    const query = document.getElementById('pexels-search-ebook').value || "Abstract dark";
+    const gallery = document.getElementById('pexels-gallery-ebook');
+    gallery.innerHTML = '<div style="color: var(--accent); font-size: 12px; grid-column: span 2; text-align: center;">Fetching...</div>';
+    
+    try {
+        const res = await fetch(`https://api.pexels.com/v1/search?query=${query}&per_page=16`, {
+            headers: { Authorization: CONFIG.PEXELS_KEY }
+        });
+        const data = await res.json();
+        gallery.innerHTML = '';
+        
+        data.photos.forEach(photo => {
+            const card = document.createElement('div');
+            card.className = 'img-card';
+            card.innerHTML = `
+                <img src="${photo.src.medium}" alt="Pexels">
+                <div class="img-actions">
+                    <button class="img-btn" onclick="setEbookBg('cover-bg', '${photo.src.large2x}')">SET COVER</button>
+                    <button class="img-btn" onclick="setEbookBg('outro-bg', '${photo.src.large2x}')">SET OUTRO</button>
+                </div>
+            `;
+            gallery.appendChild(card);
+        });
+    } catch (err) {
+        gallery.innerHTML = '<div style="color: var(--danger); font-size: 11px; grid-column: span 2;">API Error. Check Network.</div>';
+    }
+}
+
+window.setEbookBg = function(elementId, url) {
+    let img = document.getElementById(elementId);
+    if(img) {
+        img.crossOrigin = 'anonymous';
+        img.src = url;
+        showToast("Kit Visual Updated");
+    }
+}
+
+window.changeThemeEbook = function() {
+    const color = document.getElementById('theme-selector').value;
+    document.documentElement.style.setProperty('--accent', color);
+    if(color === "#00F0FF") document.documentElement.style.setProperty('--danger', '#FF0050');
+    else if(color === "#FFD700") document.documentElement.style.setProperty('--danger', '#E50914');
+    else if(color === "#FF0050") document.documentElement.style.setProperty('--danger', '#00F0FF');
+    else if(color === "#39FF14") document.documentElement.style.setProperty('--danger', '#FF7B00');
+    else if(color === "#FF7B00") document.documentElement.style.setProperty('--danger', '#00F0FF');
+}
+
+
+// --- --- ---
+
+
+        // App Bootstrap
+        document.addEventListener('DOMContentLoaded', () => {
+            initUI();
+            if (!loadInitialState()) {
+                document.querySelectorAll('.element').forEach(makeDrag);
+                saveState(); // Save initial blank state
+            }
+        });
+        
+</script>
+</body>
+</html>
