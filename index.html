@@ -102,11 +102,8 @@
 
                 <div class="section" style="border-bottom: none; flex:1;">
                     <h3 class="section-title" style="color: #00c4cc;"><i class="fas fa-paintbrush"></i> Canva Connect</h3>
-                    <p style="font-size: 11px; color: #888; margin-top: 0;">Integrate directly with Canva. Get your API key here: <a href="https://www.canva.com/developers/" target="_blank" style="color: #00c4cc; text-decoration: underline;">Canva Developer Portal</a></p>
-                    <div class="search-bar">
-                        <input type="password" id="canva-api-key" placeholder="Enter Canva API Token">
-                        <button onclick="saveCanvaKey()" style="background: #00c4cc; color: white;"><i class="fas fa-save"></i></button>
-                    </div>
+                    <p style="font-size: 11px; color: #888; margin-top: 0;">Link your Canva account securely using OAuth 2.0 PKCE.</p>
+                    <button class="btn" style="width: 100%; justify-content: center; background:#1c1f2b; border:1px solid #00c4cc; color: #00c4cc; margin-bottom: 15px;" onclick="startCanvaAuth()"><i class="fas fa-link"></i> Authorize Canva</button>
                     <button class="btn" style="width: 100%; justify-content: center; background:#00c4cc; color: white; border: none; font-weight: bold; margin-bottom: 10px;" onclick="exportToCanva()"><i class="fas fa-cloud-upload-alt"></i> Export Canvas to Canva</button>
                     <button class="btn" style="width: 100%; justify-content: center; background:#222; border:1px dashed #00c4cc;" onclick="importFromCanva()"><i class="fas fa-cloud-download-alt"></i> Import Canva Assets</button>
                 </div>
