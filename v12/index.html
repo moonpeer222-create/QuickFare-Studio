@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuickFare Studio V12 | Pro Kit Engine</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<div class="navbar">
+    <div class="logo">QuickFare <span>Studio</span></div>
+    <div class="nav-group">
+        <button class="btn btn-icon" onclick="QF.undo()" title="Undo"><i class="fas fa-undo"></i></button>
+        <button class="btn btn-icon" onclick="QF.redo()" title="Redo"><i class="fas fa-redo"></i></button>
+    </div>
+    <div class="nav-divider"></div>
+    <div class="nav-group">
+        <select id="preset-size" class="nav-select" onchange="QF.applyPreset()">
+            <option value="1080x1080">Post 1080×1080</option>
+            <option value="1080x1350">Portrait 1080×1350</option>
+            <option value="1080x1920">Reel 1080×1920</option>
+            <option value="1200x628">FB Ad 1200×628</option>
+            <option value="1748x2480">A5 Cover 1748×2480</option>
+        </select>
+    </div>
+    <div class="nav-divider"></div>
+    <div class="nav-group">
+        <select id="export-fmt" class="nav-select">
+            <option value="png">PNG</option>
+            <option value="jpeg">JPEG</option>
+        </select>
+        <button class="btn btn-primary" onclick="QF.exportDesign()"><i class="fas fa-download"></i> Export</button>
+        <button class="btn btn-magic" id="zip-btn" style="display:none" onclick="QF.downloadZip()"><i class="fas fa-file-archive"></i> ZIP Kit</button>
+    </div>
+</div>
+
+<!-- MAIN LAYOUT -->
+<div class="app-body">
+
+    <!-- LEFT PANEL -->
+    <div class="panel">
+        <div class="panel-tabs">
+            <button class="tab-btn active" data-tab="kit"><i class="fas fa-boxes-stacked"></i>&nbsp; Full Kit</button>
+            <button class="tab-btn" data-tab="editor"><i class="fas fa-pen-ruler"></i>&nbsp; Editor</button>
+        </div>
+        <div class="tab-body">
+
+            <!-- TAB: FULL KIT GEN -->
+            <div class="tab-pane active" id="pane-kit">
+                <div class="sec sec-highlight">
+                    <div class="sec-title"><i class="fas fa-bolt"></i> AI Campaign Kit</div>
+                    <p style="font-size:11px;color:var(--text3);line-height:1.5;margin-bottom:14px">Enter a niche. Qwen-72B writes copy, fetches cinematic Pexels images, renders designs in all dimensions, and packages as ZIP.</p>
+                    <div class="field">
+                        <label>Topic / Product</label>
+                        <textarea id="kit-topic" placeholder="e.g., Learn High-Ticket Freelancing and Escape the 9-5 Matrix..."></textarea>
+                    </div>
+                    <div class="sec-title" style="margin-top:8px"><i class="fas fa-list-check"></i> Deliverables</div>
+                    <label class="check-item"><input type="checkbox" id="chk-cover" checked><span>A5 E-Book Cover (1748×2480)</span></label>
+                    <label class="check-item"><input type="checkbox" id="chk-post" checked><span>Square Post (1080×1080)</span></label>
+                    <label class="check-item"><input type="checkbox" id="chk-reel" checked><span>Reel / Story (1080×1920)</span></label>
+                    <label class="check-item"><input type="checkbox" id="chk-adcopy" checked><span>Meta Ad Copy (.txt)</span></label>
+                    <label class="check-item"><input type="checkbox" id="chk-script" checked><span>Video Script (.txt)</span></label>
+                    <button class="btn btn-magic" style="width:100%;justify-content:center;padding:14px;font-size:13px;margin-top:12px" onclick="QF.generateKit()">
+                        <i class="fas fa-wand-magic-sparkles"></i> Generate Full Kit
+                    </button>
+                </div>
+                <!-- AI Strategist (fallback) -->
+                <details class="acc">
+                    <summary><span><i class="fas fa-brain"></i>&nbsp; AI Strategist</span><i class="fas fa-chevron-down chevron"></i></summary>
+                    <div class="acc-body">
+                        <p style="font-size:10px;color:var(--text3);line-height:1.5;margin-bottom:12px;padding:8px;background:rgba(0,0,0,.3);border-radius:6px">Generates marketing hooks via OpenRouter. Falls back to local engine if API blocked.</p>
+                        <div class="field">
+                            <label>Topic</label>
+                            <textarea id="ai-topic" placeholder="e.g. Avoiding Freelancing Scams"></textarea>
+                        </div>
+                        <button class="btn btn-primary" style="width:100%;justify-content:center;padding:12px" onclick="QF.aiCampaign()"><i class="fas fa-cogs"></i> Engage Strategy</button>
+                        <div id="ai-results" class="ai-box"></div>
+                    </div>
+                </details>
+            </div>
+
+            <!-- TAB: EDITOR -->
+            <div class="tab-pane" id="pane-editor">
+                <!-- Magic Auto-Create -->
+                <div class="sec sec-highlight">
+                    <div class="sec-title"><i class="fas fa-wand-magic-sparkles"></i> Magic Auto-Create</div>
+                    <div class="field">
+                        <input type="text" id="magic-topic" placeholder="e.g., SEO Guide 2026, Fit Body...">
+                    </div>
+                    <button class="btn btn-magic" style="width:100%;justify-content:center;padding:12px" onclick="QF.magicCreate()"><i class="fas fa-bolt"></i> 1-Click Generate</button>
+                </div>
+
+                <!-- Templates -->
+                <details class="acc">
+                    <summary><span><i class="fas fa-shapes"></i>&nbsp; Templates</span><i class="fas fa-chevron-down chevron"></i></summary>
+                    <div class="acc-body">
+                        <div class="tpl-grid">
+                            <button class="tpl-btn" onclick="QF.loadTemplate('cover')"><i class="fas fa-book"></i>E-Book Cover</button>
+                            <button class="tpl-btn" onclick="QF.loadTemplate('viral')"><i class="fas fa-fire"></i>Viral Reel</button>
+                            <button class="tpl-btn" onclick="QF.loadTemplate('quote')"><i class="fas fa-quote-left"></i>Quote Card</button>
+                            <button class="tpl-btn" onclick="QF.loadTemplate('split')"><i class="fas fa-columns"></i>Split Compare</button>
+                        </div>
+                    </div>
+                </details>
+
+                <!-- Elements -->
+                <details class="acc" open>
+                    <summary><span><i class="fas fa-plus-circle"></i>&nbsp; Add Elements</span><i class="fas fa-chevron-down chevron"></i></summary>
+                    <div class="acc-body">
+                        <div class="row" style="margin-bottom:8px">
+                            <button class="btn" style="justify-content:center" onclick="QF.addText()"><i class="fas fa-font"></i> Heading</button>
+                            <button class="btn" style="justify-content:center" onclick="QF.addCard()"><i class="fas fa-list-ul"></i> Subtext Box</button>
+                        </div>
+                        <div class="upload-wrap">
+                            <button class="btn" style="width:100%;justify-content:center;background:rgba(30,35,50,.8)"><i class="fas fa-image"></i> Upload Image</button>
+                            <input type="file" accept="image/*" onchange="QF.uploadImage(event)">
+                        </div>
+                    </div>
+                </details>
+
+                <!-- Layers -->
+                <details class="acc" open>
+                    <summary><span><i class="fas fa-layer-group"></i>&nbsp; Layers</span><i class="fas fa-chevron-down chevron"></i></summary>
+                    <div class="acc-body">
+                        <div id="layer-list"><div style="text-align:center;color:var(--text3);font-size:11px;padding:8px">No layers yet</div></div>
+                    </div>
+                </details>
+
+                <!-- Pillar Library -->
+                <details class="acc">
+                    <summary><span><i class="fas fa-database"></i>&nbsp; Offline Library</span><i class="fas fa-chevron-down chevron"></i></summary>
+                    <div class="acc-body">
+                        <div class="field" style="margin-bottom:8px">
+                            <select id="pillar-cat" onchange="QF.loadPillars()">
+                                <option value="finance">Finance & Wealth</option>
+                                <option value="tech">Technology & AI</option>
+                                <option value="ecom">E-Commerce</option>
+                                <option value="fitness">Health & Fitness</option>
+                                <option value="abstract">Cinematic / Abstract</option>
+                            </select>
+                        </div>
+                        <div class="gallery" id="pillar-gallery" style="max-height:180px"></div>
+                    </div>
+                </details>
+
+                <!-- Pexels Search -->
+                <div class="sec" style="border-bottom:none;flex:1">
+                    <div class="sec-title"><i class="fas fa-camera"></i> Pexels Search</div>
+                    <div class="search-bar">
+                        <select id="pexels-type" style="width:76px;padding:8px 4px;background:rgba(0,0,0,.35);border:1px solid var(--border);color:#fff;border-radius:8px;font:700 11px 'Outfit',sans-serif;outline:none">
+                            <option value="photos">Photos</option>
+                            <option value="videos">Videos</option>
+                        </select>
+                        <input type="text" id="pexels-q" placeholder="Search..." value="Dark luxury">
+                        <button onclick="QF.searchPexels(false)"><i class="fas fa-search"></i></button>
+                    </div>
+                    <div class="gallery" id="pexels-gallery" style="max-height:400px"></div>
+                    <button id="pexels-more" class="btn" style="width:100%;justify-content:center;margin-top:8px;display:none" onclick="QF.searchPexels(true)"><i class="fas fa-arrow-down"></i> Load More</button>
+                </div>
+
+                <!-- Background Filters -->
+                <details class="acc">
+                    <summary><span><i class="fas fa-sliders-h"></i>&nbsp; Background Filters</span><i class="fas fa-chevron-down chevron"></i></summary>
+                    <div class="acc-body">
+                        <div class="field"><label>Blur</label><input type="range" id="f-blur" min="0" max="20" value="0" oninput="QF.applyFilters()"></div>
+                        <div class="field"><label>Brightness</label><input type="range" id="f-bright" min="0" max="200" value="100" oninput="QF.applyFilters()"></div>
+                        <div class="field"><label>Grayscale</label><input type="range" id="f-gray" min="0" max="100" value="0" oninput="QF.applyFilters()"></div>
+                    </div>
+                </details>
+            </div>
+        </div>
+    </div>
+
+    <!-- WORKSPACE -->
+    <div class="workspace" id="workspace">
+        <div id="kit-dashboard">
+            <div class="kit-header">
+                <h1><i class="fas fa-check-circle"></i> Assets Ready</h1>
+                <button class="btn" onclick="QF.closeDash()"><i class="fas fa-times"></i> Close</button>
+            </div>
+            <p style="color:var(--text3);font-size:13px">Review below, then hit "ZIP Kit" in the navbar to download everything.</p>
+            <div class="kit-grid" id="kit-grid"></div>
+        </div>
+        <div id="artboard-wrap">
+            <canvas id="artboard" width="1080" height="1080"></canvas>
+        </div>
+    </div>
+</div>
+
+<!-- FLOATING TOOLBAR -->
+<div id="float-toolbar">
+    <select id="tb-font" onchange="QF.setFont(this.value)">
+        <option value="Anton">Anton</option>
+        <option value="Montserrat">Montserrat</option>
+        <option value="Oswald">Oswald</option>
+        <option value="Bebas Neue">Bebas Neue</option>
+        <option value="Space Grotesk">Space Grotesk</option>
+        <option value="Playfair Display">Playfair Display</option>
+        <option value="Cinzel">Cinzel</option>
+        <option value="Outfit">Outfit</option>
+    </select>
+    <div class="tb-sep"></div>
+    <input type="number" id="tb-size" value="100" min="8" max="600" onchange="QF.setSize(this.value)">
+    <div class="tb-sep"></div>
+    <input type="color" id="tb-color" value="#ffffff" oninput="QF.setColor(this.value)">
+    <div class="tb-sep"></div>
+    <button class="btn btn-sm btn-icon" onclick="QF.zIndex(1)" title="Bring Forward"><i class="fas fa-arrow-up"></i></button>
+    <button class="btn btn-sm btn-icon" onclick="QF.zIndex(-1)" title="Send Back"><i class="fas fa-arrow-down"></i></button>
+    <div class="tb-sep"></div>
+    <button class="btn btn-sm btn-icon btn-danger" onclick="QF.deleteActive()" title="Delete"><i class="fas fa-trash"></i></button>
+</div>
+
+<!-- HIDDEN RENDER CANVAS -->
+<div id="hidden-render"><canvas id="hidden-c" width="1080" height="1080"></canvas></div>
+
+<!-- LOADER -->
+<div id="loader">
+    <div class="spinner"></div>
+    <div id="loader-text">INITIALIZING...</div>
+    <div id="loader-sub">Please wait</div>
+</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<script src="core.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
