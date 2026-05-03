@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuickFair V10 Ultimate | AI Auto-Create Engine</title>
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Bebas+Neue&family=Cinzel:wght@700&family=Montserrat:ital,wght@0,400;0,700;0,900;1,900&family=Oswald:wght@500;700&family=Playfair+Display:ital,wght@0,700;1,700&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <style>
+        :root {
+            --bg-dark: #0a0c10;
+            --panel-bg: #141722;
+            --accent: #00F0FF;
+            --text-main: #ffffff;
+            --border: #2c3145;
+            --danger: #FF0050;
+            --magic: #b900ff;
+        }
+
+        * { box-sizing: border-box; }
+        body, html { margin: 0; padding: 0; width: 100%; height: 100vh; background-color: var(--bg-dark); color: var(--text-main); font-family: 'Montserrat', sans-serif; overflow: hidden; display: flex; flex-direction: column; }
+
+        /* NAVBAR */
+        .navbar { height: 65px; background: #000; display: flex; justify-content: space-between; align-items: center; padding: 0 25px; border-bottom: 1px solid var(--border); z-index: 100; box-shadow: 0 4px 30px rgba(0,0,0,0.7); }
+        .logo { font-size: 22px; font-weight: 900; letter-spacing: 1.5px; text-transform: uppercase; }
+        .logo span { color: var(--accent); }
+        .nav-controls { display: flex; gap: 12px; align-items: center; }
+        
+        .btn { padding: 10px 18px; background: #222; color: white; border: 1px solid #444; border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 8px; font-size: 12px; }
+        .btn:hover { background: #333; }
+        .btn-primary { background: var(--accent); color: #000; border: none; font-weight: 900; text-transform: uppercase; }
+        .btn-primary:hover { background: #fff; box-shadow: 0 0 15px var(--accent); transform: translateY(-2px); }
+        .btn-magic { background: linear-gradient(45deg, #00F0FF, var(--magic)); color: white; border: none; font-weight: 900; text-transform: uppercase;}
+        .btn-magic:hover { opacity: 0.9; box-shadow: 0 0 20px var(--magic); }
+        
+        select.nav-select { background: #111; border: 1px solid #444; color: white; padding: 10px; border-radius: 6px; font-weight: bold; font-size: 12px; outline: none; cursor: pointer;}
+
+        /* MAIN LAYOUT */
+        .app-body { display: flex; flex: 1; height: calc(100vh - 65px); overflow: hidden; }
+
+        /* PANELS */
+        .sidebar { width: 360px; background: var(--panel-bg); border-right: 1px solid var(--border); display: flex; flex-direction: column; overflow-y: auto; padding-bottom: 20px; }
+        .properties-panel { width: 340px; background: var(--panel-bg); border-left: 1px solid var(--border); display: flex; flex-direction: column; overflow-y: auto; padding: 20px; padding-bottom: 50px; }
+        
+        /* TABS */
+        .sidebar-tabs { display: flex; border-bottom: 1px solid var(--border); background: #000; flex-shrink: 0; }
+        .tab-btn { flex: 1; padding: 18px 0; text-align: center; background: none; border: none; color: #777; font-weight: bold; cursor: pointer; text-transform: uppercase; font-size: 12px; transition: 0.2s; }
+        .tab-btn.active { color: white; border-bottom: 2px solid var(--accent); background: var(--panel-bg); }
+        
+        .tab-content { flex: 1; display: none; flex-direction: column; }
+        .tab-content.active { display: flex; }
+        .section { padding: 20px; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+        .section-title { font-size: 12px; text-transform: uppercase; color: #888; letter-spacing: 1.5px; margin: 0 0 15px 0; font-weight: bold; }
+
+        /* INPUTS */
+        .input-group { margin-bottom: 15px; }
+        .input-group label { display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 6px; color: #bbb; text-transform: uppercase; font-weight: bold; }
+        .input-group input[type="text"], .input-group input[type="number"], .input-group select, .input-group textarea { width: 100%; padding: 12px; background: #0b0c10; border: 1px solid #333; color: white; border-radius: 6px; font-family: inherit; font-size: 13px; outline: none; transition: 0.2s; }
+        .input-group input:focus, .input-group textarea:focus { border-color: var(--accent); box-shadow: 0 0 5px rgba(0, 240, 255, 0.2); }
+        .input-group textarea { height: 90px; resize: vertical; line-height: 1.5; }
+        .input-group input[type="color"] { width: 100%; height: 40px; border: none; background: transparent; cursor: pointer; padding: 0; }
+        .row { display: flex; gap: 10px; }
+        .row .input-group { flex: 1; }
+
+        /* TEMPLATES GRID */
+        .template-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .tpl-btn { background: #08090c; border: 1px solid #333; color: white; padding: 15px 10px; border-radius: 8px; cursor: pointer; font-size: 11px; font-weight: bold; transition: 0.2s; text-align: center; }
+        .tpl-btn i { display: block; font-size: 22px; margin-bottom: 10px; color: var(--accent); }
+        .tpl-btn:hover { border-color: var(--accent); background: #111; transform: translateY(-2px); }
+
+        /* GALLERY & SEARCH */
+        .search-bar { display: flex; gap: 5px; margin-bottom: 15px; }
+        .search-bar input { flex: 1; padding: 12px; background: #08090c; border: 1px solid #333; color: white; border-radius: 6px; }
+        .search-bar button { padding: 10px 15px; background: var(--accent); color: #000; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        .gallery { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; max-height: 400px; overflow-y: auto; padding-right: 5px; }
+        .img-card { position: relative; border-radius: 8px; overflow: hidden; border: 2px solid transparent; cursor: pointer; aspect-ratio: 1; background:#000; }
+        .img-card img { width: 100%; height: 100%; object-fit: cover; display: block; transition: 0.3s; opacity: 0.8;}
+        .img-card:hover img { transform: scale(1.1); opacity: 0.4; }
+        .img-actions { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 8px; opacity: 0; transition: 0.3s; }
+        .img-card:hover .img-actions { opacity: 1; }
+        .img-btn { background: rgba(0,0,0,0.9); color: white; border: 1px solid var(--accent); padding: 8px; font-size: 10px; border-radius: 4px; cursor: pointer; font-weight: bold; width: 85%; text-transform: uppercase;}
+
+        /* UPLOAD WRAPPER */
+        .upload-wrapper { position: relative; width: 100%; overflow: hidden; display: flex; align-items: center; justify-content: center; margin-top: 15px;}
+        .upload-wrapper input[type="file"] { position: absolute; font-size: 100px; opacity: 0; right: 0; top: 0; cursor: pointer; height:100%; width:100%; }
+
+        /* AI STRATEGIST BOX */
+        .ai-result-box { background: #0b0c10; border: 1px solid #333; border-radius: 8px; padding: 20px; margin-top: 15px; font-size: 13px; line-height: 1.6; color: #ddd; display: none; }
+        .ai-result-box h4 { color: var(--accent); margin: 20px 0 8px 0; font-size: 12px; text-transform: uppercase; border-bottom: 1px dashed #333; padding-bottom: 5px; }
+        .ai-result-box h4:first-child { margin-top: 0; }
+        .tag-pill { display: inline-block; background: rgba(0, 240, 255, 0.1); color: var(--accent); padding: 3px 8px; border-radius: 4px; font-size: 11px; border: 1px solid rgba(0, 240, 255, 0.3); margin: 4px 4px 0 0; font-weight: bold;}
+
+        /* WORKSPACE & CANVAS */
+        .workspace { flex: 1; background: #040405; background-image: radial-gradient(#222 1px, transparent 1px); background-size: 25px 25px; display: grid; place-items: center; overflow: auto; position: relative; }
+        #artboard-wrapper { position: relative; box-shadow: 0 0 0 1px #333, 0 40px 100px rgba(0,0,0,0.9); transition: transform 0.1s ease-out; transform-origin: center center; margin: auto;}
+        
+        #artboard { width: 1080px; height: 1080px; background-color: #000; position: relative; overflow: hidden; }
+
+        .layer-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; transition: filter 0.2s; pointer-events: none;}
+        .layer-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: transparent; z-index: 2; pointer-events: none; }
+        
+        /* DRAGGABLES */
+        .element { position: absolute; z-index: 10; cursor: move; user-select: none; box-sizing: border-box; }
+        .element::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; border: 2px dashed transparent; pointer-events: none; transition: 0.2s; z-index: 999; }
+        .element:hover::before { border-color: rgba(255,255,255,0.3); }
+        .element.active::before { border-color: var(--accent); border-style: solid; box-shadow: 0 0 15px rgba(0,240,255,0.3); }
+
+        .el-text { font-family: 'Anton', sans-serif; font-size: 100px; color: white; white-space: pre-wrap; word-wrap: break-word; line-height: 1.1; text-transform: uppercase; text-shadow: 0px 10px 20px rgba(0,0,0,0.8); -webkit-text-stroke: 0px transparent; margin: 0; padding: 0; }
+        .el-card { background: rgba(15, 15, 20, 0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.15); border-radius: 20px; padding: 40px; width: 600px; color: white; font-family: 'Montserrat', sans-serif; font-size: 35px; line-height: 1.5; box-shadow: 0 30px 60px rgba(0,0,0,0.9); white-space: pre-wrap; word-wrap: break-word; }
+        .el-image { width: 400px; height: auto; object-fit: cover; display: block; box-shadow: 0 15px 40px rgba(0,0,0,0.7); border-radius: 0px; }
+
+        /* LOADER & TOAST */
+        #loader { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 9999; flex-direction: column; justify-content: center; align-items: center; }
+        .spinner { width: 80px; height: 80px; border: 4px solid #222; border-top-color: var(--accent); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 25px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        
+        #toast { position: fixed; bottom: -100px; left: 50%; transform: translateX(-50%); background: var(--accent); color: #000; padding: 15px 30px; border-radius: 8px; font-weight: bold; font-size: 14px; box-shadow: 0 10px 30px rgba(0,0,0,0.6); transition: 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55); z-index: 10000; text-transform: uppercase;}
+        #toast.show { bottom: 50px; }
+    </style>
+</head>
+<body>
+
+    <div class="navbar">
+        <div class="logo">QuickFair <span>Engine V10</span></div>
+        <div class="nav-controls">
+            <button class="btn" onclick="clearCanvasElements()" style="background: #5a0c16; border-color: #aa0000; color:white;"><i class="fas fa-trash-alt"></i> Clean Canvas</button>
+            <select id="export-format" class="nav-select">
+                <option value="image/png">Lossless PNG</option>
+                <option value="image/jpeg">Optimized JPEG</option>
+            </select>
+            <button class="btn btn-primary" onclick="exportDesign()"><i class="fas fa-download"></i> Save Final Asset</button>
+        </div>
+    </div>
+
+    <div class="app-body">
+        <div class="sidebar">
+            <div class="sidebar-tabs">
+                <button class="tab-btn active" onclick="switchTab('design')"><i class="fas fa-layer-group"></i> Design Suite</button>
+                <button class="tab-btn" onclick="switchTab('strategist')"><i class="fas fa-bolt"></i> Auto Magic</button>
+            </div>
+
+            <div id="tab-design" class="tab-content active">
+                
+                <div class="section">
+                    <h3 class="section-title">Canvas Setup</h3>
+                    <div class="input-group">
+                        <select id="preset-size" onchange="applyPresetSize()">
+                            <option value="1080x1080">Insta/FB Post (1080x1080)</option>
+                            <option value="1080x1350">Portrait Feed (1080x1350)</option>
+                            <option value="1080x1920">Reel/Story (1080x1920)</option>
+                            <option value="1200x628">FB Ad Link (1200x628)</option>
+                            <option value="1748x2480">A5 (E-Book Cover) - 1748x2480</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="section" style="background: rgba(185, 0, 255, 0.1); border-left: 4px solid var(--magic);">
+                    <h3 class="section-title" style="color: var(--magic);">MAGIC AUTO-CREATE CANVAS</h3>
+                    <div class="input-group">
+                        <input type="text" id="magic-topic" placeholder="e.g., SEO Guide 2026, Fit Body...">
+                    </div>
+                    <button class="btn btn-magic" style="width: 100%; justify-content:center; padding:15px; font-size:13px;" onclick="magicAutoCreate()"><i class="fas fa-wand-magic-sparkles"></i> 1-CLICK GENERATE DESIGN</button>
+                </div>
+
+                <div class="section">
+                    <h3 class="section-title">Classic Templates</h3>
+                    <div class="template-grid">
+                        <button class="tpl-btn" onclick="loadTemplate('cover')"><i class="fas fa-book"></i> E-Book Cover</button>
+                        <button class="tpl-btn" onclick="loadTemplate('viral')"><i class="fas fa-fire"></i> Viral Reel (9:16)</button>
+                        <button class="tpl-btn" onclick="loadTemplate('quote')"><i class="fas fa-quote-left"></i> Authority Quote</button>
+                        <button class="tpl-btn" onclick="loadTemplate('split')"><i class="fas fa-columns"></i> Split Compare</button>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h3 class="section-title">Manual Elements</h3>
+                    <div class="row">
+                        <button class="btn" style="flex:1; justify-content:center;" onclick="addElement('text')"><i class="fas fa-font"></i> Heading</button>
+                        <button class="btn" style="flex:1; justify-content:center;" onclick="addElement('card')"><i class="fas fa-list-ul"></i> Subtext Box</button>
+                    </div>
+                    <div class="upload-wrapper">
+                        <button class="btn" style="width:100%; justify-content:center; background:#223; color:#fff; border-color:#446;"><i class="fas fa-image"></i> Local System Upload</button>
+                        <input type="file" accept="image/*" onchange="uploadLocalImage(event)">
+                    </div>
+                </div>
+
+                <div class="section" style="border-bottom: none; flex:1;">
+                    <h3 class="section-title">Pexels Premium Search</h3>
+                    <div class="search-bar">
+                        <input type="text" id="pexels-search" placeholder="Type prompt (e.g. Neon City)" value="Dark office luxury">
+                        <button onclick="fetchPexels(false)"><i class="fas fa-search"></i></button>
+                    </div>
+                    <div class="gallery" id="pexels-gallery"></div>
+                    <button class="btn" style="width: 100%; justify-content: center; background:#222; border:1px dashed #555;" onclick="fetchPexels(true)">Load Endless Scroller</button>
+                </div>
+            </div>
+
+            <div id="tab-strategist" class="tab-content">
+                <div class="section" style="border-bottom: none;">
+                    <h3 class="section-title" style="color:var(--accent);"><i class="fas fa-brain"></i> OpenRouter Fallback Logic</h3>
+                    <p style="font-size: 11px; color: #888; margin-top: 0; line-height: 1.6; padding: 10px; background: rgba(0,0,0,0.5); border-radius:6px; border:1px solid #222;">Generates pure marketing hooks. If OpenRouter API hits a strict CORS rejection, the "Ghost Mock" engine flawlessly bridges data instead.</p>
+                    
+                    <div class="input-group" style="margin-top:20px;">
+                        <label style="color:white; font-size:11px;">Detailed Topic Entry:</label>
+                        <textarea id="ai-topic" placeholder="e.g. Avoiding Freelancing Scams" style="height: 100px; color:#00F0FF; padding:15px; border: 1px solid var(--border);"></textarea>
+                    </div>
+                    <button class="btn btn-primary" style="width: 100%; justify-content: center; padding: 18px; font-size: 13px;" onclick="triggerAICampaign()"><i class="fas fa-cogs"></i> ENGAGE STRATEGY</button>
+                    
+                    <div id="ai-results" class="ai-result-box" style="margin-top:25px;"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="workspace" id="workspace">
+            <div id="artboard-wrapper">
+                <div id="artboard">
+                    <img id="bg-img" class="layer-bg" src="https://images.unsplash.com/photo-1628156108169-f815598fb28c?q=80&w=1920&auto=format&fit=crop" crossorigin="anonymous" draggable="false">
+                    <div id="bg-overlay" class="layer-overlay" style="background: linear-gradient(to top, rgba(0,0,0,0.9), rgba(0,0,0,0.3));"></div>
+                    
+                    <div class="element el-text" id="el-default" style="top: 300px; left: 80px; width: 900px; color: #fff; z-index: 10; font-family: 'Anton', sans-serif; font-size: 130px;">QUICKFAIR<br><span style="color:#00F0FF;">V10 ALIVE.</span></div>
+                    
+                    <div class="element el-card" id="el-sub" style="top: 600px; left: 80px; width: 850px; background: rgba(20,20,25,0.7); backdrop-filter:blur(20px); border-radius:20px; padding:40px; border:1px solid rgba(255,255,255,0.2); color: white; font-family: 'Montserrat', sans-serif; font-size: 38px; font-weight:700;">Zero font overlaps during rendering.<br>Auto Magic creator available in Left Menu. Drag to customize perfectly.</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="properties-panel" id="properties-panel">
+            <div style="text-align: center; color: #555; margin-top: 80px; font-size: 12px; line-height: 1.6;">
+                <i class="fas fa-mouse-pointer" style="font-size: 40px; margin-bottom: 20px; color:var(--accent); opacity:0.5;"></i><br>Select Layer Matrix on Canvas<br>To Open Config Panel.
+            </div>
+        </div>
+    </div>
+
+    <div id="toast">SYSTEM INITIALIZATION SUCCESSFUL</div>
+
+    <script>
+        // ==========================================
+        // SYSTEM CORE: Variables & API Keys
+        // ==========================================
+        const artboard = document.getElementById('artboard');
+        const wrapper = document.getElementById('artboard-wrapper');
+        const workspace = document.getElementById('workspace');
+        
+        // API Keys 
+        const PEXELS_KEY = 'c56L0l6NiI8lQhFccTdyyNwFg75mqhtaXKvWvimcSQVS00wqP1xdoftW';
+        const OR_KEY = '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';
+        
+        let activeEl = null; 
+        let elCount = 1000; 
+        let currScale = 1; 
+        let mxZ = 20; 
+        let pexPage = 1;
+
+        // TOAST NOTIFICATION
+        function showToast(msg, isErr=false) {
+            const t = document.getElementById('toast'); 
+            t.innerText = msg;
+            t.style.background = isErr ? "var(--danger)" : "var(--accent)"; 
+            t.style.color = isErr ? "#fff" : "#000";
+            t.classList.add('show'); 
+            setTimeout(() => t.classList.remove('show'), 3000);
+        }
+
+        // INIT EXISTING ELEMENTS
+        document.querySelectorAll('.element').forEach(makeDrag);
+
+        // TAB SWITCHER
+        function switchTab(t) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            event.target.classList.add('active'); 
+            document.getElementById('tab-' + t).classList.add('active');
+        }
+
+        // PERFECT ZOOM FIT SCALING
+        function fitArtboard() {
+            currScale = Math.min((workspace.clientWidth - 100) / artboard.clientWidth, (workspace.clientHeight - 100) / artboard.clientHeight);
+            wrapper.style.transform = `scale(${currScale})`;
+        }
+        window.addEventListener('resize', fitArtboard); 
+        setTimeout(fitArtboard, 100);
+
+        workspace.addEventListener('wheel', e => {
+            if(e.ctrlKey || e.metaKey){ 
+                e.preventDefault(); 
+                currScale = Math.max(0.1, Math.min(currScale + (e.deltaY > 0 ? -0.05 : 0.05), 3)); 
+                wrapper.style.transform = `scale(${currScale})`; 
+            }
+        }, {passive: false});
+
+        // CANVAS SIZING
+        function applyPresetSize(){ 
+            let v = document.getElementById('preset-size').value; 
+            if(v === 'custom') return; 
+            artboard.style.width = v.split('x')[0] + 'px'; 
+            artboard.style.height = v.split('x')[1] + 'px'; 
+            fitArtboard(); 
+        }
+
+        // MOCKED AI FALLBACK STRATEGIST (Cleaned up logic)
+        function mockedAIResponse(topic) {
+            topic = topic.toLowerCase(); 
+            let hook="", pt="", hkg="", sr="";
+            if(topic.includes('market') || topic.includes('finan') || topic.includes('ecommerce') || topic.includes('sale')) {
+                hook = "Your current setup is literally bleeding money. Fix it in 3 clicks."; 
+                pt = "Physical scaling burns through cash."; 
+                hkg="#ScaleDigitally #NoInventory #Ecommerce"; 
+                sr = "Luxury business abstract dark";
+            } else if(topic.includes('fit') || topic.includes('health') || topic.includes('diet')) {
+                hook = "Everything they told you about calories is mathematically wrong."; 
+                pt = "Diet industries sell lies, not results."; 
+                hkg="#RealFitness #BioHacking #DietFacts"; 
+                sr = "dark green healthy organic food";
+            } else {
+                hook = "If you don't execute this formula today, someone else will."; 
+                pt = "Stagnation is equal to deletion in the modern era."; 
+                hkg="#FutureProof #SystemScale #Automation"; 
+                sr = "Dark futuristic neon space";
+            }
+            return `<h4>🔥 VIRAL TRIGGER HOOK</h4><p id="ai-hook" style='color:#fff;font-size:16px;font-weight:900;'>${hook.toUpperCase()}</p><h4>🧠 DIRECT AD FRAMEWORK</h4><p id="ai-frame"><b>PROBLEM MAP:</b> ${pt}<br><b>AGGRESSION LIMIT:</b> Action takers consume entire segments daily avoiding manual friction.<br><b>SOLUTION ROADMAP:</b> Deploy the specific sequence inside mitigating negative resistance.</p><h4>🎯 DEMOGRAPHIC TARGET DIRECTIVES</h4><p>${hkg}</p><h4>🖼️ VISUAL INITIATION NODE</h4><p>Target System Background String Output : <span style='color:var(--accent); font-weight:bold;'>${sr}</span></p><button class="btn btn-magic" style="width:100%; margin-top:15px;" onclick="applyAIResultsToCanvas()"><i class="fas fa-plus-circle"></i> APPLY TO CANVAS</button>`;
+        }
+
+        function applyAIResultsToCanvas() {
+            const hook = document.getElementById('ai-hook')?.innerText;
+            const frame = document.getElementById('ai-frame')?.innerText;
+            if (!hook) return showToast("No AI data to apply", true);
+
+            // Clear previous elements if it's a fresh start
+            // clearCanvasElements(); 
+            
+            addTextObj(hook, "300px", "80px", "920px", "100px", "Anton");
+            if (frame) {
+                addCardObj(frame, "600px", "80px", "850px");
+            }
+            showToast("AI Strategy Synced to Canvas!");
+        }
+
+        async function triggerAICampaign() {
+            let tp = document.getElementById('ai-topic').value; 
+            let bx = document.getElementById('ai-results');
+            if(!tp) return showToast("Provide a detailed topic segment first", true);
+            
+            bx.style.display = "block"; 
+            bx.innerHTML = `<div style="text-align:center;padding:30px;"><i class="fas fa-circle-notch fa-spin" style="font-size:25px;color:cyan;margin-bottom:10px;"></i><p>Pinging OpenRouter Relay...</p></div>`;
+
+            const sys = "Produce elite copy formatted EXACTLY like so: <h4>🔥 VIRAL TRIGGER HOOK</h4> <p>[punchline]</p> <h4>🧠 DIRECT AD FRAMEWORK</h4> <p><b>PROBLEM MAP:</b> [text]<br><b>AGGRESSION LIMIT:</b>[text]<br><b>SOLUTION ROADMAP:</b>[text]</p> <h4>🎯 DEMOGRAPHIC TARGET DIRECTIVES</h4> <p>#tag1 #tag2 #tag3</p> <h4>🖼️ VISUAL INITIATION NODE</h4> <p>Target System Background String Output : [strictly 3 visual word descriptors of photo. no brackets]</p>";
+
+            try {
+                let orNetReq = await fetch("https://openrouter.ai/api/v1/chat/completions", { 
+                    method: "POST", 
+                    headers: {"Authorization": `Bearer ${OR_KEY}`, "Content-Type": "application/json", "HTTP-Referer": "http://localhost", "X-Title":"SaaS Studio" }, 
+                    body: JSON.stringify({ "model": "meta-llama/llama-3-8b-instruct:free", "messages":[ {"role":"system","content":sys}, {"role":"user","content":"Execute marketing data configuration for niche: " + tp}]})
+                });
+                
+                if(!orNetReq.ok) throw new Error("CORS or Server Halt");
+                let jsData = await orNetReq.json();
+                let dirtyHtml = jsData.choices[0].message.content.replace(/```(html)?/gi,'');
+                
+                // Wrap content to allow extraction
+                let hookMatch = /TRIGGER HOOK<\/h4>\s*<p>(.*?)<\/p>/i.exec(dirtyHtml);
+                let frameMatch = /AD FRAMEWORK<\/h4>\s*<p>(.*?)<\/p>/i.exec(dirtyHtml);
+                
+                let finalHtml = dirtyHtml + `<button class="btn btn-magic" style="width:100%; margin-top:15px;" onclick="applyAIResultsToCanvas()"><i class="fas fa-plus-circle"></i> APPLY TO CANVAS</button>`;
+                
+                bx.innerHTML = finalHtml;
+                // Add hidden data for easier extraction if needed, or rely on IDs if we can inject them
+                if (document.querySelector('#ai-results #ai-hook')) { /* already has IDs from AI output maybe? */ }
+                else {
+                    // Try to inject IDs for the apply function
+                    bx.querySelectorAll('p').forEach((p, i) => {
+                        if (i === 0) p.id = 'ai-hook';
+                        if (i === 1) p.id = 'ai-frame';
+                    });
+                }
+                showToast("Real AI Neural Integration Accepted.");
+
+                let findImageDesc = /Output[\s\S]*?:([^<]+)<\/p>/i.exec(dirtyHtml);
+                if(findImageDesc && findImageDesc[1]) {
+                    document.getElementById('pexels-search').value = findImageDesc[1].trim();
+                    fetchPexels(false);
+                }
+
+            } catch (err) {
+                console.warn("Deploying Fallback Brain due to CORS or Limit Block...");
+                let mockResponse = mockedAIResponse(tp);
+                bx.innerHTML = `<div style="margin-bottom:10px; font-size:10px; color:#5a6; background:#1b3d2b; padding:4px 8px; border-radius:4px; display:inline-block;"><i class="fas fa-shield-alt"></i> OPENROUTER BLOCKED: PROXY FALLBACK LAUNCHED</div>` + mockResponse;
+                showToast("Connection Proxy Redirected To Safe Local Storage.", false);
+                
+                let fallbackMatch = /Output :.*?<span.*?>([^<]+)<\/span>/i.exec(mockResponse);
+                if(fallbackMatch) { 
+                    document.getElementById('pexels-search').value = fallbackMatch[1]; 
+                    fetchPexels(false);
+                }
+            }
+        }
+
+        // MAGIC AUTO CREATE CANVAS ENGINE
+        function magicAutoCreate() {
+            let mt = document.getElementById('magic-topic').value || "Default Launch Plan";
+            let colors = ["#00F0FF", "#FF0050", "#39FF14", "#FFD700", "#FF7B00"];
+            let magC = colors[Math.floor(Math.random() * colors.length)];
+            
+            document.getElementById('preset-size').value = "1080x1350"; 
+            applyPresetSize();
+            clearCanvasElements();
+
+            let kArr = mt.split(" "); 
+            let mKey = kArr.length > 2 ? `${kArr[kArr.length-2]} ${kArr[kArr.length-1]} dark` : `${mt} dark aesthetics`;
+            
+            showToast(`Generating Magic Canvas... (${mKey})`, false);
+            document.getElementById('pexels-search').value = mKey;
+            
+            document.getElementById('bg-overlay').style.background = `linear-gradient(to top, #000 0%, transparent 60%, rgba(0,0,0,0.8) 100%)`;
+            
+            addTextObj("THE EXCLUSIVE<br><span style='color:"+magC+"; text-transform:uppercase;'>"+mt.substring(0,25)+"...</span>", "120px", "80px", "920px", "90px", "Oswald");
+            let mSubBObjSystem = addCardObj("Learn the highly specific methodology frameworks completely transforming digital arrays and generating exponential value streams directly without friction...<br><br><span style='font-weight:900;'>Click Link Included Inside Output Render!</span>", "850px", "80px", "900px", "20px", "rgba(10,12,18,0.85)"); 
+            mSubBObjSystem.style.borderLeft = "4px solid " + magC;
+            
+            fetchPexelsAutoM(mKey);
+        }
+
+        // PEXELS FETCHERS
+        const FallbackURLsOff = ["https://images.unsplash.com/photo-1542838132-92c53300491e?q=80&w=1080","https://images.unsplash.com/photo-1518546305927-5a555bb7020d?q=80&w=1080"];
+        
+        async function fetchPexelsAutoM(kyw) {
+            try {
+                let nr = await fetch(`https://api.pexels.com/v1/search?query=${kyw}&per_page=1`, { headers:{Authorization: PEXELS_KEY}});
+                let jd = await nr.json();
+                if(jd.photos && jd.photos.length > 0) bg(jd.photos[0].src.large2x);
+                else throw new Error("empty");
+            } catch(ed){ 
+                bg(FallbackURLsOff[Math.floor(Math.random() * FallbackURLsOff.length)]); 
+            }
+            showToast("Magic Setup Done.");
+        }
+
+        const FBSafer = ["https://images.unsplash.com/photo-1555949963-aa79dcee981c?q=80&w=1080","https://images.unsplash.com/photo-1542404554-4638d15d6d84?q=80&w=1080","https://images.unsplash.com/photo-1490645935967-10de6ba17061?q=80&w=1080"];
+        
+        async function fetchPexels(pgn=false) {
+            let gBox = document.getElementById('pexels-gallery'); 
+            let qr = document.getElementById('pexels-search').value || "coding";
+            
+            if(pgn) pexPage++; else pexPage=1;
+            if(!pgn) gBox.innerHTML='<div style="font-size:12px;color:cyan;grid-column:span 2;text-align:center;"><i class="fas fa-sync fa-spin"></i> Getting Premium Art...</div>';
+            
+            try {
+                let ppR = pgn ? pexPage : (Math.floor(Math.random()*4)+1);
+                let qd = await fetch(`https://api.pexels.com/v1/search?query=${qr}&per_page=12&page=${ppR}`, { headers:{Authorization: PEXELS_KEY}});
+                if(!qd.ok) throw new Error("limit");
+                let md = await qd.json(); 
+                if(!pgn) gBox.innerHTML='';
+                if(md.photos.length===0 && !pgn) throw new Error("nada");
+                
+                md.photos.forEach(ip => {
+                    gBox.insertAdjacentHTML('beforeend',`<div class="img-card"><img src="${ip.src.medium}"><div class="img-actions"><button class="img-btn" onclick="bg('${ip.src.large2x}')">Set Background</button><button class="img-btn" style="background:#222;" onclick="addImage('${ip.src.large2x}', '50px','50px','400px')">Spawn Canvas Node</button></div></div>`);
+                });
+            } catch (x) {
+                if(!pgn) {
+                    gBox.innerHTML = `<div style="grid-column:span 2; font-size:10px; color:#aaa; text-align:center; padding:10px; border:1px solid #444; border-radius:5px; margin-bottom:5px;">Pexels Quota Limited.<br>Using Offline Studio Reserve...</div>`;
+                    FBSafer.forEach(url => gBox.insertAdjacentHTML('beforeend', `<div class="img-card"><img src="${url}"><div class="img-actions"><button class="img-btn" onclick="bg('${url}')">Set Base Surface</button></div></div>`));
+                }
+            }
+        }
+
+        function bg(url) { 
+            let b = document.getElementById('bg-img'); 
+            b.crossOrigin = 'anonymous'; 
+            b.src = url; 
+        }
+
+        function uploadLocalImage(ev){ 
+            let iFn = ev.target.files[0]; 
+            if(!iFn) return; 
+            let rdLObj = new FileReader(); 
+            rdLObj.onload = z => addImage(z.target.result, "50px", "50px", "400px", "0px"); 
+            rdLObj.readAsDataURL(iFn); 
+            showToast("Upload Active.");
+        }
+
+        // CANVAS ELEMENT GENERATION LOGIC
+        function clearCanvasElements(){ artboard.querySelectorAll('.element').forEach(z => z.remove()); }
+        
+        function addElement(t){ 
+            if(t === 'text') addTextObj("TYPE NOW", "200px", "100px", "800px", "100px", "Anton"); 
+            else addCardObj("Highlight target logic here clearly to engage readers seamlessly with your new output.", "400px", "100px", "600px");
+        }
+
+        function addTextObj(htm, tp, lft, wd, fs, fm, cl="#fff", ls="0px", lh="1.1", al="left", stk="0px transparent") {
+            let dv = document.createElement('div'); 
+            dv.className = 'element el-text'; 
+            dv.id = 'el-' + elCount++;
+            dv.innerHTML = htm; 
+            dv.style.top = tp; 
+            dv.style.left = lft; 
+            dv.style.width = wd; 
+            dv.style.fontSize = fs; 
+            dv.style.fontFamily = fm; 
+            dv.style.color = cl; 
+            dv.style.letterSpacing = ls; 
+            dv.style.lineHeight = lh; 
+            dv.style.textAlign = al; 
+            dv.style.webkitTextStroke = stk; 
+            dv.style.zIndex = ++mxZ; 
+            artboard.appendChild(dv); 
+            makeDrag(dv); 
+            sEl(dv); 
+            return dv;
+        }
+
+        function addCardObj(htm, tp, lft, wd, br="20px", clrB="rgba(18,20,25,0.85)") {
+            let cp = document.createElement('div'); 
+            cp.className = 'element el-card'; 
+            cp.id = 'el-' + elCount++; 
+            cp.innerHTML = htm; 
+            cp.style.top = tp; 
+            cp.style.left = lft; 
+            cp.style.width = wd; 
+            cp.style.borderRadius = br; 
+            cp.style.background = clrB; 
+            cp.style.zIndex = ++mxZ; 
+            artboard.appendChild(cp); 
+            makeDrag(cp); 
+            sEl(cp); 
+            return cp;
+        }
+
+        function addImage(url, tp, lft, wd, br="0px"){
+            let mg = document.createElement('img'); 
+            mg.crossOrigin = 'anonymous'; 
+            mg.draggable = false; 
+            mg.className = 'element el-image'; 
+            mg.id = 'el-' + elCount++; 
+            mg.src = url; 
+            mg.style.top = tp; 
+            mg.style.left = lft; 
+            mg.style.width = wd; 
+            mg.style.borderRadius = br; 
+            mg.style.zIndex = ++mxZ; 
+            artboard.appendChild(mg); 
+            makeDrag(mg); 
+            sEl(mg); 
+            return mg;
+        }
+
+        // TEMPLATES SETUP
+        function loadTemplate(type) {
+            clearCanvasElements();
+            if (type === 'cover') {
+                document.getElementById('preset-size').value = "1748x2480"; applyPresetSize();
+                bg("https://images.unsplash.com/photo-1628156108169-f815598fb28c?q=80&w=1920");
+                addTextObj("ULTIMATE<br>GUIDE", "400px", "100px", "1500px", "200px", "Anton", "#00F0FF");
+            } else if (type === 'viral') {
+                document.getElementById('preset-size').value = "1080x1920"; applyPresetSize();
+                addTextObj("3 SECRET<br>WEBSITES", "300px", "50px", "980px", "150px", "Anton", "#FF0050");
+            } else if (type === 'quote') {
+                document.getElementById('preset-size').value = "1080x1080"; applyPresetSize();
+                addCardObj('"The best way to predict the future is to create it."', "300px", "100px", "880px", "20px", "rgba(0,0,0,0.8)");
+            } else {
+                document.getElementById('preset-size').value = "1080x1080"; applyPresetSize();
+            }
+            showToast("Template Loaded.");
+        }
+
+        // ELEMENT SELECTION & PROPERTIES
+        function sEl(el) {
+            if (activeEl) activeEl.classList.remove('active');
+            activeEl = el;
+            el.classList.add('active');
+            
+            document.getElementById('properties-panel').innerHTML = `
+                <div style="padding-bottom: 20px;">
+                    <h3 style="color:var(--accent); font-size:14px; text-transform:uppercase; margin-bottom: 20px;">Layer Properties</h3>
+                    <button class="btn" style="width:100%; margin-bottom:15px; justify-content:center; background:#5a0c16; border-color:#aa0000;" onclick="deleteActiveEl()">
+                        <i class="fas fa-trash-alt"></i> Delete Selected Layer
+                    </button>
+                    <div class="input-group">
+                        <label>Font Size</label>
+                        <input type="number" value="${parseInt(activeEl.style.fontSize) || 40}" oninput="activeEl.style.fontSize = this.value + 'px'">
+                    </div>
+                    <div class="input-group">
+                        <label>Text Color</label>
+                        <input type="color" value="${rgbToHex(activeEl.style.color) || '#ffffff'}" oninput="activeEl.style.color = this.value">
+                    </div>
+                    <p style="font-size: 11px; color: #888;">Tip: Double-click the text on the canvas to edit it directly.</p>
+                </div>
+            `;
+        }
+
+        function rgbToHex(rgb) {
+            if (!rgb || !rgb.startsWith('rgb')) return rgb;
+            const parts = rgb.match(/\d+/g);
+            if (!parts) return rgb;
+            return "#" + parts.slice(0, 3).map(x => {
+                const hex = parseInt(x).toString(16);
+                return hex.length === 1 ? "0" + hex : hex;
+            }).join("");
+        }
+
+        function deleteActiveEl() {
+            if (activeEl) {
+                activeEl.remove();
+                activeEl = null;
+                document.getElementById('properties-panel').innerHTML = `
+                    <div style="text-align: center; color: #555; margin-top: 80px; font-size: 12px; line-height: 1.6;">
+                        <i class="fas fa-mouse-pointer" style="font-size: 40px; margin-bottom: 20px; color:var(--accent); opacity:0.5;"></i><br>Select Layer Matrix on Canvas<br>To Open Config Panel.
+                    </div>`;
+            }
+        }
+
+        // FIX: BUG-FREE DRAGGING LOGIC (Hallucinations Removed)
+        function makeDrag(el) {
+            let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+            if (el.tagName === 'IMG') el.draggable = false;
+            
+            el.onmousedown = dragMouseDown;
+
+            function dragMouseDown(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                if (e.target !== el && e.target.nodeName === 'BUTTON') return;
+                sEl(el);
+                
+                // Bring to front
+                el.style.zIndex = ++mxZ;
+
+                if (el.contentEditable === "true") return; // Don't drag while editing
+
+                pos3 = e.clientX;
+                pos4 = e.clientY;
+                document.onmouseup = closeDragElement;
+                document.onmousemove = elementDrag;
+            }
+
+            el.ondblclick = function(e) {
+                if (el.classList.contains('el-image')) return;
+                el.contentEditable = "true";
+                el.focus();
+                el.style.cursor = "text";
+                // Select all text
+                document.execCommand('selectAll', false, null);
+            };
+
+            el.onblur = function() {
+                el.contentEditable = "false";
+                el.style.cursor = "move";
+            };
+
+            function elementDrag(e) {
+                e.preventDefault();
+                // Scale math allows accurate dragging even when artboard is zoomed out
+                let currentZoom = currScale || 1;
+                pos1 = (pos3 - e.clientX) / currentZoom;
+                pos2 = (pos4 - e.clientY) / currentZoom;
+                pos3 = e.clientX;
+                pos4 = e.clientY;
+                el.style.top = (el.offsetTop - pos2) + "px";
+                el.style.left = (el.offsetLeft - pos1) + "px";
+            }
+
+            function closeDragElement() {
+                document.onmouseup = null;
+                document.onmousemove = null;
+            }
+        }
+
+        // EXPORT FUNCTION (html2canvas)
+        function exportDesign() {
+            showToast("Rendering Final Asset...");
+            if(activeEl) activeEl.classList.remove('active');
+            let format = document.getElementById('export-format').value;
+            let ext = format === 'image/jpeg' ? 'jpg' : 'png';
+            
+            setTimeout(() => {
+                html2canvas(document.getElementById('artboard'), {
+                    useCORS: true,
+                    allowTaint: false, // Changed to false for better security/reliability
+                    backgroundColor: "#000000",
+                    scale: 2,
+                    logging: true // Help debug if it fails
+                }).then(canvas => {
+                    let link = document.createElement('a');
+                    link.download = `QuickFair_Export.${ext}`;
+                    link.href = canvas.toDataURL(format, 0.9);
+                    link.click();
+                    showToast("Asset Downloaded Successfully!");
+                }).catch(err => {
+                    showToast("Export failed: " + err.message, true);
+                    console.error("Export Error:", err);
+                });
+            }, 300);
+        }
+
+    </script>
+</body>
+</html>
