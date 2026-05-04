@@ -161,6 +161,34 @@ class CanvasManager {
         else this.addCard();
     }
 
+    duplicateLayer() {
+        const active = document.querySelector('.element.active');
+        if (!active) return;
+        const clone = active.cloneNode(true);
+        clone.id = `el-${this.elementCount++}`;
+        clone.style.top = (parseInt(active.style.top) + 30) + 'px';
+        clone.style.left = (parseInt(active.style.left) + 30) + 'px';
+        this.artboard.appendChild(clone);
+        this._initEl(clone);
+        sEl(clone);
+        this.updateState();
+        showToast('Layer Duplicated');
+    }
+
+    bringForward() {
+        const active = document.querySelector('.element.active');
+        if (active) { active.style.zIndex = ++this.maxZIndex; this.updateState(); }
+    }
+
+    sendBackward() {
+        const active = document.querySelector('.element.active');
+        if (active) { 
+            let cur = parseInt(active.style.zIndex) || 10;
+            active.style.zIndex = Math.max(1, cur - 1); 
+            this.updateState(); 
+        }
+    }
+
     uploadLocalImage(event) {
         const file = event.target.files[0]; if (!file) return;
         const reader = new FileReader();
@@ -409,3 +437,6 @@ class CanvasManager {
 const canvasManager = new CanvasManager();
 export default canvasManager;
 window.canvasManager = canvasManager;
+window.bringForward = () => canvasManager.bringForward();
+window.sendBackward = () => canvasManager.sendBackward();
+window.duplicateLayer = () => canvasManager.duplicateLayer();
