@@ -212,7 +212,8 @@ class CanvasManager {
                 bg: 'https://images.unsplash.com/photo-1618045952959-1582e219736e?q=80&w=1920',
                 overlay: 'linear-gradient(to bottom, rgba(0,0,0,0.6), rgba(0,0,0,0.9))',
                 fn: () => {
-                    this.addCard({ content: '"The people who are crazy enough to think they can change the world are the ones who do."<br><br><span style="color:#8a5cf6;font-size:20px;">— Steve Jobs</span>', top:'300px', left:'60px', width:'960px', background:'rgba(0,0,0,0.7)', fontSize:'36px' });
+                    const q = topic ? `"${topic} is not just a trend, it's the future of how we operate."` : '"The people who are crazy enough to think they can change the world are the ones who do."';
+                    this.addCard({ content: `${q}<br><br><span style="color:#8a5cf6;font-size:20px;">— Elite Insights</span>`, top:'300px', left:'60px', width:'960px', background:'rgba(0,0,0,0.7)', fontSize:'36px' });
                 }
             },
             split: {
@@ -254,8 +255,8 @@ class CanvasManager {
                 overlay: '',
                 fn: () => {
                     if (bgOv) { bgOv.style.background = 'linear-gradient(135deg, #0f1020 0%, #1a1440 100%)'; }
-                    this.addText({ text: (topic || 'MINIMAL').toUpperCase(), top:'350px', left:'60px', fontSize:'140px', color:'#fff', fontFamily:'Bebas Neue' });
-                    this.addText({ text: 'Subtitle goes here', top:'600px', left:'60px', fontSize:'36px', color:'rgba(255,255,255,.5)', fontFamily:'Plus Jakarta Sans' });
+                    this.addText({ text: (topic || 'MINIMAL').toUpperCase(), top:'350px', left:'60px', fontSize: (topic && topic.length > 15 ? '80px' : '140px'), color:'#fff', fontFamily:'Bebas Neue' });
+                    this.addText({ text: topic ? 'Master the art of scaling' : 'Subtitle goes here', top:'600px', left:'60px', fontSize:'36px', color:'rgba(255,255,255,.5)', fontFamily:'Plus Jakarta Sans' });
                 }
             }
         };
