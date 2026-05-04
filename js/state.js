@@ -20,9 +20,28 @@ export function saveState() {
     const activeEl = document.querySelector('.element.active');
     if (activeEl) activeEl.classList.remove('active');
 
-    // Serialize elements
+    // Serialize elements using a data-driven approach instead of huge HTML blobs
+    const elements = Array.from(artboard.querySelectorAll('.element')).map(el => {
+        const isImage = el.tagName === 'IMG';
+        return {
+            id: el.id,
+            tagName: el.tagName,
+            className: el.className,
+            html: isImage ? '' : el.innerHTML,
+            src: isImage ? el.src : '',
+            style: el.style.cssText
+        };
+    });
+
+    const bgImg = document.getElementById('bg-img');
+    const bgOverlay = document.getElementById('bg-overlay');
+
     const state = {
-        html: artboard.innerHTML,
+        version: 2, // Tagging version to differentiate from old HTML blob storage
+        bgSrc: bgImg ? bgImg.src : '',
+        bgFilter: bgImg ? bgImg.style.filter : '',
+        overlayBg: bgOverlay ? bgOverlay.style.background : '',
+        elements: elements,
         mxZ: window.mxZ || 20,
         elCount: window.elCount || 1000
     };
@@ -69,7 +88,44 @@ function restoreState(state) {
     isRestoring = true;
     
     const artboard = document.getElementById('artboard');
-    artboard.innerHTML = state.html;
+    
+    if (state.version !== 2) {
+        // Fallback for legacy state (HTML blob)
+        artboard.innerHTML = state.html;
+    } else {
+        // Data-driven restore
+        // Clear all current elements
+        artboard.querySelectorAll('.element').forEach(el => el.remove());
+        
+        // Restore Backgrounds
+        const bgImg = document.getElementById('bg-img');
+        if (bgImg && state.bgSrc) {
+            bgImg.src = state.bgSrc;
+            bgImg.style.filter = state.bgFilter || '';
+        }
+        
+        const bgOverlay = document.getElementById('bg-overlay');
+        if (bgOverlay && state.overlayBg) {
+            bgOverlay.style.background = state.overlayBg;
+        }
+
+        // Restore Elements dynamically
+        state.elements.forEach(elData => {
+            const el = document.createElement(elData.tagName);
+            el.id = elData.id;
+            el.className = elData.className;
+            el.style.cssText = elData.style;
+            if (elData.tagName === 'IMG') {
+                el.src = elData.src;
+                el.crossOrigin = 'anonymous';
+                el.draggable = false;
+            } else {
+                el.innerHTML = elData.html;
+            }
+            artboard.appendChild(el);
+        });
+    }
+
     window.mxZ = state.mxZ;
     window.elCount = state.elCount;
     window.activeEl = null;
