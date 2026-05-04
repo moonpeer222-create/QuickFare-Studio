@@ -491,19 +491,43 @@
 
     <!-- MAIN APP BOOTSTRAP -->
     <script type="module">
-        import { initUI } from './js/ui.js';
-        import { loadInitialState, saveState } from './js/state.js';
-        import { makeDrag } from './js/canvas.js';
-        import './js/api.js';
+        import appState from './js/appState.js';
+        import canvasManager from './js/CanvasManager.js';
+        import campaignController from './js/CampaignController.js';
+        import * as ui from './js/ui.js';
 
-        // Initialize UI events
-        initUI();
+        // Initialize state
+        appState.loadFromLocal();
 
-        // Try to load state, otherwise setup default elements and save initial state
-        if (!loadInitialState()) {
-            document.querySelectorAll('.element').forEach(makeDrag);
-            saveState(); // Save initial blank state
+        // Bind new APIs to window for legacy onclick support
+        window.appState = appState;
+        window.canvasManager = canvasManager;
+        window.campaignController = campaignController;
+        window.ui = ui;
+
+        // Map legacy function names to new modular methods
+        window.undo = () => appState.undo();
+        window.redo = () => appState.redo();
+        window.clearCanvasElements = () => canvasManager.clearAll();
+        window.exportDesign = () => canvasManager.downloadAsImage();
+        window.toggleTheme = ui.toggleTheme;
+        window.switchTab = ui.switchTab;
+        window.applyPresetSize = () => canvasManager.applyPresetSize();
+        window.magicAutoCreate = () => campaignController.magicAutoCreate();
+        window.loadTemplate = (t) => canvasManager.loadTemplate(t);
+        window.addElement = (t) => canvasManager.addElement(t);
+        window.uploadLocalImage = (e) => canvasManager.uploadLocalImage(e);
+        window.triggerAICampaign = () => campaignController.generateCampaign(document.getElementById('ai-topic-strategy').value);
+        window.bg = (url) => canvasManager.setBackground(url);
+        window.addImage = (url, tp, lft, wd) => canvasManager.addImage(url, { top: tp, left: lft, width: wd });
+
+        // Initial setup
+        const snapshot = appState.getSnapshot();
+        if (snapshot.canvas.elements.length === 0) {
+            canvasManager.addText({ text: "QUICKFARE STUDIO V12", top: "300px" });
         }
+        
+        ui.showToast("System V12 Modular Initialized");
     </script>
 </body>
 </html>
