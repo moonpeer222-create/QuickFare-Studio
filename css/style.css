@@ -60,9 +60,25 @@ select.nav-select{background:#0c0e1d;border:1px solid var(--btn-border);color:va
 .tab-content{flex:1;display:none;flex-direction:column;}
 .tab-content.active{display:flex;}
 
-/* ── SECTIONS ── */
-.section{padding:16px;border-bottom:1px solid var(--border);flex-shrink:0;}
-.section-title{font-size:11px;text-transform:uppercase;color:var(--muted);letter-spacing:1.5px;margin:0 0 14px;font-weight:800;display:flex;justify-content:space-between;align-items:center;}
+/* ── SECTIONS & ACCORDIONS ── */
+.section{border-bottom:1px solid var(--border);flex-shrink:0;}
+.section-title{padding:16px;margin:0;font-size:11px;text-transform:uppercase;color:var(--muted);letter-spacing:1.5px;font-weight:800;display:flex;justify-content:space-between;align-items:center;cursor:pointer;transition:all 0.3s ease;user-select:none;}
+.section-title:hover { background: rgba(255,255,255,0.02); color: var(--text); }
+.section-title i.chevron { transition: transform 0.3s ease; }
+.section.active .section-title i.chevron { transform: rotate(180deg); color: var(--accent); }
+.section-content { padding: 0 16px; max-height: 0; overflow: hidden; opacity: 0; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+.section.active .section-content { padding: 0 16px 16px 16px; max-height: 800px; opacity: 1; }
+
+/* AI Magic Sparkle Animation */
+@keyframes pulseGlow { 0% { box-shadow: 0 0 5px var(--glow); } 50% { box-shadow: 0 0 15px var(--glow); } 100% { box-shadow: 0 0 5px var(--glow); } }
+.btn-magic { animation: pulseGlow 2s infinite; position: relative; overflow: hidden; }
+.btn-magic::after { content:''; position:absolute; top:-50%; left:-50%; width:200%; height:200%; background:linear-gradient(to right, transparent, rgba(255,255,255,0.1), transparent); transform:rotate(45deg); animation: shine 3s infinite; }
+@keyframes shine { 0% { left: -100%; } 100% { left: 100%; } }
+
+/* Floating AI Suggestion text */
+.ai-helper-text { font-size: 10px; color: var(--qwen); margin-top: 6px; font-style: italic; display: flex; align-items: center; gap: 4px; animation: fadeIn 0.5s ease; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+
 
 /* ── INPUTS ── */
 .input-group{margin-bottom:12px;}
