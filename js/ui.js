@@ -16,32 +16,94 @@ export function sEl(el) {
     document.querySelectorAll('.element').forEach(z => z.classList.remove('active'));
     if (!el) return;
     el.classList.add('active');
-    const props = document.getElementById('layer-properties');
-    if (!props) return;
+    const isImg = el.classList.contains('el-image');
+    
     props.innerHTML = `
         <div style="padding-bottom:20px;">
-            <h3 style="color:var(--accent);font-size:14px;text-transform:uppercase;margin-bottom:20px;">Layer Properties</h3>
-            <div class="input-group"><label>Layer ID</label><input type="text" value="${el.id}" readonly style="opacity:0.5"></div>
-            ${!el.classList.contains('el-image') ? `
-            <div class="input-group"><label>Font Size</label><input type="text" id="prop-fs" value="${el.style.fontSize || ''}"></div>
-            <div class="input-group"><label>Color</label><input type="color" id="prop-color" value="#ffffff"></div>
-            ` : ''}
-            <div class="row" style="margin-top:10px;">
-                <button class="btn" style="flex:1;justify-content:center;background:#334;" onclick="bringForward()"><i class="fas fa-arrow-up"></i> Forward</button>
-                <button class="btn" style="flex:1;justify-content:center;background:#334;" onclick="sendBackward()"><i class="fas fa-arrow-down"></i> Backward</button>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                <h3 style="color:var(--accent); font-size:12px; text-transform:uppercase; letter-spacing:1px; margin:0;">Layer Properties</h3>
+                <span style="font-size:10px; color:var(--muted); font-family:monospace;">${el.id}</span>
             </div>
-            <button class="btn" style="width:100%;margin-top:10px;justify-content:center;background:#5a0c16;border-color:#aa0000;" id="btn-del-layer"><i class="fas fa-trash-alt"></i> Delete Layer</button>
+
+            ${!isImg ? `
+            <div class="input-group">
+                <label>Text Content</label>
+                <textarea id="prop-text" style="height:60px;">${el.innerHTML.replace(/<br>/g, '\n')}</textarea>
+            </div>
+            <div class="row">
+                <div class="input-group" style="flex:2;">
+                    <label>Font Family</label>
+                    <select id="prop-font">
+                        <option value="Anton" ${el.style.fontFamily.includes('Anton') ? 'selected' : ''}>Anton - Bold</option>
+                        <option value="'Plus Jakarta Sans'" ${el.style.fontFamily.includes('Jakarta') ? 'selected' : ''}>Jakarta - Modern</option>
+                        <option value="'Space Grotesk'" ${el.style.fontFamily.includes('Grotesk') ? 'selected' : ''}>Grotesk - Tech</option>
+                        <option value="'Oswald'" ${el.style.fontFamily.includes('Oswald') ? 'selected' : ''}>Oswald - News</option>
+                        <option value="'Montserrat'" ${el.style.fontFamily.includes('Montserrat') ? 'selected' : ''}>Montserrat</option>
+                    </select>
+                </div>
+                <div class="input-group" style="flex:1;">
+                    <label>Size</label>
+                    <input type="number" id="prop-fs" value="${parseInt(el.style.fontSize) || 40}">
+                </div>
+            </div>
+            <div class="row">
+                <div class="input-group">
+                    <label>Color</label>
+                    <input type="color" id="prop-color" value="${rgbToHex(el.style.color) || '#ffffff'}">
+                </div>
+                <div class="input-group">
+                    <label>Align</label>
+                    <select id="prop-align">
+                        <option value="left" ${el.style.textAlign === 'left' ? 'selected' : ''}>Left</option>
+                        <option value="center" ${el.style.textAlign === 'center' ? 'selected' : ''}>Center</option>
+                        <option value="right" ${el.style.textAlign === 'right' ? 'selected' : ''}>Right</option>
+                    </select>
+                </div>
+            </div>
+            ` : `
+            <div class="input-group">
+                <label>Border Radius</label>
+                <input type="range" id="prop-radius" min="0" max="100" value="${parseInt(el.style.borderRadius) || 0}">
+            </div>
+            `}
+
+            <div class="row" style="margin-top:15px;">
+                <button class="btn" style="flex:1;justify-content:center;" onclick="bringForward()" title="Bring to Front"><i class="fas fa-layer-group"></i> UP</button>
+                <button class="btn" style="flex:1;justify-content:center;" onclick="sendBackward()" title="Send to Back"><i class="fas fa-layer-group" style="transform:rotate(180deg)"></i> DOWN</button>
+                <button class="btn" style="flex:1;justify-content:center;" onclick="duplicateLayer()" title="Duplicate Layer"><i class="fas fa-copy"></i> CLONE</button>
+            </div>
+            <button class="btn btn-danger" style="width:100%; margin-top:10px; justify-content:center;" id="btn-del-layer"><i class="fas fa-trash-alt"></i> DELETE LAYER</button>
         </div>`;
+
+    // Event Listeners
+    if (!isImg) {
+        document.getElementById('prop-text').oninput = e => { el.innerHTML = e.target.value.replace(/\n/g, '<br>'); window.canvasManager.updateState(); };
+        document.getElementById('prop-font').onchange = e => { el.style.fontFamily = e.target.value; window.canvasManager.updateState(); };
+        document.getElementById('prop-fs').oninput = e => { el.style.fontSize = e.target.value + 'px'; window.canvasManager.updateState(); };
+        document.getElementById('prop-color').oninput = e => { el.style.color = e.target.value; window.canvasManager.updateState(); };
+        document.getElementById('prop-align').onchange = e => { el.style.textAlign = e.target.value; window.canvasManager.updateState(); };
+
+        // Sync Sidebar
+        const pick = document.getElementById('font-picker'); if (pick) pick.value = el.style.fontFamily.replace(/'/g, '');
+        const sizeIn = document.getElementById('font-size-input'); if (sizeIn) sizeIn.value = parseInt(el.style.fontSize) || 80;
+        const colIn = document.getElementById('font-color-input'); if (colIn) colIn.value = rgbToHex(el.style.color) || '#ffffff';
+    } else {
+        document.getElementById('prop-radius').oninput = e => { el.style.borderRadius = e.target.value + 'px'; window.canvasManager.updateState(); };
+    }
 
     document.getElementById('btn-del-layer').onclick = () => {
         el.remove();
         props.innerHTML = '<div style="text-align:center;color:#555;margin-top:60px;font-size:12px;"><i class="fas fa-mouse-pointer" style="font-size:30px;margin-bottom:15px;display:block;color:var(--accent);opacity:0.5;"></i>Select Layer to Edit</div>';
-        window.saveState && window.saveState();
+        window.canvasManager.updateState();
     };
-    const fsInput = document.getElementById('prop-fs');
-    if (fsInput) fsInput.oninput = e => { el.style.fontSize = e.target.value; window.debounceSave && window.debounceSave(); };
-    const colorInput = document.getElementById('prop-color');
-    if (colorInput) colorInput.oninput = e => { el.style.color = e.target.value; window.debounceSave && window.debounceSave(); };
+}
+
+function rgbToHex(rgb) {
+    if (!rgb || !rgb.startsWith('rgb')) return rgb;
+    const parts = rgb.match(/\d+/g);
+    if (!parts || parts.length < 3) return '#ffffff';
+    const hex = (n) => parseInt(n).toString(16).padStart(2, '0');
+    return `#${hex(parts[0])}${hex(parts[1])}${hex(parts[2])}`;
 }
 
 export function switchTab(tabId) {
