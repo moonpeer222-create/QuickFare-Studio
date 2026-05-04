@@ -210,18 +210,25 @@
 
             <!-- E-BOOK WRAPPER -->
             <div id="business-kit-wrapper">
+                <!-- GENERATE PROMPT BANNER -->
+                <div id="kit-generate-banner" style="width:100%;max-width:680px;background:linear-gradient(135deg,rgba(138,92,246,.15),rgba(236,72,153,.1));border:1px solid var(--accent);border-radius:14px;padding:24px 30px;text-align:center;margin-bottom:0;">
+                    <div style="font-size:28px;margin-bottom:10px;">✨</div>
+                    <h3 style="color:var(--accent);font-size:16px;text-transform:uppercase;letter-spacing:1px;margin:0 0 8px;">Business Kit is Empty</h3>
+                    <p style="color:var(--muted);font-size:13px;margin:0 0 16px;line-height:1.6;">Go to <strong style="color:var(--text);">Business Kit tab → Enter your topic → Click Generate</strong><br>AI will fill all 17 pages automatically.</p>
+                    <button class="btn btn-primary" onclick="switchTab('ebook')" style="margin:0 auto;"><i class="fas fa-wand-magic-sparkles"></i> Generate Business Kit</button>
+                </div>
+
                 <!-- PAGE 1: COVER -->
                 <div class="page">
-                    <img id="cover-bg" src="https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?q=80&w=1200&auto=format&fit=crop" class="bg-img" crossorigin="anonymous" alt="Cover BG">
+                    <img id="cover-bg" src="" class="bg-img" crossorigin="anonymous" alt="Cover BG" style="display:none;">
                     <div class="gradient-overlay"></div>
                     <div class="page-content" style="justify-content: center; align-items: center; text-align: center;">
-                        <div id="c-badge" contenteditable="true" style="background: var(--danger); color: white; padding: 5px 20px; font-family: 'Oswald', sans-serif; letter-spacing: 5px; font-size: 16px; margin-bottom: 30px; border-radius: 3px; font-weight: bold;">QUICKFARE PRODUCTIONS</div>
-                        <div id="c-title" class="h-title" contenteditable="true" style="font-size: 80px; margin-bottom: 10px;">AI SE <span>AZADI</span></div>
-                        <div id="c-sub" class="h-sub" contenteditable="true" style="color: white; font-size: 22px; letter-spacing: 2px; margin-bottom: 40px; opacity: 0.9;">THE $5,000/MONTH SYSTEMS ARCHITECT</div>
-                        
+                        <div id="c-badge" contenteditable="true" style="background: var(--danger); color: white; padding: 5px 20px; font-family: 'Oswald', sans-serif; letter-spacing: 5px; font-size: 16px; margin-bottom: 30px; border-radius: 3px; font-weight: bold;">YOUR BRAND NAME</div>
+                        <div id="c-title" class="h-title" contenteditable="true" style="font-size: 80px; margin-bottom: 10px;">YOUR <span>TITLE</span></div>
+                        <div id="c-sub" class="h-sub" contenteditable="true" style="color: white; font-size: 22px; letter-spacing: 2px; margin-bottom: 40px; opacity: 0.9;">YOUR SUBTITLE HERE</div>
                         <div style="margin-top: 50px; border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.6); padding: 25px; border-radius: 15px; backdrop-filter: blur(10px); width: 80%;">
-                            <div id="c-tag" contenteditable="true" style="color: var(--accent); font-size: 18px; margin-bottom: 5px; font-weight: 700; font-family: 'Montserrat', sans-serif;">FOR PAKISTANI FREELANCERS ONLY</div>
-                            <div id="c-desc" class="p-text" contenteditable="true" style="margin: 0; color: #ccc;">Manual "Gadha Mazdoori" Se Nikaal Kar<br>Automated Systems Banne Ka Mukammal Safar (2026 Edition)</div>
+                            <div id="c-tag" contenteditable="true" style="color: var(--accent); font-size: 18px; margin-bottom: 5px; font-weight: 700; font-family: 'Montserrat', sans-serif;">TARGET AUDIENCE</div>
+                            <div id="c-desc" class="p-text" contenteditable="true" style="margin: 0; color: #ccc;">Book description will appear here after AI generation.</div>
                         </div>
                     </div>
                 </div>
@@ -230,17 +237,14 @@
                 <div class="page">
                     <div class="page-content" style="justify-content: center; align-items: center; text-align: center;">
                         <div style="width: 80px; height: 80px; border: 4px solid var(--danger); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 30px;">
-                            <span id="w-badge" contenteditable="true" style="color: var(--danger); font-size: 30px; font-weight: bold; font-family: 'Oswald', sans-serif;">18+</span>
+                            <span id="w-badge" contenteditable="true" style="color: var(--danger); font-size: 30px; font-weight: bold; font-family: 'Oswald', sans-serif;">!</span>
                         </div>
                         <div class="h-title" contenteditable="true" style="color: var(--danger); font-size: 50px;">WARNING</div>
-                        <div id="w-sub" class="h3" contenteditable="true" style="margin-bottom: 30px; font-size: 24px;">Yeh Masterclass kamzor dil walon ke liye nahi hai.</div>
-                        
-                        <div id="w-p1" class="p-text" contenteditable="true" style="font-size: 16px; max-width: 80%; line-height: 1.8; margin: 0 auto 20px auto;">Zindagi rewind nahi hoti. Jo waqt aapne $5 ki Fiverr gigs par zaya kar diya, wo wapas nahi aayega. 2026 mein rules badal chuke hain. AI aapki job nahi kha raha, woh insan aapki job kha raha hai jo AI ko system banana jaanta hai.</div>
-                        
-                        <div id="w-p2" class="p-text" contenteditable="true" style="font-size: 16px; max-width: 80%; line-height: 1.8; margin: 0 auto 20px auto;">Agar aap abhi bhi samajhte hain ke old methods kaam karenge toh is PDF ko band kar dein.</div>
-                        
+                        <div id="w-sub" class="h3" contenteditable="true" style="margin-bottom: 30px; font-size: 24px;">AI will write this title for your topic.</div>
+                        <div id="w-p1" class="p-text" contenteditable="true" style="font-size: 16px; max-width: 80%; line-height: 1.8; margin: 0 auto 20px auto;">Paragraph 1 — AI generated content will appear here.</div>
+                        <div id="w-p2" class="p-text" contenteditable="true" style="font-size: 16px; max-width: 80%; line-height: 1.8; margin: 0 auto 20px auto;">Paragraph 2 — AI generated content will appear here.</div>
                         <div class="cinematic-box" style="margin-top: 40px; text-align: left; max-width: 80%;">
-                            <p id="w-quote" contenteditable="true">"Duniya badal chuki hai. AI manual jobs kha chuka hai. Ab 'Hard Work' ka zamana nahi raha, ab 'Smart Systems' ka zamana hai."</p>
+                            <p id="w-quote" contenteditable="true">"AI generated motivational quote will appear here."</p>
                         </div>
                     </div>
                     <div class="footer-num">02</div>
@@ -335,28 +339,22 @@
                 <!-- PAGE 5: CHARACTERS -->
                 <div class="page">
                     <div class="page-content">
-                        <div class="ep-header"><span>Episode 02</span><span>Choose Your Fighter</span></div>
+                        <div class="ep-header"><span>Episode 02</span><span>The Two Personas</span></div>
                         <div class="h-title" contenteditable="true" style="color: white;">PERSONA A VS PERSONA B</div>
-                        <div class="p-text" contenteditable="true">Let's meet two professionals. Dekhein aap in mein se kis mindset mein hain.</div>
-
-                        <div class="grid-2" style="margin-top: 30px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <div class="p-text" contenteditable="true">Two mindsets — one wins, one struggles. Which one are you?</div>
+                        <div style="margin-top: 30px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
                             <div class="mac-window">
                                 <div class="mac-body" style="padding-top: 40px;">
-                                    <div id="char1-title" class="h3" style="color: var(--danger); margin-top: 0;" contenteditable="true">THE VICTIM (Manual)</div>
-                                    <div id="char1-desc" class="p-text" style="font-size: 13px;" contenteditable="true">Ye shakhs 14 ghante online rehta hai. Raat bhar jagta hai.</div>
-                                    <div id="char1-traits" class="p-text" style="font-size: 13px; color: var(--text-muted); margin-bottom: 0;" contenteditable="true">
-                                        <b>Status:</b> High Stress
-                                    </div>
+                                    <div id="char1-title" class="h3" style="color: var(--danger); margin-top: 0;" contenteditable="true">PERSONA A</div>
+                                    <div id="char1-desc" class="p-text" style="font-size: 13px;" contenteditable="true">AI generated persona description will appear here.</div>
+                                    <div id="char1-traits" class="p-text" style="font-size: 13px; color: var(--muted); margin-bottom: 0;" contenteditable="true"><b>Traits:</b> Will be filled by AI</div>
                                 </div>
                             </div>
-
                             <div class="mac-window" style="border-color: var(--accent);">
                                 <div class="mac-body" style="padding-top: 40px;">
-                                    <div id="char2-title" class="h3" style="color: var(--accent); margin-top: 0;" contenteditable="true">THE ARCHITECT (System)</div>
-                                    <div id="char2-desc" class="p-text" style="font-size: 13px;" contenteditable="true">Ye shakhs din mein sirf 3 ghante kaam karta hai aur automation use karta hai.</div>
-                                    <div id="char2-traits" class="p-text" style="font-size: 13px; color: var(--text-muted); margin-bottom: 0;" contenteditable="true">
-                                        <b>Status:</b> Financial Freedom
-                                    </div>
+                                    <div id="char2-title" class="h3" style="color: var(--accent); margin-top: 0;" contenteditable="true">PERSONA B</div>
+                                    <div id="char2-desc" class="p-text" style="font-size: 13px;" contenteditable="true">AI generated persona description will appear here.</div>
+                                    <div id="char2-traits" class="p-text" style="font-size: 13px; color: var(--muted); margin-bottom: 0;" contenteditable="true"><b>Traits:</b> Will be filled by AI</div>
                                 </div>
                             </div>
                         </div>
