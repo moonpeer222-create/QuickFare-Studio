@@ -4,12 +4,12 @@ import { PexelsService } from './services/PexelsService.js';
 import { AIService } from './services/AIService.js';
 import { CanvaService } from './services/CanvaService.js';
 
-// Resolve canvas helpers from window (set by CanvasManager module bootstrap)
-const bg = (url) => window.bg && window.bg(url);
-const addImage = (url, tp, lft, wd) => window.addImage && window.addImage(url, tp, lft, wd);
-const addTextObj = (...args) => window.addTextObj && window.addTextObj(...args);
-const addCardObj = (...args) => window.addCardObj && window.addCardObj(...args);
-const clearCanvasElements = () => window.clearCanvasElements && window.clearCanvasElements();
+// Resolve canvas helpers from window
+const bg = (url) => window.canvasManager && window.canvasManager.setBackground(url);
+const addImage = (url, tp, lft, wd) => window.canvasManager && window.canvasManager.addImage({ url, top: tp, left: lft, width: wd });
+const addTextObj = (txt, tp, lft, wd, fs, ff) => window.canvasManager && window.canvasManager.addText({ text: txt, top: tp, left: lft, width: wd, fontSize: fs, fontFamily: ff });
+const addCardObj = (txt, tp, lft, wd) => window.canvasManager && window.canvasManager.addCard({ content: txt, top: tp, left: lft, width: wd });
+const clearCanvasElements = () => window.canvasManager && window.canvasManager.clearAll();
 const saveState = () => window.saveState && window.saveState();
 
 let pexPage = 1;
@@ -188,7 +188,9 @@ window.suggestTopicsEbook = async function() {
     const prompt = `Act as an elite digital marketer. Suggest 5 highly profitable, trendy e-book topics right now. Return ONLY a JSON array of strings. Example:["How to start Dropshipping", "Freelancing without Fiverr"]`;
 
     try {
-        let result = await AIService.generateCompletion("qwen/qwen-2.5-72b-instruct", prompt, prompt);
+        const apiKey = AIService.getKey();
+        if (!apiKey) throw new Error('No API Key');
+        let result = await AIService.generateCompletion("meta-llama/llama-3.1-8b-instruct:free", prompt, prompt);
         result = result.replace(/```json/g, '').replace(/```/g, '');
         const topics = JSON.parse(result);
         
