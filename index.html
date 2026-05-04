@@ -840,10 +840,17 @@ Return ONLY a JSON object with these keys:
             // Magic Auto Create
             window.magicAutoCreate = async () => {
                 const topic = document.getElementById('magic-topic')?.value?.trim() || 'Digital Marketing 2026';
-                const colors = ['#8a5cf6','#f59e0b','#ef4444','#10b981','#ec4899'];
+                const colors = ['#8a5cf6','#f59e0b','#ef4444','#10b981','#ec4899','#00f0ff','#39ff14'];
                 const color = colors[Math.floor(Math.random()*colors.length)];
+                
+                // Adaptive font scaling
+                let fs = '120px';
+                if (topic.length > 20) fs = '90px';
+                if (topic.length > 40) fs = '70px';
+                if (topic.length > 60) fs = '50px';
+
                 canvasManager.clearAll();
-                canvasManager.addText({ text: topic.toUpperCase().replace(/ /g,'<br>'), top: '150px', left: '60px', fontSize: '110px', color });
+                const mainEl = canvasManager.addText({ text: topic.toUpperCase().replace(/ /g,'<br>'), top: '150px', left: '60px', fontSize: fs, color });
                 
                 showToast('Generating AI Copy...');
                 let subtitle = '✦ AI-Generated Design\nCustomize each layer by clicking it.';
@@ -873,6 +880,10 @@ Return ONLY a JSON object with these keys:
                     const pr = await fetch(`https://api.pexels.com/v1/search?query=${encodeURIComponent(topic+' dark')}&per_page=1`, { headers: { Authorization: pKey } });
                     if (pr.ok) { const pd = await pr.json(); if (pd.photos?.length) canvasManager.setBackground(pd.photos[0].src.large2x); }
                 } catch(e) {}
+                
+                // Auto-select the main heading
+                setTimeout(() => sEl(mainEl), 500);
+                
                 showToast('Magic Canvas Created!');
                 if (isMobile()) toggleSidebar();
             };
