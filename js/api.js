@@ -1,10 +1,16 @@
 import { CONFIG } from './config.js';
 import { showToast } from './ui.js';
-import { bg, addImage, addTextObj, addCardObj, clearCanvasElements } from './canvas.js';
-import { saveState } from './state.js';
 import { PexelsService } from './services/PexelsService.js';
 import { AIService } from './services/AIService.js';
 import { CanvaService } from './services/CanvaService.js';
+
+// Resolve canvas helpers from window (set by CanvasManager module bootstrap)
+const bg = (url) => window.bg && window.bg(url);
+const addImage = (url, tp, lft, wd) => window.addImage && window.addImage(url, tp, lft, wd);
+const addTextObj = (...args) => window.addTextObj && window.addTextObj(...args);
+const addCardObj = (...args) => window.addCardObj && window.addCardObj(...args);
+const clearCanvasElements = () => window.clearCanvasElements && window.clearCanvasElements();
+const saveState = () => window.saveState && window.saveState();
 
 let pexPage = 1;
 
