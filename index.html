@@ -15,11 +15,13 @@
     <div class="navbar">
         <div class="logo">QuickFare <span>Studio V12</span></div>
         <div class="nav-controls">
+            <!-- Theme Toggle -->
+            <button class="btn btn-icon" onclick="toggleTheme()" title="Toggle Light/Dark Theme"><i class="fas fa-moon" id="theme-icon"></i></button>
             <!-- Canvas Controls -->
             <span id="canvas-controls" style="display:flex; gap:12px; align-items:center;">
                 <button class="btn btn-icon" onclick="undo()" title="Undo"><i class="fas fa-undo"></i></button>
                 <button class="btn btn-icon" onclick="redo()" title="Redo"><i class="fas fa-redo"></i></button>
-                <button class="btn" onclick="clearCanvasElements()" style="background: #5a0c16; border-color: #aa0000; color:white;"><i class="fas fa-trash-alt"></i> Clean Canvas</button>
+                <button class="btn" onclick="clearCanvasElements()" style="background: var(--danger); border-color: var(--danger); color:white;"><i class="fas fa-trash-alt"></i> Clean Canvas</button>
                 <select id="export-format" class="nav-select">
                     <option value="image/png">Lossless PNG</option>
                     <option value="image/jpeg">Optimized JPEG</option>
@@ -81,7 +83,7 @@
                         <button class="btn" style="flex:1; justify-content:center;" onclick="addElement('card')"><i class="fas fa-list-ul"></i> Subtext Box</button>
                     </div>
                     <div class="upload-wrapper">
-                        <button class="btn" style="width:100%; justify-content:center; background:#223; color:#fff; border-color:#446;"><i class="fas fa-image"></i> Local System Upload</button>
+                        <button class="btn" style="width:100%; justify-content:center; background:var(--btn-bg); color:var(--text-main); border-color:var(--btn-border);"><i class="fas fa-image"></i> Local System Upload</button>
                         <input type="file" accept="image/*" onchange="uploadLocalImage(event)">
                     </div>
                 </div>
