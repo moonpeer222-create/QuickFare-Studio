@@ -2,6 +2,9 @@ import { CONFIG } from './config.js';
 import { showToast } from './ui.js';
 import { bg, addImage, addTextObj, addCardObj, clearCanvasElements } from './canvas.js';
 import { saveState } from './state.js';
+import { PexelsService } from './services/PexelsService.js';
+import { AIService } from './services/AIService.js';
+import { CanvaService } from './services/CanvaService.js';
 
 let pexPage = 1;
 
@@ -27,7 +30,7 @@ function mockedAIResponse(topic) {
         hkg="#FutureProof #SystemScale #Automation"; 
         sr = "Dark futuristic neon space";
     }
-    return `<h4>🔥 VIRAL TRIGGER HOOK</h4><p id="ai-hook" style='color:#fff;font-size:16px;font-weight:900;'>${hook.toUpperCase()}</p><h4>🧠 DIRECT AD FRAMEWORK</h4><p id="ai-frame"><b>PROBLEM MAP:</b> ${pt}<br><b>AGGRESSION LIMIT:</b> Action takers consume entire segments daily avoiding manual friction.<br><b>SOLUTION ROADMAP:</b> Deploy the specific sequence inside mitigating negative resistance.</p><h4>🎯 DEMOGRAPHIC TARGET DIRECTIVES</h4><p>${hkg}</p><h4>🖼️ VISUAL INITIATION NODE</h4><p>Target System Background String Output : <span style='color:var(--accent); font-weight:bold;'>${sr}</span></p><button class="btn btn-magic" style="width:100%; margin-top:15px;" onclick="applyAIResultsToCanvas()"><i class="fas fa-plus-circle"></i> APPLY TO CANVAS</button>`;
+    return `<h4>🔥 VIRAL TRIGGER HOOK</h4><p id="ai-hook" style='color:var(--text-main);font-size:16px;font-weight:900;'>${hook.toUpperCase()}</p><h4>🧠 DIRECT AD FRAMEWORK</h4><p id="ai-frame"><b>PROBLEM MAP:</b> ${pt}<br><b>AGGRESSION LIMIT:</b> Action takers consume entire segments daily avoiding manual friction.<br><b>SOLUTION ROADMAP:</b> Deploy the specific sequence inside mitigating negative resistance.</p><h4>🎯 DEMOGRAPHIC TARGET DIRECTIVES</h4><p>${hkg}</p><h4>🖼️ VISUAL INITIATION NODE</h4><p>Target System Background String Output : <span style='color:var(--accent); font-weight:bold;'>${sr}</span></p><button class="btn btn-magic" style="width:100%; margin-top:15px;" onclick="applyAIResultsToCanvas()"><i class="fas fa-plus-circle"></i> APPLY TO CANVAS</button>`;
 }
 
 window.applyAIResultsToCanvas = function() {
@@ -54,15 +57,8 @@ window.triggerAICampaign = async function() {
     const sys = "Produce elite copy formatted EXACTLY like so: <h4>🔥 VIRAL TRIGGER HOOK</h4> <p>[punchline]</p> <h4>🧠 DIRECT AD FRAMEWORK</h4> <p><b>PROBLEM MAP:</b> [text]<br><b>AGGRESSION LIMIT:</b>[text]<br><b>SOLUTION ROADMAP:</b>[text]</p> <h4>🎯 DEMOGRAPHIC TARGET DIRECTIVES</h4> <p>#tag1 #tag2 #tag3</p> <h4>🖼️ VISUAL INITIATION NODE</h4> <p>Target System Background String Output : [strictly 3 visual word descriptors of photo. no brackets]</p>";
 
     try {
-        let orNetReq = await fetch("https://openrouter.ai/api/v1/chat/completions", { 
-            method: "POST", 
-            headers: {"Authorization": `Bearer ${CONFIG.OR_KEY}`, "Content-Type": "application/json", "HTTP-Referer": "http://localhost", "X-Title":"SaaS Studio" }, 
-            body: JSON.stringify({ "model": "meta-llama/llama-3-8b-instruct:free", "messages":[ {"role":"system","content":sys}, {"role":"user","content":"Execute marketing data configuration for niche: " + tp}]})
-        });
-        
-        if(!orNetReq.ok) throw new Error("CORS or Server Halt");
-        let jsData = await orNetReq.json();
-        let dirtyHtml = jsData.choices[0].message.content.replace(/```(html)?/gi,'');
+        let completion = await AIService.generateCompletion("meta-llama/llama-3-8b-instruct:free", sys, "Execute marketing data configuration for niche: " + tp);
+        let dirtyHtml = completion.replace(/```(html)?/gi,'');
         
         let finalHtml = dirtyHtml + `<button class="btn btn-magic" style="width:100%; margin-top:15px;" onclick="applyAIResultsToCanvas()"><i class="fas fa-plus-circle"></i> APPLY TO CANVAS</button>`;
         
@@ -123,45 +119,61 @@ window.magicAutoCreate = function() {
 }
 
 async function fetchPexelsAutoM(kyw) {
-    try {
-        let nr = await fetch(`https://api.pexels.com/v1/search?query=${kyw}&per_page=1`, { headers:{Authorization: CONFIG.PEXELS_KEY}});
-        let jd = await nr.json();
-        if(jd.photos && jd.photos.length > 0) bg(jd.photos[0].src.large2x);
-        else throw new Error("empty");
-    } catch(ed){ 
-        bg(CONFIG.FALLBACK_URLS[Math.floor(Math.random() * CONFIG.FALLBACK_URLS.length)]); 
-    }
+    const photos = await PexelsService.search(kyw, 1, 1);
+    if(photos && photos.length > 0) bg(photos[0].src.large2x);
+    else bg(CONFIG.FALLBACK_URLS[Math.floor(Math.random() * CONFIG.FALLBACK_URLS.length)]); 
     showToast("Magic Setup Done.");
 }
 
 // ==========================================
-// 3. PEXELS API FOR CANVAS
+// 3. PEXELS API FOR CANVAS & EBOOK (UNIFIED)
 // ==========================================
-window.fetchPexels = async function(pgn=false) {
-    let gBox = document.getElementById('pexels-gallery'); 
-    let qr = document.getElementById('pexels-search').value || "coding";
+async function renderPexelsGallery(query, targetGalleryId, isEndlessScroll = false, isEbook = false) {
+    const gallery = document.getElementById(targetGalleryId);
     
-    if(pgn) pexPage++; else pexPage=1;
-    if(!pgn) gBox.innerHTML='<div style="font-size:12px;color:cyan;grid-column:span 2;text-align:center;"><i class="fas fa-sync fa-spin"></i> Getting Premium Art...</div>';
+    if (isEndlessScroll) pexPage++; else pexPage = 1;
     
-    try {
-        let ppR = pgn ? pexPage : (Math.floor(Math.random()*4)+1);
-        let qd = await fetch(`https://api.pexels.com/v1/search?query=${qr}&per_page=12&page=${ppR}`, { headers:{Authorization: CONFIG.PEXELS_KEY}});
-        if(!qd.ok) throw new Error("limit");
-        let md = await qd.json(); 
-        if(!pgn) gBox.innerHTML='';
-        if(md.photos.length===0 && !pgn) throw new Error("nada");
-        
-        md.photos.forEach(ip => {
-            gBox.insertAdjacentHTML('beforeend',`<div class="img-card"><img src="${ip.src.medium}"><div class="img-actions"><button class="img-btn" onclick="bg('${ip.src.large2x}')">Set Background</button><button class="img-btn" style="background:#222;" onclick="addImage('${ip.src.large2x}', '50px','50px','400px')">Spawn Canvas Node</button></div></div>`);
-        });
-    } catch (x) {
-        if(!pgn) {
-            gBox.innerHTML = `<div style="grid-column:span 2; font-size:10px; color:#aaa; text-align:center; padding:10px; border:1px solid #444; border-radius:5px; margin-bottom:5px;">Pexels Quota Limited.<br>Using Offline Studio Reserve...</div>`;
-            CONFIG.FB_SAFER_URLS.forEach(url => gBox.insertAdjacentHTML('beforeend', `<div class="img-card"><img src="${url}"><div class="img-actions"><button class="img-btn" onclick="bg('${url}')">Set Base Surface</button></div></div>`));
-        }
+    if (!isEndlessScroll) {
+        gallery.innerHTML = '<div style="color: var(--accent); font-size: 12px; grid-column: span 2; text-align: center;"><i class="fas fa-sync fa-spin"></i> Fetching Art...</div>';
     }
+
+    const pageToFetch = isEndlessScroll ? pexPage : (Math.floor(Math.random() * 4) + 1);
+    const photos = await PexelsService.search(query, pageToFetch, 12);
+    
+    if (!isEndlessScroll) gallery.innerHTML = '';
+    
+    if (photos.length === 0 && !isEndlessScroll) {
+        gallery.innerHTML = `<div style="grid-column:span 2; font-size:10px; color:#aaa; text-align:center; padding:10px; border:1px solid #444; border-radius:5px; margin-bottom:5px;">Quota Limited.</div>`;
+        return;
+    }
+    
+    photos.forEach(ip => {
+        if(isEbook) {
+            gallery.insertAdjacentHTML('beforeend',`
+                <div class="img-card">
+                    <img src="${ip.src.medium}" alt="Pexels">
+                    <div class="img-actions">
+                        <button class="img-btn" onclick="setEbookBg('cover-bg', '${ip.src.large2x}')">SET COVER</button>
+                        <button class="img-btn" onclick="setEbookBg('outro-bg', '${ip.src.large2x}')">SET OUTRO</button>
+                    </div>
+                </div>
+            `);
+        } else {
+            gallery.insertAdjacentHTML('beforeend',`
+                <div class="img-card">
+                    <img src="${ip.src.medium}">
+                    <div class="img-actions">
+                        <button class="img-btn" onclick="bg('${ip.src.large2x}')">Set Background</button>
+                        <button class="img-btn" style="background:var(--btn-bg);" onclick="addImage('${ip.src.large2x}', '50px','50px','400px')">Spawn Node</button>
+                    </div>
+                </div>
+            `);
+        }
+    });
 }
+
+window.fetchPexels = (pgn=false) => renderPexelsGallery(document.getElementById('pexels-search').value || "coding", 'pexels-gallery', pgn, false);
+window.fetchPexelsEbook = () => renderPexelsGallery(document.getElementById('pexels-search-ebook').value || "Abstract dark", 'pexels-gallery-ebook', false, true);
 
 
 // ==========================================
@@ -176,20 +188,7 @@ window.suggestTopicsEbook = async function() {
     const prompt = `Act as an elite digital marketer. Suggest 5 highly profitable, trendy e-book topics right now. Return ONLY a JSON array of strings. Example:["How to start Dropshipping", "Freelancing without Fiverr"]`;
 
     try {
-        const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-            method: "POST",
-            headers: {
-                "Authorization": `Bearer ${CONFIG.OR_KEY}`,
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                model: "qwen/qwen-2.5-72b-instruct",
-                messages:[{ "role": "user", "content": prompt }]
-            })
-        });
-
-        const data = await response.json();
-        let result = data.choices[0].message.content;
+        let result = await AIService.generateCompletion("qwen/qwen-2.5-72b-instruct", prompt, prompt);
         result = result.replace(/```json/g, '').replace(/```/g, '');
         const topics = JSON.parse(result);
         
@@ -261,20 +260,7 @@ You MUST return ONLY a valid JSON object matching this exact schema, with no mar
 ${schema}`;
 
     try {
-        const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-            method: "POST",
-            headers: {
-                "Authorization": `Bearer ${CONFIG.OR_KEY}`,
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                model: "qwen/qwen-2.5-72b-instruct",
-                messages: [{ "role": "user", "content": prompt }]
-            })
-        });
-
-        const data = await response.json();
-        let result = data.choices[0].message.content;
+        let result = await AIService.generateCompletion("qwen/qwen-2.5-72b-instruct", prompt, prompt);
         result = result.replace(/```json/g, '').replace(/```/g, '').trim();
         
         const ebookData = JSON.parse(result);
@@ -282,7 +268,7 @@ ${schema}`;
 
         // Auto fetch new background images based on AI suggestion
         document.getElementById('pexels-search-ebook').value = ebookData.pexels_query || "dark abstract";
-        fetchPexelsEbook();
+        window.fetchPexelsEbook();
 
         loader.style.display = 'none';
         showToast("Business Kit Generation Complete!");
@@ -311,35 +297,6 @@ function populateEbookDOM(data) {
     }
 }
 
-window.fetchPexelsEbook = async function() {
-    const query = document.getElementById('pexels-search-ebook').value || "Abstract dark";
-    const gallery = document.getElementById('pexels-gallery-ebook');
-    gallery.innerHTML = '<div style="color: var(--accent); font-size: 12px; grid-column: span 2; text-align: center;">Fetching...</div>';
-    
-    try {
-        const res = await fetch(`https://api.pexels.com/v1/search?query=${query}&per_page=16`, {
-            headers: { Authorization: CONFIG.PEXELS_KEY }
-        });
-        const data = await res.json();
-        gallery.innerHTML = '';
-        
-        data.photos.forEach(photo => {
-            const card = document.createElement('div');
-            card.className = 'img-card';
-            card.innerHTML = `
-                <img src="${photo.src.medium}" alt="Pexels">
-                <div class="img-actions">
-                    <button class="img-btn" onclick="setEbookBg('cover-bg', '${photo.src.large2x}')">SET COVER</button>
-                    <button class="img-btn" onclick="setEbookBg('outro-bg', '${photo.src.large2x}')">SET OUTRO</button>
-                </div>
-            `;
-            gallery.appendChild(card);
-        });
-    } catch (err) {
-        gallery.innerHTML = '<div style="color: var(--danger); font-size: 11px; grid-column: span 2;">API Error. Check Network.</div>';
-    }
-}
-
 window.setEbookBg = function(elementId, url) {
     let img = document.getElementById(elementId);
     if(img) {
@@ -363,74 +320,23 @@ window.changeThemeEbook = function() {
 // 5. CANVA CONNECT API INTEGRATION (OAuth 2.0 PKCE)
 // ==========================================
 
-function generateRandomString(length) {
-    const charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~';
-    let result = '';
-    const values = new Uint8Array(length);
-    window.crypto.getRandomValues(values);
-    for (let i = 0; i < length; i++) result += charset[values[i] % charset.length];
-    return result;
-}
-
-async function generateCodeChallenge(codeVerifier) {
-    const encoder = new TextEncoder();
-    const data = encoder.encode(codeVerifier);
-    const digest = await window.crypto.subtle.digest('SHA-256', data);
-    return btoa(String.fromCharCode.apply(null, new Uint8Array(digest)))
-        .replace(/\+/g, '-')
-        .replace(/\//g, '_')
-        .replace(/=+$/, '');
-}
-
-window.startCanvaAuth = async function() {
-    const codeVerifier = generateRandomString(96);
-    localStorage.setItem('CANVA_CODE_VERIFIER', codeVerifier);
-    
-    const codeChallenge = await generateCodeChallenge(codeVerifier);
-    const clientId = CONFIG.CANVA_CLIENT_ID;
-    
-    const scope = "brandtemplate:content:write brandtemplate:content:read comment:read folder:permission:write design:content:read asset:read asset:write design:permission:read design:permission:write comment:write app:read folder:permission:read folder:write design:meta:read app:write design:content:write folder:read brandtemplate:meta:read";
-    
-    const authUrl = `https://www.canva.com/api/oauth/authorize?code_challenge_method=s256&response_type=code&client_id=${clientId}&scope=${encodeURIComponent(scope)}&code_challenge=${codeChallenge}`;
-    
-    window.location.href = authUrl;
-}
+window.startCanvaAuth = () => CanvaService.startAuth();
 
 window.addEventListener('DOMContentLoaded', async () => {
     const urlParams = new URLSearchParams(window.location.search);
     const code = urlParams.get('code');
     
     if (code) {
-        // Clear the URL parameter right away for UX
         const cleanUrl = window.location.href.split('?')[0];
         window.history.replaceState({}, document.title, cleanUrl);
 
         showToast("Authenticating with Canva...");
-        const codeVerifier = localStorage.getItem('CANVA_CODE_VERIFIER');
-        const clientId = CONFIG.CANVA_CLIENT_ID;
 
         try {
-            const tokenParams = new URLSearchParams();
-            tokenParams.append('grant_type', 'authorization_code');
-            tokenParams.append('code_verifier', codeVerifier);
-            tokenParams.append('code', code);
-            tokenParams.append('client_id', clientId);
-            tokenParams.append('redirect_uri', cleanUrl);
-
-            const response = await fetch('https://api.canva.com/rest/v1/oauth/token', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: tokenParams
-            });
-
-            if (response.ok) {
-                const data = await response.json();
-                localStorage.setItem('CANVA_ACCESS_TOKEN', data.access_token);
-                if(data.refresh_token) localStorage.setItem('CANVA_REFRESH_TOKEN', data.refresh_token);
-                showToast("Canva Connected Successfully!");
-            } else {
-                throw new Error("Token exchange failed");
-            }
+            const data = await CanvaService.exchangeToken(code, cleanUrl);
+            localStorage.setItem('CANVA_ACCESS_TOKEN', data.access_token);
+            if(data.refresh_token) localStorage.setItem('CANVA_REFRESH_TOKEN', data.refresh_token);
+            showToast("Canva Connected Successfully!");
         } catch (e) {
             console.warn("Canva token exchange issue (CORS or server req): ", e);
             localStorage.setItem('CANVA_ACCESS_TOKEN', 'mock_token_due_to_cors');
@@ -452,30 +358,15 @@ window.exportToCanva = async function() {
 
     try {
         const artboard = document.getElementById('artboard');
-        // Render canvas to blob
         const canvas = await html2canvas(artboard, {
             useCORS: true,
             allowTaint: true,
             backgroundColor: "#000",
-            scale: 2 // High Res
+            scale: 2 
         });
         
         canvas.toBlob(async (blob) => {
-            const formData = new FormData();
-            formData.append("file", blob, "quickfare_studio_export.png");
-            
-            // Mock the API delay
-            await new Promise(r => setTimeout(r, 2000));
-            
-            /* REAL IMPLEMENTATION COMMENT:
-            const response = await fetch("https://api.canva.com/rest/v1/asset-uploads", {
-                method: "POST",
-                headers: { "Authorization": "Bearer " + token },
-                body: formData
-            });
-            if(!response.ok) throw new Error("Canva API Auth Failed");
-            */
-            
+            await CanvaService.uploadAsset(blob, token);
             loader.style.display = 'none';
             loaderText.innerText = oldText;
             showToast("Success! Exported to Canva Asset Library.", false);
@@ -493,11 +384,8 @@ window.importFromCanva = async function() {
     if (!token) return showToast("No Canva Access Token found. Authorize first.", true);
 
     showToast("Fetching assets from Canva...", false);
-    
-    // Mock the API delay
     await new Promise(r => setTimeout(r, 1000));
     
-    // Injecting dummy assets to simulate Canva imports
     const gallery = document.getElementById('pexels-gallery');
     gallery.innerHTML = '';
     const mockCanvaAssets = [
@@ -512,7 +400,7 @@ window.importFromCanva = async function() {
                 <img src="${url}">
                 <div class="img-actions">
                     <button class="img-btn" onclick="bg('${url}')">Set Canva BG</button>
-                    <button class="img-btn" style="background:#222;" onclick="addImage('${url}', '50px','50px','400px')">Add Element</button>
+                    <button class="img-btn" style="background:var(--btn-bg);" onclick="addImage('${url}', '50px','50px','400px')">Add Element</button>
                 </div>
             </div>
         `);
