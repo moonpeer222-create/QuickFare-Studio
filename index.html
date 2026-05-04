@@ -13,27 +13,23 @@
 <body>
 
     <div class="navbar">
-        <div class="logo">QuickFare <span>Studio V12</span></div>
+        <button class="btn btn-icon" id="mobile-menu-btn" onclick="toggleSidebar()" style="display:none;"><i class="fas fa-bars"></i></button>
+        <div class="logo">⚡ QuickFare <span>Studio</span></div>
         <div class="nav-controls">
-            <!-- Theme Toggle -->
-            <button class="btn btn-icon" onclick="toggleTheme()" title="Toggle Light/Dark Theme"><i class="fas fa-moon" id="theme-icon"></i></button>
-            <!-- Canvas Controls -->
-            <span id="canvas-controls" style="display:flex; gap:12px; align-items:center;">
-                <button class="btn btn-icon" onclick="undo()" title="Undo"><i class="fas fa-undo"></i></button>
-                <button class="btn btn-icon" onclick="redo()" title="Redo"><i class="fas fa-redo"></i></button>
-                <button class="btn" onclick="clearCanvasElements()" style="background: var(--danger); border-color: var(--danger); color:white;"><i class="fas fa-trash-alt"></i> Clean Canvas</button>
-                <select id="export-format" class="nav-select">
-                    <option value="image/png">Lossless PNG</option>
-                    <option value="image/jpeg">Optimized JPEG</option>
-                </select>
-                <button class="btn btn-primary" onclick="exportDesign()"><i class="fas fa-download"></i> Save Final Asset</button>
+            <button class="btn btn-icon" onclick="undo()" title="Undo"><i class="fas fa-undo"></i></button>
+            <button class="btn btn-icon" onclick="redo()" title="Redo"><i class="fas fa-redo"></i></button>
+            <span id="canvas-controls" style="display:flex; gap:6px; align-items:center;">
+                <button class="btn btn-danger" onclick="clearCanvasElements()"><i class="fas fa-trash-alt"></i> Clear</button>
+                <select id="export-format" class="nav-select"><option value="image/png">PNG</option><option value="image/jpeg">JPEG</option></select>
+                <button class="btn btn-primary" onclick="exportDesign()"><i class="fas fa-download"></i> Export</button>
             </span>
-            <!-- E-Book Controls -->
-            <span id="ebook-controls" style="display:none; gap:12px; align-items:center;">
-                <button class="btn btn-primary" onclick="window.print()"><i class="fas fa-file-pdf"></i> Export Full Kit (PDF)</button>
+            <span id="ebook-controls" style="display:none; gap:6px; align-items:center;">
+                <button class="btn btn-primary" onclick="window.print()"><i class="fas fa-file-pdf"></i> PDF</button>
             </span>
+            <button class="btn btn-icon" onclick="toggleTheme()" title="Theme"><i class="fas fa-moon" id="theme-icon"></i></button>
         </div>
     </div>
+    <div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleSidebar()"></div>
 
     <div class="app-body">
         <div class="sidebar">
@@ -123,17 +119,31 @@
 
             <!-- TAB 2: STRATEGIST -->
             <div id="tab-strategist" class="tab-content">
-                <div class="section" style="border-bottom: none;">
-                    <h3 class="section-title" style="color:var(--accent);"><i class="fas fa-brain"></i> OpenRouter Fallback Logic</h3>
-                    <p style="font-size: 11px; color: #888; margin-top: 0; line-height: 1.6; padding: 10px; background: rgba(0,0,0,0.5); border-radius:6px; border:1px solid #222;">Generates pure marketing hooks. If OpenRouter API hits a strict CORS rejection, the "Ghost Mock" engine flawlessly bridges data instead.</p>
-                    
-                    <div class="input-group" style="margin-top:20px;">
-                        <label style="color:white; font-size:11px;">Detailed Topic Entry:</label>
-                        <textarea id="ai-topic-strategy" placeholder="e.g. Avoiding Freelancing Scams" style="height: 100px; color:#00F0FF; padding:15px; border: 1px solid var(--border);"></textarea>
+                <div class="section">
+                    <h3 class="section-title" style="color:var(--accent);"><i class="fas fa-key"></i> API Configuration</h3>
+                    <div class="api-key-box">
+                        <label>OpenRouter API Key (Free at openrouter.ai)</label>
+                        <div style="display:flex;gap:6px;">
+                            <input type="password" id="or-key-input" placeholder="sk-or-v1-..." style="flex:1;padding:10px;background:#0c0e1d;border:1px solid #2d3057;color:#fff;border-radius:8px;font-size:12px;outline:none;">
+                            <button class="btn" onclick="saveORKey()" style="background:var(--accent2);color:#000;border:none;padding:10px 14px;"><i class="fas fa-save"></i></button>
+                        </div>
+                        <p style="font-size:10px;color:var(--muted);margin-top:6px;">Free key → openrouter.ai/keys — Ghost fallback activates if blank.</p>
                     </div>
-                    <button class="btn btn-primary" style="width: 100%; justify-content: center; padding: 18px; font-size: 13px;" onclick="triggerAICampaign()"><i class="fas fa-cogs"></i> ENGAGE STRATEGY</button>
-                    
-                    <div id="ai-results" class="ai-result-box" style="margin-top:25px;"></div>
+                </div>
+                <div class="section" style="border-bottom:none;flex:1;">
+                    <h3 class="section-title" style="color:var(--accent);"><i class="fas fa-brain"></i> AI Campaign Generator</h3>
+                    <div class="input-group">
+                        <label>Campaign Topic</label>
+                        <textarea id="ai-topic-strategy" placeholder="e.g. Freelancing in Pakistan 2026, Weight Loss for Busy Moms, E-Commerce Automation..." style="height:90px;"></textarea>
+                    </div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">
+                        <button class="btn" style="justify-content:center;font-size:11px;" onclick="setAIStyle('viral')"><i class="fas fa-fire"></i> Viral Hook</button>
+                        <button class="btn" style="justify-content:center;font-size:11px;" onclick="setAIStyle('authority')"><i class="fas fa-award"></i> Authority</button>
+                        <button class="btn" style="justify-content:center;font-size:11px;" onclick="setAIStyle('story')"><i class="fas fa-book-open"></i> Story</button>
+                        <button class="btn" style="justify-content:center;font-size:11px;" onclick="setAIStyle('pain')"><i class="fas fa-exclamation"></i> Pain Point</button>
+                    </div>
+                    <button class="btn-ai" onclick="triggerAICampaign()"><i class="fas fa-wand-magic-sparkles"></i> Generate AI Campaign</button>
+                    <div id="ai-results" class="ai-result-box"></div>
                 </div>
             </div>
 
@@ -493,26 +503,38 @@
     <script type="module">
         import appState from './js/appState.js';
         import canvasManager from './js/CanvasManager.js';
-        import { showToast, sEl, switchTab, toggleTheme, debounce } from './js/ui.js';
-        import './js/api.js'; // Reconnects: Pexels, AI Campaign, Ebook, Canva
+        import { showToast, sEl, switchTab, toggleTheme } from './js/ui.js';
+        import './js/api.js';
 
-        // Run AFTER DOM is fully ready
         document.addEventListener('DOMContentLoaded', () => {
 
-            // ── Shared state helpers ───────────────────────────────────────
-            let saveTimeout;
-            window.debounceSave = () => { clearTimeout(saveTimeout); saveTimeout = setTimeout(saveState, 500); };
+            // ── Mobile Sidebar ─────────────────────────────────────────────
+            const sidebar = document.querySelector('.sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            const menuBtn = document.getElementById('mobile-menu-btn');
 
+            function isMobile() { return window.innerWidth <= 900; }
+            function updateMobileUI() {
+                if (menuBtn) menuBtn.style.display = isMobile() ? 'flex' : 'none';
+            }
+            window.toggleSidebar = () => {
+                sidebar.classList.toggle('open');
+                overlay.classList.toggle('open');
+            };
+            window.addEventListener('resize', updateMobileUI);
+            updateMobileUI();
+
+            // ── State helpers ──────────────────────────────────────────────
+            let saveTimeout;
+            window.debounceSave = () => { clearTimeout(saveTimeout); saveTimeout = setTimeout(saveState, 600); };
             function saveState() {
-                const snap = canvasManager.updateState ? (() => { canvasManager.updateState(); return true; })() : false;
-                appState.pushHistory();
-                appState.saveToLocal();
+                canvasManager.updateState && canvasManager.updateState();
+                appState.pushHistory(); appState.saveToLocal();
             }
             window.saveState = saveState;
 
-            // ── Canvas global wrappers ─────────────────────────────────────
-            window.undo = () => {
-                const s = appState.undo();
+            // ── Canvas wrappers ────────────────────────────────────────────
+            function restoreFromState(s) {
                 if (!s) return;
                 canvasManager.artboard.querySelectorAll('.element').forEach(e => e.remove());
                 canvasManager.restoreElements(s.canvas.elements);
@@ -520,36 +542,22 @@
                 if (bg && s.canvas.background.src) { bg.src = s.canvas.background.src; bg.style.filter = s.canvas.background.filter || ''; }
                 canvasManager.elementCount = s.canvas.elementCount;
                 canvasManager.maxZIndex = s.canvas.maxZIndex;
-            };
-            window.redo = () => {
-                const s = appState.redo();
-                if (!s) return;
-                canvasManager.artboard.querySelectorAll('.element').forEach(e => e.remove());
-                canvasManager.restoreElements(s.canvas.elements);
-                const bg = document.getElementById('bg-img');
-                if (bg && s.canvas.background.src) { bg.src = s.canvas.background.src; bg.style.filter = s.canvas.background.filter || ''; }
-                canvasManager.elementCount = s.canvas.elementCount;
-                canvasManager.maxZIndex = s.canvas.maxZIndex;
-            };
+            }
+            window.undo = () => restoreFromState(appState.undo());
+            window.redo = () => restoreFromState(appState.redo());
             window.clearCanvasElements = () => canvasManager.clearAll();
             window.exportDesign = () => canvasManager.downloadAsImage();
             window.applyPresetSize = () => canvasManager.applyPresetSize();
-            window.loadTemplate = t => canvasManager.loadTemplate(t);
-            window.addElement = t => canvasManager.addElement(t);
+            window.loadTemplate = t => { canvasManager.loadTemplate(t); if(isMobile()) toggleSidebar(); };
+            window.addElement = t => { canvasManager.addElement(t); if(isMobile()) toggleSidebar(); };
             window.uploadLocalImage = e => canvasManager.uploadLocalImage(e);
             window.bg = url => canvasManager.setBackground(url);
-            window.addImage = (url, tp, lft, wd) => canvasManager.addImage(url, { top: tp || '50px', left: lft || '50px', width: wd || '400px' });
-            window.addTextObj = (html, tp, lft, wd, fs, fm, cl) => canvasManager.addText({ text: html, top: tp, left: lft, width: wd, fontSize: fs, fontFamily: fm, color: cl || '#fff' });
-            window.addCardObj = (html, tp, lft, wd) => canvasManager.addCard({ content: html, top: tp, left: lft, width: wd });
+            window.addImage = (url, tp, lft, wd) => canvasManager.addImage(url, { top: tp||'50px', left: lft||'50px', width: wd||'400px' });
+            window.addTextObj = (html, tp, lft, wd, fs, fm, cl) => canvasManager.addText({ text:html, top:tp, left:lft, width:wd, fontSize:fs, fontFamily:fm, color:cl||'#fff' });
+            window.addCardObj = (html, tp, lft, wd) => canvasManager.addCard({ content:html, top:tp, left:lft, width:wd });
             window.applyFilters = () => canvasManager.applyFilters();
-            window.bringForward = () => {
-                const active = document.querySelector('.element.active');
-                if (active) { active.style.zIndex = ++canvasManager.maxZIndex; saveState(); }
-            };
-            window.sendBackward = () => {
-                const active = document.querySelector('.element.active');
-                if (active && parseInt(active.style.zIndex) > 10) { active.style.zIndex = parseInt(active.style.zIndex) - 1; saveState(); }
-            };
+            window.bringForward = () => { const a=document.querySelector('.element.active'); if(a){a.style.zIndex=++canvasManager.maxZIndex;saveState();} };
+            window.sendBackward = () => { const a=document.querySelector('.element.active'); if(a&&parseInt(a.style.zIndex)>10){a.style.zIndex=parseInt(a.style.zIndex)-1;saveState();} };
 
             // ── UI ─────────────────────────────────────────────────────────
             window.toggleTheme = toggleTheme;
@@ -557,56 +565,172 @@
             window.showToast = showToast;
             window.sEl = sEl;
 
+            // ── AI: API Key Management ─────────────────────────────────────
+            const savedKey = localStorage.getItem('qf_or_key');
+            if (savedKey && document.getElementById('or-key-input')) {
+                document.getElementById('or-key-input').value = savedKey;
+            }
+            window.saveORKey = () => {
+                const k = document.getElementById('or-key-input')?.value?.trim();
+                if (k) { localStorage.setItem('qf_or_key', k); showToast('API Key Saved!'); }
+                else { localStorage.removeItem('qf_or_key'); showToast('Key cleared — Ghost AI active', false); }
+            };
+
+            // AI style prompt prefixes
+            const AI_STYLES = {
+                viral: 'Write in a VIRAL, shocking, scroll-stopping style. Use pattern interrupts. ',
+                authority: 'Write with expert authority, cite statistics, build credibility. ',
+                story: 'Use a compelling personal story arc: struggle → revelation → transformation. ',
+                pain: 'Focus on the burning pain point, agitate the problem deeply, then offer the solution. '
+            };
+            let currentAIStyle = '';
+            window.setAIStyle = (style) => {
+                currentAIStyle = AI_STYLES[style] || '';
+                document.querySelectorAll('[onclick^="setAIStyle"]').forEach(b => b.style.borderColor = '');
+                event.currentTarget.style.borderColor = 'var(--accent)';
+                showToast(`Style: ${style.toUpperCase()}`);
+            };
+
+            // ── AI Campaign (with real OpenRouter + Ghost fallback) ────────
+            window.triggerAICampaign = async () => {
+                const topic = document.getElementById('ai-topic-strategy')?.value?.trim();
+                if (!topic) { showToast('Enter a topic first!', true); return; }
+                const resultsBox = document.getElementById('ai-results');
+                resultsBox.style.display = 'block';
+                resultsBox.innerHTML = `<div style="text-align:center;padding:20px;"><div class="spinner" style="margin:0 auto 12px;width:40px;height:40px;border-width:3px;"></div><p style="color:var(--muted);font-size:12px;">AI generating campaign...</p></div>`;
+                showToast('AI is thinking...');
+
+                const orKey = localStorage.getItem('qf_or_key') || '';
+                let hook = '', frame = '', cta = '', visualQuery = topic + ' dark cinematic';
+
+                if (orKey) {
+                    try {
+                        const prompt = `${currentAIStyle}Generate a premium marketing campaign for: "${topic}".
+Return ONLY a JSON object with these keys:
+{
+  "hook": "viral attention-grabbing hook (max 12 words)",
+  "headline": "powerful headline for a graphic design (max 8 words, ALL CAPS)",
+  "frame": "2-3 sentence marketing framework / value proposition",
+  "cta": "call to action (max 8 words)",
+  "visualQuery": "Pexels search query for background image (3-5 words)",
+  "hashtags": ["tag1","tag2","tag3","tag4","tag5"]
+}`;
+                        const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+                            method: 'POST',
+                            headers: { 'Authorization': `Bearer ${orKey}`, 'Content-Type': 'application/json', 'HTTP-Referer': location.href, 'X-Title': 'QuickFare Studio' },
+                            body: JSON.stringify({ model: 'meta-llama/llama-3.1-8b-instruct:free', messages: [{ role: 'user', content: prompt }], max_tokens: 500 })
+                        });
+                        if (!res.ok) throw new Error('API error ' + res.status);
+                        const data = await res.json();
+                        const text = data.choices[0].message.content;
+                        const jsonMatch = text.match(/\{[\s\S]*\}/);
+                        if (jsonMatch) {
+                            const parsed = JSON.parse(jsonMatch[0]);
+                            hook = parsed.hook; frame = parsed.frame; cta = parsed.cta;
+                            visualQuery = parsed.visualQuery || visualQuery;
+                            if (parsed.headline) canvasManager.artboard.querySelector('.el-text') ? null : canvasManager.addText({ text: parsed.headline, top: '200px', left: '60px', fontSize: '120px' });
+                        }
+                    } catch(e) { console.warn('OpenRouter failed, using Ghost AI:', e.message); }
+                }
+
+                // Ghost fallback (always works)
+                if (!hook) {
+                    const ghosts = [
+                        { hook: `Most people NEVER discover this ${topic} secret`, frame: `The ${topic} industry is being disrupted. Those who adapt now will dominate the next 3 years while everyone else struggles.`, cta: `Start Your ${topic} Journey Today` },
+                        { hook: `I made $5,000 from ${topic} in 30 days`, frame: `You don't need years of experience. You need the right system. ${topic} has created more millionaires this decade than any other field.`, cta: `Get The Free ${topic} Blueprint` },
+                        { hook: `Warning: ${topic} will change everything`, frame: `The window of opportunity for ${topic} is closing fast. Early movers are already seeing 10x results while late adopters scramble.`, cta: `Claim Your Spot Now` }
+                    ];
+                    const g = ghosts[Math.floor(Math.random() * ghosts.length)];
+                    hook = g.hook; frame = g.frame; cta = g.cta;
+                }
+
+                // Render results
+                resultsBox.innerHTML = `
+                    <h4>🔥 Viral Hook</h4><p style="font-weight:700;color:#f1f5f9;font-size:14px;">"${hook}"</p>
+                    <h4>🧠 Framework</h4><p>${frame}</p>
+                    <h4>🎯 Call to Action</h4><p style="color:var(--accent2);font-weight:700;">${cta}</p>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px;">
+                        <button class="btn btn-magic" style="justify-content:center;font-size:11px;" onclick="applyHookToCanvas('${hook.replace(/'/g,"\\'")}','${cta.replace(/'/g,"\\'")}')"><i class="fas fa-plus-circle"></i> Apply to Canvas</button>
+                        <button class="btn" style="justify-content:center;font-size:11px;" onclick="copyToClipboard('${(hook+' '+frame+' '+cta).replace(/'/g,"\\'")}')"><i class="fas fa-copy"></i> Copy All</button>
+                    </div>`;
+                showToast('Campaign Generated!');
+
+                // Auto-fetch visual from Pexels
+                try {
+                    const pKey = 'c56L0l6NiI8lQhFccTdyyNwFg75mqhtaXKvWvimcSQVS00wqP1xdoftW';
+                    const pr = await fetch(`https://api.pexels.com/v1/search?query=${encodeURIComponent(visualQuery)}&per_page=1`, { headers: { Authorization: pKey } });
+                    if (pr.ok) { const pd = await pr.json(); if (pd.photos?.length) canvasManager.setBackground(pd.photos[0].src.large2x); }
+                } catch(e) {}
+            };
+
+            window.applyHookToCanvas = (hook, cta) => {
+                canvasManager.addText({ text: hook.toUpperCase(), top: '180px', left: '60px', fontSize: '90px', color: '#fff' });
+                canvasManager.addCard({ content: cta, top: '700px', left: '60px', width: '960px' });
+                showToast('Applied to Canvas!');
+                if (isMobile()) { switchTab('design'); toggleSidebar(); }
+            };
+            window.copyToClipboard = (text) => { navigator.clipboard.writeText(text).then(() => showToast('Copied!')); };
+
+            // Magic Auto Create
+            window.magicAutoCreate = async () => {
+                const topic = document.getElementById('magic-topic')?.value?.trim() || 'Digital Marketing 2026';
+                const colors = ['#8a5cf6','#f59e0b','#ef4444','#10b981','#ec4899'];
+                const color = colors[Math.floor(Math.random()*colors.length)];
+                canvasManager.clearAll();
+                canvasManager.addText({ text: topic.toUpperCase().replace(/ /g,'<br>'), top: '150px', left: '60px', fontSize: '110px', color });
+                canvasManager.addCard({ content: '✦ AI-Generated Design\nCustomize each layer by clicking it.', top: '750px', left: '60px', width: '960px' });
+                try {
+                    const pKey = 'c56L0l6NiI8lQhFccTdyyNwFg75mqhtaXKvWvimcSQVS00wqP1xdoftW';
+                    const pr = await fetch(`https://api.pexels.com/v1/search?query=${encodeURIComponent(topic+' dark')}&per_page=1`, { headers: { Authorization: pKey } });
+                    if (pr.ok) { const pd = await pr.json(); if (pd.photos?.length) canvasManager.setBackground(pd.photos[0].src.large2x); }
+                } catch(e) {}
+                showToast('Magic Canvas Created!');
+                if (isMobile()) toggleSidebar();
+            };
+
             // ── Zoom / fit ─────────────────────────────────────────────────
             function fitArtboard() {
                 const ws = document.getElementById('workspace');
                 const wr = document.getElementById('artboard-wrapper');
                 const ab = document.getElementById('artboard');
                 if (!ws || !wr || !ab) return;
-                const scaleX = (ws.clientWidth - 80) / ab.offsetWidth;
-                const scaleY = (ws.clientHeight - 80) / ab.offsetHeight;
-                window.currScale = Math.min(scaleX, scaleY, 1);
+                window.currScale = Math.min((ws.clientWidth - 60) / ab.offsetWidth, (ws.clientHeight - 60) / ab.offsetHeight, 1);
                 wr.style.transform = `scale(${window.currScale})`;
             }
             window.fitArtboard = fitArtboard;
             window.addEventListener('resize', fitArtboard);
-
             document.getElementById('workspace').addEventListener('wheel', e => {
-                if (e.ctrlKey || e.metaKey) {
-                    e.preventDefault();
-                    window.currScale = Math.max(0.1, Math.min((window.currScale || 1) + (e.deltaY > 0 ? -0.05 : 0.05), 3));
-                    document.getElementById('artboard-wrapper').style.transform = `scale(${window.currScale})`;
-                }
+                if (!e.ctrlKey && !e.metaKey) return;
+                e.preventDefault();
+                window.currScale = Math.max(0.1, Math.min((window.currScale||1)+(e.deltaY>0?-0.05:0.05), 3));
+                document.getElementById('artboard-wrapper').style.transform = `scale(${window.currScale})`;
             }, { passive: false });
-
-            // Deselect on workspace click
             document.getElementById('workspace').addEventListener('click', e => {
-                if (e.target === document.getElementById('workspace') || e.target === document.getElementById('artboard-wrapper') || e.target === document.getElementById('artboard')) {
-                    document.querySelectorAll('.element').forEach(el => el.classList.remove('active'));
-                    document.getElementById('layer-properties').innerHTML = '<div style="text-align:center;color:#555;margin-top:60px;font-size:12px;line-height:1.6;"><i class="fas fa-mouse-pointer" style="font-size:40px;margin-bottom:20px;display:block;color:var(--accent);opacity:0.5;"></i>Select Layer on Canvas</div>';
+                const ws = document.getElementById('workspace');
+                const wr = document.getElementById('artboard-wrapper');
+                const ab = document.getElementById('artboard');
+                if (e.target===ws||e.target===wr||e.target===ab) {
+                    document.querySelectorAll('.element').forEach(el=>el.classList.remove('active'));
+                    const lp = document.getElementById('layer-properties');
+                    if (lp) lp.innerHTML = '<div style="text-align:center;color:#475569;margin-top:60px;font-size:12px;line-height:2;"><i class="fas fa-mouse-pointer" style="font-size:32px;display:block;margin-bottom:12px;color:var(--accent);opacity:0.4;"></i>Select a layer<br>to edit properties</div>';
                 }
             });
 
-            // ── Load saved state OR set defaults ───────────────────────────
+            // ── Load state ─────────────────────────────────────────────────
             const loaded = appState.loadFromLocal();
-            if (loaded && appState.state.canvas.elements.length > 0) {
+            if (loaded && appState.state.canvas.elements?.length > 0) {
                 const bg = document.getElementById('bg-img');
-                if (bg && appState.state.canvas.background.src) {
-                    bg.src = appState.state.canvas.background.src;
-                    bg.style.filter = appState.state.canvas.background.filter || '';
-                }
-                canvasManager.elementCount = appState.state.canvas.elementCount;
-                canvasManager.maxZIndex = appState.state.canvas.maxZIndex;
+                if (bg && appState.state.canvas.background?.src) { bg.src = appState.state.canvas.background.src; bg.style.filter = appState.state.canvas.background.filter||''; }
+                canvasManager.elementCount = appState.state.canvas.elementCount || 1000;
+                canvasManager.maxZIndex = appState.state.canvas.maxZIndex || 20;
                 canvasManager.restoreElements(appState.state.canvas.elements);
             } else {
-                // Default welcome state
-                canvasManager.addText({ text: 'QUICKFARE<br><span style="color:#00F0FF;">V12 ALIVE.</span>', top: '300px', left: '80px', fontSize: '130px' });
-                canvasManager.addCard({ content: 'Zero font overlaps. Auto Magic creator in Left Menu. Drag to customize.', top: '600px', left: '80px', width: '850px' });
+                canvasManager.addText({ text: '⚡ QUICKFARE<br><span style="color:#8a5cf6;">STUDIO V12</span>', top:'260px', left:'60px', fontSize:'120px' });
+                canvasManager.addCard({ content:'AI-Powered Design Studio\nClick Magic Auto-Create or add elements from the sidebar.', top:'620px', left:'60px', width:'960px' });
                 saveState();
             }
-
-            setTimeout(fitArtboard, 100);
-            showToast('QuickFare Studio V12 Ready');
+            setTimeout(fitArtboard, 120);
+            showToast('⚡ QuickFare Studio Ready');
         });
     </script>
 </body>
