@@ -1,246 +1,146 @@
-import { CONFIG } from './config.js';
-import { saveState, undo, redo, clearState } from './state.js';
-import { addTextObj, addCardObj, bg, addImage, clearCanvasElements } from './canvas.js';
-import { fetchPexels, triggerAICampaign, magicAutoCreate } from './api.js';
+/**
+ * ui.js - Refactored UI Utilities
+ * Toast notifications, modals, DOM helpers, and theme management.
+ */
+import appState from './appState.js';
 
-window.activeEl = null;
-
-// TOAST NOTIFICATION
-export function showToast(msg, isErr=false) {
-    const t = document.getElementById('toast'); 
-    t.innerText = msg;
-    t.style.background = isErr ? "var(--danger)" : "var(--accent)"; 
-    t.style.color = isErr ? "#fff" : "#000";
-    t.classList.add('show'); 
-    setTimeout(() => t.classList.remove('show'), 3000);
-}
-
-// TAB SWITCHER
-window.switchTab = function(t) {
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+/**
+ * Toast Notification System
+ */
+export function showToast(msg, isErr = false) {
+    const toast = document.getElementById('toast');
+    if (!toast) return;
     
-    const btn = document.querySelector(`.tab-btn[onclick="switchTab('${t}')"]`);
-    if(btn) btn.classList.add('active'); 
-    document.getElementById('tab-' + t).classList.add('active');
-
-    // UI toggles based on active tool mode
-    const artboardWrapper = document.getElementById('artboard-wrapper');
-    const bkWrapper = document.getElementById('business-kit-wrapper');
-    const propsPanel = document.getElementById('properties-panel');
-    const canvasControls = document.getElementById('canvas-controls');
-    const ebookControls = document.getElementById('ebook-controls');
-
-    if (t === 'ebook') {
-        if(artboardWrapper) artboardWrapper.style.display = 'none';
-        if(propsPanel) propsPanel.style.display = 'none';
-        if(canvasControls) canvasControls.style.display = 'none';
-        
-        if(bkWrapper) bkWrapper.style.display = 'flex';
-        if(ebookControls) ebookControls.style.display = 'flex';
-    } else {
-        if(bkWrapper) bkWrapper.style.display = 'none';
-        if(ebookControls) ebookControls.style.display = 'none';
-        
-        if(artboardWrapper) artboardWrapper.style.display = 'block';
-        if(propsPanel) propsPanel.style.display = 'flex';
-        if(canvasControls) canvasControls.style.display = 'flex';
-        fitArtboard();
-    }
+    toast.innerHTML = `<i class="fas ${isErr ? 'fa-exclamation-triangle' : 'fa-check-circle'}"></i> ${msg}`;
+    toast.style.background = isErr ? 'rgba(255,0,80,0.9)' : 'rgba(0,240,255,0.9)';
+    toast.className = 'toast show';
+    
+    setTimeout(() => { toast.className = 'toast'; }, 3000);
 }
 
-// PERFECT ZOOM FIT SCALING
-export function fitArtboard() {
-    const workspace = document.getElementById('workspace');
-    const artboard = document.getElementById('artboard');
-    const wrapper = document.getElementById('artboard-wrapper');
-    if(!workspace || !artboard || !wrapper || wrapper.style.display === 'none') return;
-
-    window.currScale = Math.min((workspace.clientWidth - 100) / artboard.clientWidth, (workspace.clientHeight - 100) / artboard.clientHeight);
-    wrapper.style.transform = `scale(${window.currScale})`;
-}
-
-// CANVAS SIZING
-window.applyPresetSize = function() { 
-    const artboard = document.getElementById('artboard');
-    let v = document.getElementById('preset-size').value; 
-    if(v === 'custom') return; 
-    artboard.style.width = v.split('x')[0] + 'px'; 
-    artboard.style.height = v.split('x')[1] + 'px'; 
-    fitArtboard(); 
-    saveState();
-}
-
-// LAYER SELECTION & PROPERTIES
+/**
+ * Element Selection Visuals
+ */
 export function sEl(el) {
-    if (window.activeEl) window.activeEl.classList.remove('active');
-    window.activeEl = el;
+    document.querySelectorAll('.element').forEach(z => z.classList.remove('active'));
     el.classList.add('active');
     
-    const isImage = el.classList.contains('el-image');
-    
-    document.getElementById('layer-properties').innerHTML = `
-        <div style="padding-bottom: 20px;">
-            <h3 style="color:var(--accent); font-size:14px; text-transform:uppercase; margin-bottom: 20px;">Layer Properties</h3>
-            
-            <div class="row" style="margin-bottom:15px;">
-                <button class="btn" style="flex:1; justify-content:center; background:var(--btn-bg); border-color:var(--btn-border);" onclick="changeZIndex(1)"><i class="fas fa-arrow-up"></i> Bring Forward</button>
-                <button class="btn" style="flex:1; justify-content:center; background:var(--btn-bg); border-color:var(--btn-border);" onclick="changeZIndex(-1)"><i class="fas fa-arrow-down"></i> Send Backward</button>
-            </div>
+    // Update Layer Properties Panel
+    const props = document.getElementById('layer-properties');
+    if (!props) return;
 
-            <button class="btn" style="width:100%; margin-bottom:15px; justify-content:center; background:var(--danger); border-color:var(--danger); color:white;" onclick="deleteActiveEl()">
-                <i class="fas fa-trash-alt"></i> Delete Selected Layer
-            </button>
-            
-            ${!isImage ? `
-            <div class="input-group">
-                <label>Font Family</label>
-                <select id="font-picker" onchange="changeFont(this.value)">
-                    <option value="Anton" ${el.style.fontFamily.includes('Anton') ? 'selected' : ''}>Anton</option>
-                    <option value="Montserrat" ${el.style.fontFamily.includes('Montserrat') ? 'selected' : ''}>Montserrat</option>
-                    <option value="Oswald" ${el.style.fontFamily.includes('Oswald') ? 'selected' : ''}>Oswald</option>
-                    <option value="Bebas Neue" ${el.style.fontFamily.includes('Bebas Neue') ? 'selected' : ''}>Bebas Neue</option>
-                    <option value="Space Grotesk" ${el.style.fontFamily.includes('Space Grotesk') ? 'selected' : ''}>Space Grotesk</option>
-                    <option value="Playfair Display" ${el.style.fontFamily.includes('Playfair') ? 'selected' : ''}>Playfair Display</option>
-                    <option value="Cinzel" ${el.style.fontFamily.includes('Cinzel') ? 'selected' : ''}>Cinzel</option>
-                </select>
+    props.innerHTML = `
+        <div class="prop-group">
+            <label>LAYER ID</label>
+            <input type="text" value="${el.id}" readonly style="opacity:0.5">
+        </div>
+        <div class="prop-group">
+            <label>CONTENT / HTML</label>
+            <textarea id="prop-html" rows="4">${el.innerHTML}</textarea>
+        </div>
+        <div class="prop-group">
+            <label>SIZE / FONT</label>
+            <input type="text" id="prop-fs" value="${el.style.fontSize}">
+        </div>
+        <button class="btn btn-danger" id="btn-delete-el" style="width:100%; margin-top:10px;"><i class="fas fa-trash"></i> DELETE LAYER</button>
+    `;
+
+    // Bind events
+    document.getElementById('prop-html').oninput = (e) => {
+        el.innerHTML = e.target.value;
+    };
+    document.getElementById('prop-fs').oninput = (e) => {
+        el.style.fontSize = e.target.value;
+    };
+    document.getElementById('btn-delete-el').onclick = () => {
+        el.remove();
+        props.innerHTML = '<p style="text-align:center; opacity:0.5;">Select Layer Matrix</p>';
+    };
+}
+
+/**
+ * Theme Management
+ */
+export function toggleTheme() {
+    const isDark = document.body.classList.toggle('light-theme');
+    appState.setState({ ui: { ...appState.state.ui, theme: isDark ? 'light' : 'dark' } }, false);
+}
+
+/**
+ * Debounce Helper
+ */
+export function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+
+/**
+ * Modal System Helper
+ */
+export function showModal(title, content, actions = []) {
+    const overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    overlay.style.display = 'flex';
+    
+    overlay.innerHTML = `
+        <div class="modal-content">
+            <h3 style="color:var(--accent); margin-top:0;">${title}</h3>
+            <div class="modal-body">${content}</div>
+            <div class="modal-actions" style="display:flex; gap:10px; width:100%; margin-top:20px;">
+                ${actions.map((a, i) => `<button class="btn ${a.primary ? 'btn-primary' : ''}" id="modal-btn-${i}">${a.label}</button>`).join('')}
             </div>
-            <div class="input-group">
-                <label>Font Size</label>
-                <input type="number" value="${parseInt(el.style.fontSize) || 40}" oninput="window.activeEl.style.fontSize = this.value + 'px'; debounceSave()">
-            </div>
-            <div class="input-group">
-                <label>Text Color</label>
-                <input type="color" value="${rgbToHex(el.style.color) || '#ffffff'}" oninput="window.activeEl.style.color = this.value; debounceSave()">
-            </div>
-            <p style="font-size: 11px; color: #888;">Tip: Double-click the text on the canvas to edit it directly.</p>
-            ` : `
-            <p style="font-size: 11px; color: #888;">Image selected. Use corners to resize (coming soon) or drag to move.</p>
-            `}
         </div>
     `;
+    
+    document.body.appendChild(overlay);
+    
+    actions.forEach((a, i) => {
+        document.getElementById(`modal-btn-${i}`).onclick = () => {
+            if (a.onClick) a.onClick();
+            overlay.remove();
+        };
+    });
+
+    return overlay;
 }
 
-window.changeZIndex = function(direction) {
-    if (window.activeEl) {
-        let currentZ = parseInt(window.activeEl.style.zIndex) || 10;
-        window.activeEl.style.zIndex = currentZ + direction;
-        saveState();
-    }
-}
+/**
+ * Tab Switching Logic
+ */
+export function switchTab(tabId) {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
 
-window.changeFont = function(fontName) {
-    if (window.activeEl) {
-        window.activeEl.style.fontFamily = fontName;
-        saveState();
-    }
-}
+    const activeBtn = document.querySelector(`.tab-btn[onclick*="switchTab('${tabId}')"]`);
+    if (activeBtn) activeBtn.classList.add('active');
+    
+    const content = document.getElementById(`tab-${tabId}`);
+    if (content) content.classList.add('active');
 
-let saveTimeout;
-window.debounceSave = function() {
-    clearTimeout(saveTimeout);
-    saveTimeout = setTimeout(saveState, 500);
-}
-
-function rgbToHex(rgb) {
-    if (!rgb || !rgb.startsWith('rgb')) return rgb;
-    const parts = rgb.match(/\d+/g);
-    if (!parts) return rgb;
-    return "#" + parts.slice(0, 3).map(x => {
-        const hex = parseInt(x).toString(16);
-        return hex.length === 1 ? "0" + hex : hex;
-    }).join("");
-}
-
-window.deleteActiveEl = function() {
-    if (window.activeEl) {
-        window.activeEl.remove();
-        window.activeEl = null;
-        document.getElementById('layer-properties').innerHTML = `
-            <div style="text-align: center; color: #555; margin-top: 80px; font-size: 12px; line-height: 1.6;">
-                <i class="fas fa-mouse-pointer" style="font-size: 40px; margin-bottom: 20px; color:var(--accent); opacity:0.5;"></i><br>Select Layer Matrix on Canvas<br>To Open Config Panel.
-            </div>`;
-        saveState();
-    }
-}
-
-// Global UI bindings
-window.undo = undo;
-window.redo = redo;
-
-window.toggleTheme = function() {
-    const body = document.body;
-    const icon = document.getElementById('theme-icon');
-    if (body.classList.contains('theme-light')) {
-        body.classList.remove('theme-light');
-        icon.classList.remove('fa-sun');
-        icon.classList.add('fa-moon');
+    // Update visibility of top controls
+    const canvasControls = document.getElementById('canvas-controls');
+    const ebookControls = document.getElementById('ebook-controls');
+    
+    if (tabId === 'ebook') {
+        if (canvasControls) canvasControls.style.display = 'none';
+        if (ebookControls) ebookControls.style.display = 'flex';
     } else {
-        body.classList.add('theme-light');
-        icon.classList.remove('fa-moon');
-        icon.classList.add('fa-sun');
+        if (canvasControls) canvasControls.style.display = 'flex';
+        if (ebookControls) ebookControls.style.display = 'none';
     }
 }
 
-// Pillar System Logic
-export function loadPillars() {
-    const cat = document.getElementById('pillar-category')?.value || 'finance';
-    const gBox = document.getElementById('pillar-gallery');
-    if (!gBox) return;
-    
-    gBox.innerHTML = '';
-    const images = CONFIG.IMAGE_PILLARS[cat] || [];
-    
-    images.forEach(ip => {
-        gBox.insertAdjacentHTML('beforeend', `
-            <div class="img-card">
-                <img src="${ip.url}" alt="${ip.name}">
-                <div class="img-actions">
-                    <button class="img-btn" onclick="bg('${ip.url}')">Set Background</button>
-                </div>
-            </div>
-        `);
-    });
-}
-window.loadPillars = loadPillars;
-
-// Initialize Workspace Events
-export function initUI() {
-    const workspace = document.getElementById('workspace');
-    window.addEventListener('resize', fitArtboard); 
-    setTimeout(fitArtboard, 100);
-    setTimeout(loadPillars, 500); // Load initial pillars
-
-    workspace.addEventListener('wheel', e => {
-        if(e.ctrlKey || e.metaKey){ 
-            e.preventDefault(); 
-            if(document.getElementById('artboard-wrapper').style.display !== 'none') {
-                window.currScale = Math.max(0.1, Math.min(window.currScale + (e.deltaY > 0 ? -0.05 : 0.05), 3)); 
-                document.getElementById('artboard-wrapper').style.transform = `scale(${window.currScale})`; 
-            }
-        }
-    }, {passive: false});
-
-    // Deselect on bg click
-    document.getElementById('workspace').addEventListener('mousedown', e => {
-        if(e.target.id === 'bg-img' || e.target.id === 'bg-overlay' || e.target.id === 'artboard' || e.target.id === 'workspace') {
-            if(window.activeEl) {
-                window.activeEl.classList.remove('active');
-                window.activeEl = null;
-                document.getElementById('layer-properties').innerHTML = `
-                    <div style="text-align: center; color: #555; margin-top: 80px; font-size: 12px; line-height: 1.6;">
-                        <i class="fas fa-mouse-pointer" style="font-size: 40px; margin-bottom: 20px; color:var(--accent); opacity:0.5;"></i><br>Select Layer Matrix on Canvas<br>To Open Config Panel.
-                    </div>`;
-            }
-        }
-    });
-
-    // Keyboard Shortcuts (Delete element)
-    document.addEventListener('keydown', e => {
-        if((e.key === 'Delete' || e.key === 'Backspace') && window.activeEl) {
-            // Prevent deleting if user is typing in an input or contenteditable
-            if(e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.contentEditable === "true") return;
-            window.deleteActiveEl();
-        }
-    });
-}
+/**
+ * Global exposure for legacy compatibility
+ */
+window.showToast = showToast;
+window.sEl = sEl;
+window.toggleTheme = toggleTheme;
+window.switchTab = switchTab;
