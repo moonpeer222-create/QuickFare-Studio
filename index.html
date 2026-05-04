@@ -493,41 +493,121 @@
     <script type="module">
         import appState from './js/appState.js';
         import canvasManager from './js/CanvasManager.js';
-        import campaignController from './js/CampaignController.js';
-        import * as ui from './js/ui.js';
+        import { showToast, sEl, switchTab, toggleTheme, debounce } from './js/ui.js';
+        import './js/api.js'; // Reconnects: Pexels, AI Campaign, Ebook, Canva
 
-        // Initialize state
-        appState.loadFromLocal();
+        // Run AFTER DOM is fully ready
+        document.addEventListener('DOMContentLoaded', () => {
 
-        // Bind new APIs to window for legacy onclick support
-        window.appState = appState;
-        window.canvasManager = canvasManager;
-        window.campaignController = campaignController;
-        window.ui = ui;
+            // ── Shared state helpers ───────────────────────────────────────
+            let saveTimeout;
+            window.debounceSave = () => { clearTimeout(saveTimeout); saveTimeout = setTimeout(saveState, 500); };
 
-        // Map legacy function names to new modular methods
-        window.undo = () => appState.undo();
-        window.redo = () => appState.redo();
-        window.clearCanvasElements = () => canvasManager.clearAll();
-        window.exportDesign = () => canvasManager.downloadAsImage();
-        window.toggleTheme = ui.toggleTheme;
-        window.switchTab = ui.switchTab;
-        window.applyPresetSize = () => canvasManager.applyPresetSize();
-        window.magicAutoCreate = () => campaignController.magicAutoCreate();
-        window.loadTemplate = (t) => canvasManager.loadTemplate(t);
-        window.addElement = (t) => canvasManager.addElement(t);
-        window.uploadLocalImage = (e) => canvasManager.uploadLocalImage(e);
-        window.triggerAICampaign = () => campaignController.generateCampaign(document.getElementById('ai-topic-strategy').value);
-        window.bg = (url) => canvasManager.setBackground(url);
-        window.addImage = (url, tp, lft, wd) => canvasManager.addImage(url, { top: tp, left: lft, width: wd });
+            function saveState() {
+                const snap = canvasManager.updateState ? (() => { canvasManager.updateState(); return true; })() : false;
+                appState.pushHistory();
+                appState.saveToLocal();
+            }
+            window.saveState = saveState;
 
-        // Initial setup
-        const snapshot = appState.getSnapshot();
-        if (snapshot.canvas.elements.length === 0) {
-            canvasManager.addText({ text: "QUICKFARE STUDIO V12", top: "300px" });
-        }
-        
-        ui.showToast("System V12 Modular Initialized");
+            // ── Canvas global wrappers ─────────────────────────────────────
+            window.undo = () => {
+                const s = appState.undo();
+                if (!s) return;
+                canvasManager.artboard.querySelectorAll('.element').forEach(e => e.remove());
+                canvasManager.restoreElements(s.canvas.elements);
+                const bg = document.getElementById('bg-img');
+                if (bg && s.canvas.background.src) { bg.src = s.canvas.background.src; bg.style.filter = s.canvas.background.filter || ''; }
+                canvasManager.elementCount = s.canvas.elementCount;
+                canvasManager.maxZIndex = s.canvas.maxZIndex;
+            };
+            window.redo = () => {
+                const s = appState.redo();
+                if (!s) return;
+                canvasManager.artboard.querySelectorAll('.element').forEach(e => e.remove());
+                canvasManager.restoreElements(s.canvas.elements);
+                const bg = document.getElementById('bg-img');
+                if (bg && s.canvas.background.src) { bg.src = s.canvas.background.src; bg.style.filter = s.canvas.background.filter || ''; }
+                canvasManager.elementCount = s.canvas.elementCount;
+                canvasManager.maxZIndex = s.canvas.maxZIndex;
+            };
+            window.clearCanvasElements = () => canvasManager.clearAll();
+            window.exportDesign = () => canvasManager.downloadAsImage();
+            window.applyPresetSize = () => canvasManager.applyPresetSize();
+            window.loadTemplate = t => canvasManager.loadTemplate(t);
+            window.addElement = t => canvasManager.addElement(t);
+            window.uploadLocalImage = e => canvasManager.uploadLocalImage(e);
+            window.bg = url => canvasManager.setBackground(url);
+            window.addImage = (url, tp, lft, wd) => canvasManager.addImage(url, { top: tp || '50px', left: lft || '50px', width: wd || '400px' });
+            window.addTextObj = (html, tp, lft, wd, fs, fm, cl) => canvasManager.addText({ text: html, top: tp, left: lft, width: wd, fontSize: fs, fontFamily: fm, color: cl || '#fff' });
+            window.addCardObj = (html, tp, lft, wd) => canvasManager.addCard({ content: html, top: tp, left: lft, width: wd });
+            window.applyFilters = () => canvasManager.applyFilters();
+            window.bringForward = () => {
+                const active = document.querySelector('.element.active');
+                if (active) { active.style.zIndex = ++canvasManager.maxZIndex; saveState(); }
+            };
+            window.sendBackward = () => {
+                const active = document.querySelector('.element.active');
+                if (active && parseInt(active.style.zIndex) > 10) { active.style.zIndex = parseInt(active.style.zIndex) - 1; saveState(); }
+            };
+
+            // ── UI ─────────────────────────────────────────────────────────
+            window.toggleTheme = toggleTheme;
+            window.switchTab = switchTab;
+            window.showToast = showToast;
+            window.sEl = sEl;
+
+            // ── Zoom / fit ─────────────────────────────────────────────────
+            function fitArtboard() {
+                const ws = document.getElementById('workspace');
+                const wr = document.getElementById('artboard-wrapper');
+                const ab = document.getElementById('artboard');
+                if (!ws || !wr || !ab) return;
+                const scaleX = (ws.clientWidth - 80) / ab.offsetWidth;
+                const scaleY = (ws.clientHeight - 80) / ab.offsetHeight;
+                window.currScale = Math.min(scaleX, scaleY, 1);
+                wr.style.transform = `scale(${window.currScale})`;
+            }
+            window.fitArtboard = fitArtboard;
+            window.addEventListener('resize', fitArtboard);
+
+            document.getElementById('workspace').addEventListener('wheel', e => {
+                if (e.ctrlKey || e.metaKey) {
+                    e.preventDefault();
+                    window.currScale = Math.max(0.1, Math.min((window.currScale || 1) + (e.deltaY > 0 ? -0.05 : 0.05), 3));
+                    document.getElementById('artboard-wrapper').style.transform = `scale(${window.currScale})`;
+                }
+            }, { passive: false });
+
+            // Deselect on workspace click
+            document.getElementById('workspace').addEventListener('click', e => {
+                if (e.target === document.getElementById('workspace') || e.target === document.getElementById('artboard-wrapper') || e.target === document.getElementById('artboard')) {
+                    document.querySelectorAll('.element').forEach(el => el.classList.remove('active'));
+                    document.getElementById('layer-properties').innerHTML = '<div style="text-align:center;color:#555;margin-top:60px;font-size:12px;line-height:1.6;"><i class="fas fa-mouse-pointer" style="font-size:40px;margin-bottom:20px;display:block;color:var(--accent);opacity:0.5;"></i>Select Layer on Canvas</div>';
+                }
+            });
+
+            // ── Load saved state OR set defaults ───────────────────────────
+            const loaded = appState.loadFromLocal();
+            if (loaded && appState.state.canvas.elements.length > 0) {
+                const bg = document.getElementById('bg-img');
+                if (bg && appState.state.canvas.background.src) {
+                    bg.src = appState.state.canvas.background.src;
+                    bg.style.filter = appState.state.canvas.background.filter || '';
+                }
+                canvasManager.elementCount = appState.state.canvas.elementCount;
+                canvasManager.maxZIndex = appState.state.canvas.maxZIndex;
+                canvasManager.restoreElements(appState.state.canvas.elements);
+            } else {
+                // Default welcome state
+                canvasManager.addText({ text: 'QUICKFARE<br><span style="color:#00F0FF;">V12 ALIVE.</span>', top: '300px', left: '80px', fontSize: '130px' });
+                canvasManager.addCard({ content: 'Zero font overlaps. Auto Magic creator in Left Menu. Drag to customize.', top: '600px', left: '80px', width: '850px' });
+                saveState();
+            }
+
+            setTimeout(fitArtboard, 100);
+            showToast('QuickFare Studio V12 Ready');
+        });
     </script>
 </body>
 </html>
