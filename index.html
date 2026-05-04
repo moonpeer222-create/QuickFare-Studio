@@ -42,111 +42,126 @@
 
             <!-- TAB 1: DESIGN -->
             <div id="tab-design" class="tab-content active">
-                <div class="section">
-                    <h3 class="section-title">Canvas Setup</h3>
-                    <div class="input-group">
-                        <select id="preset-size" onchange="applyPresetSize()">
-                            <option value="1080x1080">Insta/FB Post (1080x1080)</option>
-                            <option value="1080x1350">Portrait Feed (1080x1350)</option>
-                            <option value="1080x1920">Reel/Story (1080x1920)</option>
-                            <option value="1200x628">FB Ad Link (1200x628)</option>
-                            <option value="1748x2480">A5 E-Book Cover (1748x2480)</option>
-                        </select>
-                    </div>
-                </div>
 
-                <!-- MAGIC AUTO-CREATE -->
-                <div class="section" style="background: rgba(185, 0, 255, 0.08); border-left: 4px solid var(--magic);">
-                    <h3 class="section-title" style="color: var(--magic);">MAGIC AUTO-CREATE</h3>
-                    <div class="input-group">
-                        <input type="text" id="magic-topic" placeholder="e.g., SEO Guide 2026, Fit Body..." oninput="debouncePexelsLive(this.value)">
-                    </div>
-                    <button class="btn btn-magic" style="width: 100%; justify-content:center; padding:14px;" onclick="magicAutoCreate()"><i class="fas fa-wand-magic-sparkles"></i> 1-CLICK GENERATE</button>
-                </div>
-
-                <!-- FONT PICKER -->
-                <div class="section">
-                    <h3 class="section-title"><i class="fas fa-font"></i> Font & Typography</h3>
-                    <div class="input-group">
-                        <label>Font Family</label>
-                        <select id="font-picker" onchange="applyFontToSelected()">
-                            <option value="Anton">Anton — BOLD IMPACT</option>
-                            <option value="Bebas Neue">Bebas Neue — CINEMATIC</option>
-                            <option value="Oswald">Oswald — EDITORIAL</option>
-                            <option value="Montserrat">Montserrat — Clean Modern</option>
-                            <option value="Playfair Display">Playfair Display — Elegant</option>
-                            <option value="Space Grotesk">Space Grotesk — Tech</option>
-                            <option value="Plus Jakarta Sans">Plus Jakarta Sans — SaaS</option>
-                            <option value="Cinzel">Cinzel — Luxury Premium</option>
-                            <option value="Raleway">Raleway — Fashion</option>
-                            <option value="Poppins">Poppins — Friendly Pro</option>
-                        </select>
-                    </div>
-                    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;">
-                        <div class="input-group" style="margin:0;">
-                            <label>Size (px)</label>
-                            <input type="number" id="font-size-input" value="80" min="10" max="400" onchange="applyFontSizeToSelected()">
-                        </div>
-                        <div class="input-group" style="margin:0;">
-                            <label>Color</label>
-                            <input type="color" id="font-color-input" value="#ffffff" onchange="applyColorToSelected()" style="height:38px;width:100%;padding:2px;background:var(--panel-bg);border:1px solid var(--border);border-radius:8px;cursor:pointer;">
-                        </div>
-                        <div class="input-group" style="margin:0;">
-                            <label>Align</label>
-                            <select id="text-align-input" onchange="applyAlignToSelected()">
-                                <option value="left">Left</option>
-                                <option value="center">Center</option>
-                                <option value="right">Right</option>
+                <!-- 🪄 ACCORDION 1: AI MAGIC & SETUP -->
+                <div class="section active" onclick="toggleAccordion(this)">
+                    <h3 class="section-title" style="color: var(--magic);"><span style="display:flex;align-items:center;gap:8px;"><i class="fas fa-wand-magic-sparkles"></i> AI Generator</span><i class="fas fa-chevron-down chevron"></i></h3>
+                    <div class="section-content" onclick="event.stopPropagation()">
+                        <div class="input-group">
+                            <label>Design Size</label>
+                            <select id="preset-size" onchange="applyPresetSize()">
+                                <option value="1080x1080">Insta/FB Post (1080x1080)</option>
+                                <option value="1080x1350">Portrait Feed (1080x1350)</option>
+                                <option value="1080x1920">Reel/Story (1080x1920)</option>
+                                <option value="1200x628">FB Ad Link (1200x628)</option>
+                                <option value="1748x2480">A5 E-Book Cover (1748x2480)</option>
                             </select>
                         </div>
+                        <div class="input-group" style="margin-top:16px;">
+                            <label>Prompt / Topic</label>
+                            <input type="text" id="magic-topic" placeholder="e.g., SEO Guide 2026, Fit Body..." oninput="debouncePexelsLive(this.value); rotateAIPromptHint(this.value)">
+                            <div class="ai-helper-text" id="ai-prompt-hint"><i class="fas fa-robot"></i> AI will auto-select colors and backgrounds</div>
+                        </div>
+                        <button class="btn btn-magic" style="width: 100%; justify-content:center; padding:14px; margin-bottom:10px;" onclick="magicAutoCreate()"><i class="fas fa-bolt"></i> GENERATE CANVAS</button>
                     </div>
                 </div>
 
-                <!-- TEMPLATES WITH MULTI-SELECT -->
-                <div class="section">
-                    <h3 class="section-title"><i class="fas fa-th-large"></i> Templates</h3>
-                    <p style="font-size:11px;color:var(--muted);margin:0 0 10px;"><i class="fas fa-check-square" style="color:var(--accent);"></i> Tick to select multiple → generates each on a separate page</p>
-                    <div class="template-grid">
-                        <label class="tpl-check"><input type="checkbox" name="tpl" value="cover"><div class="tpl-card"><i class="fas fa-book"></i><span>E-Book Cover</span><em>Anton / Impact</em></div></label>
-                        <label class="tpl-check"><input type="checkbox" name="tpl" value="viral"><div class="tpl-card"><i class="fas fa-fire"></i><span>Viral Hook</span><em>Bebas Neue</em></div></label>
-                        <label class="tpl-check"><input type="checkbox" name="tpl" value="quote"><div class="tpl-card"><i class="fas fa-quote-left"></i><span>Authority Quote</span><em>Playfair</em></div></label>
-                        <label class="tpl-check"><input type="checkbox" name="tpl" value="split"><div class="tpl-card"><i class="fas fa-columns"></i><span>Before/After</span><em>Anton</em></div></label>
-                        <label class="tpl-check"><input type="checkbox" name="tpl" value="announcement"><div class="tpl-card"><i class="fas fa-bullhorn"></i><span>Announcement</span><em>Oswald</em></div></label>
-                        <label class="tpl-check"><input type="checkbox" name="tpl" value="testimonial"><div class="tpl-card"><i class="fas fa-star"></i><span>Testimonial</span><em>Montserrat</em></div></label>
-                        <label class="tpl-check"><input type="checkbox" name="tpl" value="product"><div class="tpl-card"><i class="fas fa-tag"></i><span>Product/Offer</span><em>Anton</em></div></label>
-                        <label class="tpl-check"><input type="checkbox" name="tpl" value="minimal"><div class="tpl-card"><i class="fas fa-minus"></i><span>Minimal Dark</span><em>Bebas Neue</em></div></label>
-                    </div>
-                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px;">
-                        <button class="btn" onclick="loadSingleTemplate()" style="font-size:11px;justify-content:center;"><i class="fas fa-arrow-right"></i> Load Selected</button>
-                        <button class="btn btn-magic" onclick="loadAllSelectedAsPages()" style="font-size:11px;justify-content:center;"><i class="fas fa-layer-group"></i> Multi-Page</button>
-                    </div>
-                </div>
-
-                <div class="section">
-                    <h3 class="section-title">Manual Elements</h3>
-                    <div class="row">
-                        <button class="btn" style="flex:1; justify-content:center;" onclick="addElement('text')"><i class="fas fa-font"></i> Heading</button>
-                        <button class="btn" style="flex:1; justify-content:center;" onclick="addElement('card')"><i class="fas fa-list-ul"></i> Subtext</button>
-                    </div>
-                    <div class="upload-wrapper">
-                        <button class="btn" style="width:100%; justify-content:center;"><i class="fas fa-image"></i> Upload Image</button>
-                        <input type="file" accept="image/*" onchange="uploadLocalImage(event)">
+                <!-- 🎨 ACCORDION 2: TEMPLATES -->
+                <div class="section" onclick="toggleAccordion(this)">
+                    <h3 class="section-title"><span style="display:flex;align-items:center;gap:8px;"><i class="fas fa-th-large"></i> Templates</span><i class="fas fa-chevron-down chevron"></i></h3>
+                    <div class="section-content" onclick="event.stopPropagation()">
+                        <p style="font-size:11px;color:var(--muted);margin:0 0 10px;"><i class="fas fa-check-square" style="color:var(--accent);"></i> Select multiple to generate multi-page sets instantly.</p>
+                        <div class="template-grid">
+                            <label class="tpl-check"><input type="checkbox" name="tpl" value="cover"><div class="tpl-card"><i class="fas fa-book"></i><span>E-Book Cover</span><em>Anton / Impact</em></div></label>
+                            <label class="tpl-check"><input type="checkbox" name="tpl" value="viral"><div class="tpl-card"><i class="fas fa-fire"></i><span>Viral Hook</span><em>Bebas Neue</em></div></label>
+                            <label class="tpl-check"><input type="checkbox" name="tpl" value="quote"><div class="tpl-card"><i class="fas fa-quote-left"></i><span>Authority Quote</span><em>Playfair</em></div></label>
+                            <label class="tpl-check"><input type="checkbox" name="tpl" value="split"><div class="tpl-card"><i class="fas fa-columns"></i><span>Before/After</span><em>Anton</em></div></label>
+                            <label class="tpl-check"><input type="checkbox" name="tpl" value="announcement"><div class="tpl-card"><i class="fas fa-bullhorn"></i><span>Announcement</span><em>Oswald</em></div></label>
+                            <label class="tpl-check"><input type="checkbox" name="tpl" value="testimonial"><div class="tpl-card"><i class="fas fa-star"></i><span>Testimonial</span><em>Montserrat</em></div></label>
+                            <label class="tpl-check"><input type="checkbox" name="tpl" value="product"><div class="tpl-card"><i class="fas fa-tag"></i><span>Product/Offer</span><em>Anton</em></div></label>
+                            <label class="tpl-check"><input type="checkbox" name="tpl" value="minimal"><div class="tpl-card"><i class="fas fa-minus"></i><span>Minimal Dark</span><em>Bebas Neue</em></div></label>
+                        </div>
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px;">
+                            <button class="btn" onclick="loadSingleTemplate()" style="font-size:11px;justify-content:center;"><i class="fas fa-arrow-right"></i> Add Single</button>
+                            <button class="btn btn-magic" onclick="loadAllSelectedAsPages()" style="font-size:11px;justify-content:center;"><i class="fas fa-layer-group"></i> Multi-Page</button>
+                        </div>
                     </div>
                 </div>
 
-                <div class="section">
-                    <h3 class="section-title">Offline Pillar Library</h3>
-                    <div class="input-group" style="margin-bottom: 10px;">
-                        <select id="pillar-category" onchange="loadPillars()">
-                            <option value="finance">Finance &amp; Wealth</option>
-                            <option value="tech">Technology &amp; AI</option>
-                            <option value="ecom">E-Commerce &amp; Retail</option>
-                            <option value="fitness">Health &amp; Fitness</option>
-                            <option value="abstract">Cinematic / Abstract</option>
-                        </select>
+                <!-- ✍️ ACCORDION 3: TYPOGRAPHY & ELEMENTS -->
+                <div class="section" onclick="toggleAccordion(this)">
+                    <h3 class="section-title"><span style="display:flex;align-items:center;gap:8px;"><i class="fas fa-font"></i> Typography & Elements</span><i class="fas fa-chevron-down chevron"></i></h3>
+                    <div class="section-content" onclick="event.stopPropagation()">
+                        <div class="input-group">
+                            <label>Font Family</label>
+                            <select id="font-picker" onchange="applyFontToSelected()">
+                                <option value="Anton">Anton — BOLD IMPACT</option>
+                                <option value="Bebas Neue">Bebas Neue — CINEMATIC</option>
+                                <option value="Oswald">Oswald — EDITORIAL</option>
+                                <option value="Montserrat">Montserrat — Clean Modern</option>
+                                <option value="Playfair Display">Playfair Display — Elegant</option>
+                                <option value="Space Grotesk">Space Grotesk — Tech</option>
+                                <option value="Plus Jakarta Sans">Plus Jakarta Sans — SaaS</option>
+                                <option value="Cinzel">Cinzel — Luxury Premium</option>
+                                <option value="Raleway">Raleway — Fashion</option>
+                                <option value="Poppins">Poppins — Friendly Pro</option>
+                            </select>
+                            <div class="ai-helper-text" id="ai-font-hint" style="cursor:pointer;" onclick="suggestFont()"><i class="fas fa-lightbulb"></i> Click here for AI Font Suggestion</div>
+                        </div>
+                        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:16px;">
+                            <div class="input-group" style="margin:0;">
+                                <label>Size (px)</label>
+                                <input type="number" id="font-size-input" value="80" min="10" max="400" onchange="applyFontSizeToSelected()">
+                            </div>
+                            <div class="input-group" style="margin:0;">
+                                <label>Color</label>
+                                <input type="color" id="font-color-input" value="#ffffff" onchange="applyColorToSelected()" style="height:38px;width:100%;padding:2px;background:var(--panel-bg);border:1px solid var(--border);border-radius:8px;cursor:pointer;">
+                            </div>
+                            <div class="input-group" style="margin:0;">
+                                <label>Align</label>
+                                <select id="text-align-input" onchange="applyAlignToSelected()">
+                                    <option value="left">Left</option>
+                                    <option value="center">Center</option>
+                                    <option value="right">Right</option>
+                                </select>
+                            </div>
+                        </div>
+                        <h4 style="font-size:10px;color:var(--muted);text-transform:uppercase;margin:0 0 10px;">Insert Elements</h4>
+                        <div class="row">
+                            <button class="btn" style="flex:1; justify-content:center;" onclick="addElement('text')"><i class="fas fa-heading"></i> Heading</button>
+                            <button class="btn" style="flex:1; justify-content:center;" onclick="addElement('card')"><i class="fas fa-align-left"></i> Body Text</button>
+                        </div>
+                        <div class="upload-wrapper" style="margin-top:8px;">
+                            <button class="btn" style="width:100%; justify-content:center;background:rgba(255,255,255,0.05);"><i class="fas fa-image"></i> Local Image Upload</button>
+                            <input type="file" accept="image/*" onchange="uploadLocalImage(event)">
+                        </div>
                     </div>
-                    <div class="gallery" id="pillar-gallery" style="max-height: 200px;"></div>
                 </div>
+
+                <!-- 🔌 ACCORDION 4: INTEGRATIONS & LIBRARIES -->
+                <div class="section" onclick="toggleAccordion(this)">
+                    <h3 class="section-title"><span style="display:flex;align-items:center;gap:8px;"><i class="fas fa-plug"></i> Libraries & Integrations</span><i class="fas fa-chevron-down chevron"></i></h3>
+                    <div class="section-content" onclick="event.stopPropagation()">
+                        <h4 style="font-size:10px;color:var(--muted);text-transform:uppercase;margin:0 0 10px;">Offline Pillar Images</h4>
+                        <div class="input-group" style="margin-bottom: 10px;">
+                            <select id="pillar-category" onchange="loadPillars()">
+                                <option value="finance">Finance &amp; Wealth</option>
+                                <option value="tech">Technology &amp; AI</option>
+                                <option value="ecom">E-Commerce &amp; Retail</option>
+                                <option value="fitness">Health &amp; Fitness</option>
+                                <option value="abstract">Cinematic / Abstract</option>
+                            </select>
+                        </div>
+                        <div class="gallery" id="pillar-gallery" style="max-height: 200px;"></div>
+
+                        <div style="border-top:1px dashed var(--border);margin-top:16px;padding-top:16px;">
+                            <h4 style="font-size:10px;color:#00c4cc;text-transform:uppercase;margin:0 0 10px;"><i class="fas fa-paintbrush"></i> Canva Connect</h4>
+                            <button class="btn" style="width: 100%; justify-content: center; background:#1c1f2b; border:1px solid #00c4cc; color: #00c4cc; margin-bottom: 8px;" onclick="startCanvaAuth()"><i class="fas fa-link"></i> Link Account</button>
+                            <button class="btn" style="width: 100%; justify-content: center; background:#00c4cc; color: white; border: none; font-weight: bold;" onclick="exportToCanva()"><i class="fas fa-cloud-upload-alt"></i> Send to Canva</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
 
 
@@ -577,6 +592,40 @@
             };
             window.addEventListener('resize', updateMobileUI);
             updateMobileUI();
+
+            // ── Accordion & UI Logic ───────────────────────────────────────
+            window.toggleAccordion = (element) => {
+                const isActive = element.classList.contains('active');
+                // Optional: Collapse others
+                // document.querySelectorAll('.sidebar .section').forEach(el => el.classList.remove('active'));
+                if (!isActive) element.classList.add('active');
+                else element.classList.remove('active');
+            };
+
+            window.rotateAIPromptHint = (val) => {
+                const hint = document.getElementById('ai-prompt-hint');
+                if (!hint) return;
+                const ideas = [
+                    "AI will find the perfect background for this...",
+                    "Adding dark cinematic grading...",
+                    "AI is parsing your topic...",
+                    "Structuring typography based on context..."
+                ];
+                if (val.length > 5) hint.innerHTML = `<i class="fas fa-robot"></i> ${ideas[Math.floor(Math.random()*ideas.length)]}`;
+            };
+
+            window.suggestFont = () => {
+                const select = document.getElementById('font-picker');
+                const fonts = Array.from(select.options).map(o => o.value);
+                const random = fonts[Math.floor(Math.random() * fonts.length)];
+                select.value = random;
+                window.applyFontToSelected();
+                const hint = document.getElementById('ai-font-hint');
+                if (hint) {
+                    hint.innerHTML = `<i class="fas fa-check-circle" style="color:var(--accent)"></i> AI picked ${random}!`;
+                    setTimeout(() => hint.innerHTML = `<i class="fas fa-lightbulb"></i> Click here for AI Font Suggestion`, 3000);
+                }
+            };
 
             // ── State helpers ──────────────────────────────────────────────
             let saveTimeout;
