@@ -84,11 +84,11 @@ export function sEl(el) {
             <h3 style="color:var(--accent); font-size:14px; text-transform:uppercase; margin-bottom: 20px;">Layer Properties</h3>
             
             <div class="row" style="margin-bottom:15px;">
-                <button class="btn" style="flex:1; justify-content:center; background:#334;" onclick="changeZIndex(1)"><i class="fas fa-arrow-up"></i> Bring Forward</button>
-                <button class="btn" style="flex:1; justify-content:center; background:#334;" onclick="changeZIndex(-1)"><i class="fas fa-arrow-down"></i> Send Backward</button>
+                <button class="btn" style="flex:1; justify-content:center; background:var(--btn-bg); border-color:var(--btn-border);" onclick="changeZIndex(1)"><i class="fas fa-arrow-up"></i> Bring Forward</button>
+                <button class="btn" style="flex:1; justify-content:center; background:var(--btn-bg); border-color:var(--btn-border);" onclick="changeZIndex(-1)"><i class="fas fa-arrow-down"></i> Send Backward</button>
             </div>
 
-            <button class="btn" style="width:100%; margin-bottom:15px; justify-content:center; background:#5a0c16; border-color:#aa0000;" onclick="deleteActiveEl()">
+            <button class="btn" style="width:100%; margin-bottom:15px; justify-content:center; background:var(--danger); border-color:var(--danger); color:white;" onclick="deleteActiveEl()">
                 <i class="fas fa-trash-alt"></i> Delete Selected Layer
             </button>
             
@@ -167,6 +167,20 @@ window.deleteActiveEl = function() {
 // Global UI bindings
 window.undo = undo;
 window.redo = redo;
+
+window.toggleTheme = function() {
+    const body = document.body;
+    const icon = document.getElementById('theme-icon');
+    if (body.classList.contains('theme-light')) {
+        body.classList.remove('theme-light');
+        icon.classList.remove('fa-sun');
+        icon.classList.add('fa-moon');
+    } else {
+        body.classList.add('theme-light');
+        icon.classList.remove('fa-moon');
+        icon.classList.add('fa-sun');
+    }
+}
 
 // Pillar System Logic
 export function loadPillars() {
