@@ -104,28 +104,16 @@ window._legacyTriggerAICampaign = async function() {
 // ==========================================
 // 2. MAGIC AUTO CREATE CANVAS ENGINE
 // ==========================================
-window.magicAutoCreate = async function() {
-    let mt = document.getElementById('magic-topic')?.value?.trim() || "Digital Freedom 2026";
+// NOTE: magicAutoCreate is defined in index.html bootstrap for proper timing.
+// This api.js version is kept for reference only — do NOT re-define window.magicAutoCreate here.
+async function _apiMagicAutoCreate(mt) {
     let magC = CONFIG.MAGIC_COLORS[Math.floor(Math.random() * CONFIG.MAGIC_COLORS.length)];
-    
-    const preset = document.getElementById('preset-size');
-    if (preset) preset.value = "1080x1350";
-    window.applyPresetSize && window.applyPresetSize();
-    clearCanvasElements();
-
     let kArr = mt.split(" "); 
     let mKey = kArr.length > 2 ? `${kArr[kArr.length-2]} ${kArr[kArr.length-1]} dark` : `${mt} dark aesthetics`;
-    
-    showToast(`Generating Magic Canvas...`, false);
-    const pxSearch = document.getElementById('pexels-search');
-    if (pxSearch) pxSearch.value = mKey;
-    
     const bgOverlay = document.getElementById('bg-overlay');
     if (bgOverlay) bgOverlay.style.background = `linear-gradient(to top, #000 0%, transparent 60%, rgba(0,0,0,0.8) 100%)`;
-    
     addTextObj("THE EXCLUSIVE<br><span style='color:" + magC + "; text-transform:uppercase;'>" + mt.substring(0,22) + "</span>", "120px", "80px", "920px", "90px", "Oswald", "#fff");
-    addCardObj("Learn the highly specific methodology frameworks completely transforming digital arrays and generating exponential value streams directly without friction.<br><br><span style='font-weight:900;'>Click Link Included Inside Output!</span>", "850px", "80px", "900px");
-    
+    addCardObj("Learn the highly specific methodology frameworks generating exponential value streams without friction.<br><br><span style='font-weight:900;'>Take Action Today!</span>", "850px", "80px", "900px");
     fetchPexelsAutoM(mKey);
     saveState();
 }
@@ -295,18 +283,36 @@ ${schema}`;
 function populateEbookDOM(data) {
     const setHTML = (id, html) => { if(document.getElementById(id)) document.getElementById(id).innerHTML = html; };
     
+    // Hide the "generate first" banner
+    const banner = document.getElementById('kit-generate-banner');
+    if (banner) banner.style.display = 'none';
+
+    // Show cover background image
+    const coverBg = document.getElementById('cover-bg');
+    if (coverBg) coverBg.style.display = '';
+
     Object.keys(data).forEach(key => {
         let domId = key.replace(/_/g, '-'); 
         setHTML(domId, data[key]);
     });
     
     if(document.getElementById('c-title')) {
-        let parts = data.c_title.split(' ');
+        let parts = (data.c_title || '').split(' ');
         if(parts.length > 1) {
             let last = parts.pop();
             document.getElementById('c-title').innerHTML = `${parts.join(' ')} <span>${last}</span>`;
         }
     }
+
+    // Update chart bar widths based on values
+    const barPairs = [['d-v1','.fill-accent:nth-of-type(1)'],['d-v2','.fill-danger:nth-of-type(1)'],['d-v3','.fill-accent:nth-of-type(2)'],['d-v4','.fill-danger:nth-of-type(2)']];
+    document.querySelectorAll('.bar-fill').forEach((bar, i) => {
+        const valId = ['d-v1','d-v2','d-v3','d-v4'][i];
+        if (valId && data[valId]) {
+            const pct = parseInt(data[valId]) || 50;
+            bar.style.width = Math.min(pct, 100) + '%';
+        }
+    });
 }
 
 window.setEbookBg = function(elementId, url) {
