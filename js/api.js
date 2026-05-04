@@ -52,18 +52,18 @@ window.applyAIResultsToCanvas = function() {
     saveState();
 }
 
-window.triggerAICampaign = async function() {
+window._legacyTriggerAICampaign = async function() {
     let tp = document.getElementById('ai-topic-strategy').value; 
     let bx = document.getElementById('ai-results');
     if(!tp) return showToast("Provide a detailed topic segment first", true);
     
     bx.style.display = "block"; 
-    bx.innerHTML = `<div style="text-align:center;padding:30px;"><i class="fas fa-circle-notch fa-spin" style="font-size:25px;color:cyan;margin-bottom:10px;"></i><p>Pinging OpenRouter Relay...</p></div>`;
+    bx.innerHTML = `<div style="text-align:center;padding:30px;"><i class="fas fa-circle-notch fa-spin" style="font-size:25px;color:var(--accent);margin-bottom:10px;"></i><p>Pinging OpenRouter Relay...</p></div>`;
 
-    const sys = "Produce elite copy formatted EXACTLY like so: <h4>🔥 VIRAL TRIGGER HOOK</h4> <p>[punchline]</p> <h4>🧠 DIRECT AD FRAMEWORK</h4> <p><b>PROBLEM MAP:</b> [text]<br><b>AGGRESSION LIMIT:</b>[text]<br><b>SOLUTION ROADMAP:</b>[text]</p> <h4>🎯 DEMOGRAPHIC TARGET DIRECTIVES</h4> <p>#tag1 #tag2 #tag3</p> <h4>🖼️ VISUAL INITIATION NODE</h4> <p>Target System Background String Output : [strictly 3 visual word descriptors of photo. no brackets]</p>";
+    const sys = "Produce elite marketing copy formatted EXACTLY like so: <h4>🔥 VIRAL TRIGGER HOOK</h4> <p id='ai-hook'>[punchline]</p> <h4>🧠 DIRECT AD FRAMEWORK</h4> <p id='ai-frame'><b>PROBLEM MAP:</b> [text]<br><b>AGGRESSION LIMIT:</b>[text]<br><b>SOLUTION ROADMAP:</b>[text]</p> <h4>🎯 DEMOGRAPHIC TARGET DIRECTIVES</h4> <p>#tag1 #tag2 #tag3</p> <h4>🖼️ VISUAL INITIATION NODE</h4> <p>Target System Background String Output : [strictly 3 visual word descriptors of photo. no brackets]</p>";
 
     try {
-        let completion = await AIService.generateCompletion("meta-llama/llama-3-8b-instruct:free", sys, "Execute marketing data configuration for niche: " + tp);
+        let completion = await AIService.generateCompletion("meta-llama/llama-3.1-8b-instruct:free", sys, "Execute marketing data configuration for niche: " + tp);
         let dirtyHtml = completion.replace(/```(html)?/gi,'');
         
         let finalHtml = dirtyHtml + `<button class="btn btn-magic" style="width:100%; margin-top:15px;" onclick="applyAIResultsToCanvas()"><i class="fas fa-plus-circle"></i> APPLY TO CANVAS</button>`;
@@ -75,50 +75,56 @@ window.triggerAICampaign = async function() {
                 if (i === 1) p.id = 'ai-frame';
             });
         }
-        showToast("Real AI Neural Integration Accepted.");
+        showToast("Real AI Integration Accepted.");
 
         let findImageDesc = /Output[\s\S]*?:([^<]+)<\/p>/i.exec(dirtyHtml);
         if(findImageDesc && findImageDesc[1]) {
-            document.getElementById('pexels-search').value = findImageDesc[1].trim();
-            window.fetchPexels(false);
+            const pxSearch = document.getElementById('pexels-search');
+            if (pxSearch) pxSearch.value = findImageDesc[1].trim();
+            window.fetchPexels && window.fetchPexels(false);
         }
 
     } catch (err) {
-        console.warn("Deploying Fallback Brain due to CORS or Limit Block...");
+        console.warn("Deploying Fallback Brain:", err.message);
         let mockResponse = mockedAIResponse(tp);
-        bx.innerHTML = `<div style="margin-bottom:10px; font-size:10px; color:#5a6; background:#1b3d2b; padding:4px 8px; border-radius:4px; display:inline-block;"><i class="fas fa-shield-alt"></i> OPENROUTER BLOCKED: PROXY FALLBACK LAUNCHED</div>` + mockResponse;
-        showToast("Connection Proxy Redirected To Safe Local Storage.", false);
+        bx.innerHTML = `<div style="margin-bottom:10px; font-size:10px; color:#5a6; background:#1b3d2b; padding:4px 8px; border-radius:4px; display:inline-block;"><i class="fas fa-shield-alt"></i> GHOST AI ACTIVE — No API key or limit reached</div>` + mockResponse;
+        showToast("Ghost AI Campaign Generated!", false);
         
         let fallbackMatch = /Output :.*?<span.*?>([^<]+)<\/span>/i.exec(mockResponse);
         if(fallbackMatch) { 
-            document.getElementById('pexels-search').value = fallbackMatch[1]; 
-            window.fetchPexels(false);
+            const pxSearch = document.getElementById('pexels-search');
+            if (pxSearch) pxSearch.value = fallbackMatch[1];
+            window.fetchPexels && window.fetchPexels(false);
         }
     }
 }
+// triggerAICampaign is defined in bootstrap (index.html) with localStorage key support
+// Legacy version above is kept as fallback only
 
 // ==========================================
 // 2. MAGIC AUTO CREATE CANVAS ENGINE
 // ==========================================
-window.magicAutoCreate = function() {
-    let mt = document.getElementById('magic-topic').value || "Default Launch Plan";
+window.magicAutoCreate = async function() {
+    let mt = document.getElementById('magic-topic')?.value?.trim() || "Digital Freedom 2026";
     let magC = CONFIG.MAGIC_COLORS[Math.floor(Math.random() * CONFIG.MAGIC_COLORS.length)];
     
-    document.getElementById('preset-size').value = "1080x1350"; 
-    window.applyPresetSize();
+    const preset = document.getElementById('preset-size');
+    if (preset) preset.value = "1080x1350";
+    window.applyPresetSize && window.applyPresetSize();
     clearCanvasElements();
 
     let kArr = mt.split(" "); 
     let mKey = kArr.length > 2 ? `${kArr[kArr.length-2]} ${kArr[kArr.length-1]} dark` : `${mt} dark aesthetics`;
     
-    showToast(`Generating Magic Canvas... (${mKey})`, false);
-    document.getElementById('pexels-search').value = mKey;
+    showToast(`Generating Magic Canvas...`, false);
+    const pxSearch = document.getElementById('pexels-search');
+    if (pxSearch) pxSearch.value = mKey;
     
-    document.getElementById('bg-overlay').style.background = `linear-gradient(to top, #000 0%, transparent 60%, rgba(0,0,0,0.8) 100%)`;
+    const bgOverlay = document.getElementById('bg-overlay');
+    if (bgOverlay) bgOverlay.style.background = `linear-gradient(to top, #000 0%, transparent 60%, rgba(0,0,0,0.8) 100%)`;
     
-    addTextObj("THE EXCLUSIVE<br><span style='color:"+magC+"; text-transform:uppercase;'>"+mt.substring(0,25)+"...</span>", "120px", "80px", "920px", "90px", "Oswald");
-    let mSubBObjSystem = addCardObj("Learn the highly specific methodology frameworks completely transforming digital arrays and generating exponential value streams directly without friction...<br><br><span style='font-weight:900;'>Click Link Included Inside Output Render!</span>", "850px", "80px", "900px", "20px", "rgba(10,12,18,0.85)"); 
-    mSubBObjSystem.style.borderLeft = "4px solid " + magC;
+    addTextObj("THE EXCLUSIVE<br><span style='color:" + magC + "; text-transform:uppercase;'>" + mt.substring(0,22) + "</span>", "120px", "80px", "920px", "90px", "Oswald", "#fff");
+    addCardObj("Learn the highly specific methodology frameworks completely transforming digital arrays and generating exponential value streams directly without friction.<br><br><span style='font-weight:900;'>Click Link Included Inside Output!</span>", "850px", "80px", "900px");
     
     fetchPexelsAutoM(mKey);
     saveState();
