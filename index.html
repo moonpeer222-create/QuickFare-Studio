@@ -1,541 +1,606 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QuickFare Ultimate Studio V12 | AI Design & Business Kit Engine</title>
-    <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Bebas+Neue&family=Cinzel:wght@700&family=Montserrat:ital,wght@0,400;0,700;0,900;1,900&family=Oswald:wght@500;700&family=Playfair+Display:ital,wght@0,700;1,700&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
+    <title>QuickFare V17 Ultimate | Auto-Kit & Design Studio</title>
+
+    <!-- Premium Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Anton&family=Bebas+Neue&family=Cinzel:wght@700&family=Montserrat:ital,wght@0,400;0,700;0,900;1,900&family=Oswald:wght@500;700&family=Playfair+Display:ital,wght@0,700;1,700&family=Space+Grotesk:wght@700&family=Outfit:wght@300;500;700;900&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="css/style.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <!-- Core Engine Libraries (Fabric.js for Graphics, JSZip for Packaging) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+
+    <style>
+        :root {
+            --bg-dark: #050508;
+            --panel-bg: rgba(15, 17, 26, 0.85);
+            --accent: #00F0FF;
+            --text-main: #ffffff;
+            --border: rgba(255, 255, 255, 0.08);
+            --danger: #FF0050;
+            --magic: #b900ff;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent);
+        }
+
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100vh;
+            background: radial-gradient(circle at center, #0a0c10 0%, #020203 100%);
+            color: var(--text-main);
+            font-family: 'Outfit', sans-serif;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* NAVBAR */
+        .navbar {
+            height: 70px;
+            background: rgba(5, 5, 8, 0.85);
+            backdrop-filter: blur(20px);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 30px;
+            border-bottom: 1px solid var(--border);
+            z-index: 100;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 900;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .logo span {
+            color: var(--accent);
+            text-shadow: 0 0 15px rgba(0, 240, 255, 0.4);
+        }
+
+        .nav-controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            text-transform: uppercase;
+        }
+
+        .btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: #000;
+            border: none;
+            font-weight: 900;
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.3);
+        }
+
+        .btn-primary:hover {
+            background: #fff;
+            transform: translateY(-3px);
+        }
+
+        .btn-magic {
+            background: linear-gradient(135deg, #00F0FF, var(--magic));
+            color: white;
+            border: none;
+            font-weight: 900;
+        }
+
+        /* MAIN APP LAYOUT */
+        .app-body {
+            display: flex;
+            flex: 1;
+            height: calc(100vh - 70px);
+            overflow: hidden;
+        }
+
+        .sidebar,
+        .properties-panel {
+            background: var(--panel-bg);
+            backdrop-filter: blur(25px);
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .sidebar {
+            width: 380px;
+            border-right: 1px solid var(--border);
+        }
+
+        .properties-panel {
+            width: 320px;
+            border-left: 1px solid var(--border);
+            padding: 20px;
+        }
+
+        /* TABS */
+        .sidebar-tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border);
+            background: rgba(0, 0, 0, 0.4);
+            flex-shrink: 0;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 18px 0;
+            text-align: center;
+            background: none;
+            border: none;
+            color: #666;
+            font-weight: 900;
+            cursor: pointer;
+            text-transform: uppercase;
+            font-size: 12px;
+            transition: 0.3s;
+        }
+
+        .tab-btn.active {
+            color: white;
+            border-bottom: 2px solid var(--accent);
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .tab-content {
+            flex: 1;
+            display: none;
+            flex-direction: column;
+        }
+
+        .tab-content.active {
+            display: flex;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .section {
+            padding: 20px 25px;
+            border-bottom: 1px solid var(--border);
+            flex-shrink: 0;
+        }
+
+        .section-title {
+            font-size: 12px;
+            text-transform: uppercase;
+            color: #999;
+            letter-spacing: 2px;
+            margin: 0 0 15px 0;
+            font-weight: 900;
+        }
+
+        /* INPUTS & CHECKBOXES */
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 11px;
+            margin-bottom: 8px;
+            color: #aaa;
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+
+        .input-group input[type="text"],
+        .input-group input[type="number"],
+        .input-group select,
+        .input-group textarea {
+            width: 100%;
+            padding: 14px;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--border);
+            color: white;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 14px;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        .input-group input:focus,
+        .input-group textarea:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 10px rgba(0, 240, 255, 0.2);
+        }
+
+        .input-group textarea {
+            height: 100px;
+            resize: none;
+        }
+
+        .check-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+            background: rgba(255, 255, 255, 0.03);
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .check-item:hover {
+            border-color: var(--accent);
+            background: rgba(0, 240, 255, 0.05);
+        }
+
+        .check-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--accent);
+            cursor: pointer;
+        }
+
+        .check-item span {
+            font-size: 13px;
+            font-weight: bold;
+            color: white;
+        }
+
+        /* PEXELS GALLERY */
+        .search-bar {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .search-bar input {
+            flex: 1;
+            padding: 12px;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--border);
+            color: white;
+            border-radius: 8px;
+        }
+
+        .search-bar button {
+            padding: 0 15px;
+            background: var(--accent);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .gallery {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            max-height: 300px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+
+        .img-card {
+            position: relative;
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: pointer;
+            aspect-ratio: 1;
+            border: 2px solid transparent;
+        }
+
+        .img-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .img-card:hover {
+            border-color: var(--accent);
+        }
+
+        /* WORKSPACE & CANVAS */
+        .workspace {
+            flex: 1;
+            background: #030304;
+            background-image: radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+            background-size: 30px 30px;
+            display: grid;
+            place-items: center;
+            overflow: auto;
+            position: relative;
+        }
+
+        #artboard-wrapper {
+            box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1), 0 50px 100px rgba(0, 0, 0, 0.9);
+            transition: transform 0.1s ease-out;
+            transform-origin: center center;
+        }
+
+        /* DASHBOARD FOR AUTO KIT RESULTS */
+        #kit-dashboard {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-dark);
+            z-index: 50;
+            overflow-y: auto;
+            padding: 40px;
+        }
+
+        .kit-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .kit-card {
+            background: var(--panel-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .kit-card img {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+            border: 1px solid #333;
+        }
+
+        .kit-card pre {
+            background: #000;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 12px;
+            color: #ccc;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            height: 150px;
+            overflow-y: auto;
+            border: 1px solid #222;
+        }
+
+        /* LOADER */
+        #loader {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 9999;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-top: 4px solid var(--accent);
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        #toast {
+            position: fixed;
+            bottom: -100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--accent);
+            color: #000;
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-weight: 900;
+            font-size: 13px;
+            z-index: 10000;
+            text-transform: uppercase;
+            transition: 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        #toast.show {
+            bottom: 40px;
+        }
+    </style>
 </head>
+
 <body>
 
     <div class="navbar">
-        <button class="btn btn-icon" id="mobile-menu-btn" onclick="toggleSidebar()" style="display:none;"><i class="fas fa-bars"></i></button>
-        <div class="logo">⚡ QuickFare <span>Studio</span></div>
+        <div class="logo">QuickFare <span>V17 Ultimate</span></div>
         <div class="nav-controls">
-            <button class="btn btn-icon" onclick="undo()" title="Undo"><i class="fas fa-undo"></i></button>
-            <button class="btn btn-icon" onclick="redo()" title="Redo"><i class="fas fa-redo"></i></button>
-            <span id="canvas-controls" style="display:flex; gap:6px; align-items:center;">
-                <button class="btn" onclick="canvasManager.clearAll()" title="Reset Artboard"><i class="fas fa-trash-can"></i></button>
-                <button class="btn btn-primary" onclick="exportDesign()"><i class="fas fa-image"></i> PNG</button>
-                <button class="btn" onclick="downloadAllPages()" title="Download All Pages" style="background:rgba(139,92,246,.15); border-color:var(--accent);"><i class="fas fa-layer-group"></i> ALL PAGES</button>
-            </span>
-            <span id="ebook-controls" style="display:none; gap:6px; align-items:center;">
-                <button class="btn btn-primary" onclick="generatePDF()"><i class="fas fa-file-pdf"></i> DOWNLOAD PDF</button>
-            </span>
-            <button class="btn btn-icon" onclick="toggleTheme()" title="Theme"><i class="fas fa-moon" id="theme-icon"></i></button>
+            <button class="btn btn-primary" onclick="downloadZipKit()" id="zip-btn" style="display:none;"><i
+                    class="fas fa-file-archive"></i> Download .ZIP Kit</button>
+            <button class="btn" onclick="exportManualCanvas()" id="manual-btn"><i class="fas fa-image"></i> Export
+                Canvas</button>
         </div>
     </div>
-    <div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleSidebar()"></div>
 
     <div class="app-body">
+
+        <!-- SIDEBAR -->
         <div class="sidebar">
             <div class="sidebar-tabs">
-                <button class="tab-btn active" onclick="switchTab('design')"><i class="fas fa-layer-group"></i> Design Suite</button>
-                <button class="tab-btn" onclick="switchTab('strategist')"><i class="fas fa-bolt"></i> Auto Magic</button>
-                <button class="tab-btn" onclick="switchTab('ebook')"><i class="fas fa-book"></i> Business Kit</button>
+                <button class="tab-btn active" onclick="switchTab('kit')"><i class="fas fa-bolt"></i> Auto-Kit
+                    Gen</button>
+                <button class="tab-btn" onclick="switchTab('manual')"><i class="fas fa-layer-group"></i> Editor</button>
+                <button class="tab-btn" onclick="switchTab('settings')"><i class="fas fa-cog"></i></button>
             </div>
 
-            <!-- TAB 1: DESIGN -->
-            <div id="tab-design" class="tab-content active">
-
-                <!-- 🪄 ACCORDION 1: AI MAGIC & SETUP -->
-                <div class="section active" onclick="toggleAccordion(this)">
-                    <h3 class="section-title" style="color: var(--magic);"><span style="display:flex;align-items:center;gap:8px;"><i class="fas fa-wand-magic-sparkles"></i> AI Generator</span><i class="fas fa-chevron-down chevron"></i></h3>
-                    <div class="section-content" onclick="event.stopPropagation()">
-                        <div class="input-group">
-                            <label>Design Size</label>
-                            <select id="preset-size" onchange="applyPresetSize()">
-                                <option value="1080x1080">Insta/FB Post (1080x1080)</option>
-                                <option value="1080x1350">Portrait Feed (1080x1350)</option>
-                                <option value="1080x1920">Reel/Story (1080x1920)</option>
-                                <option value="1200x628">FB Ad Link (1200x628)</option>
-                                <option value="1748x2480">A5 E-Book Cover (1748x2480)</option>
-                            </select>
-                        </div>
-                        <div class="input-group" style="margin-top:16px;">
-                            <label>Prompt / Topic</label>
-                            <input type="text" id="magic-topic" placeholder="e.g., SEO Guide 2026, Fit Body..." oninput="debouncePexelsLive(this.value); rotateAIPromptHint(this.value)">
-                            <div class="ai-helper-text" id="ai-prompt-hint"><i class="fas fa-robot"></i> AI will auto-select colors and backgrounds</div>
-                        </div>
-                        <button class="btn btn-magic" style="width: 100%; justify-content:center; padding:14px; margin-bottom:10px;" onclick="magicAutoCreate()"><i class="fas fa-bolt"></i> GENERATE CANVAS</button>
-                    </div>
-                </div>
-
-                <!-- 🎨 ACCORDION 2: TEMPLATES -->
-                <div class="section" onclick="toggleAccordion(this)">
-                    <h3 class="section-title"><span style="display:flex;align-items:center;gap:8px;"><i class="fas fa-th-large"></i> Templates</span><i class="fas fa-chevron-down chevron"></i></h3>
-                    <div class="section-content" onclick="event.stopPropagation()">
-                        <p style="font-size:11px;color:var(--muted);margin:0 0 10px;"><i class="fas fa-check-square" style="color:var(--accent);"></i> Select multiple to generate multi-page sets instantly.</p>
-                        <div class="template-grid">
-                            <label class="tpl-check"><input type="checkbox" name="tpl" value="cover"><div class="tpl-card"><i class="fas fa-book"></i><span>E-Book Cover</span><em>Anton / Impact</em></div></label>
-                            <label class="tpl-check"><input type="checkbox" name="tpl" value="viral"><div class="tpl-card"><i class="fas fa-fire"></i><span>Viral Hook</span><em>Bebas Neue</em></div></label>
-                            <label class="tpl-check"><input type="checkbox" name="tpl" value="quote"><div class="tpl-card"><i class="fas fa-quote-left"></i><span>Authority Quote</span><em>Playfair</em></div></label>
-                            <label class="tpl-check"><input type="checkbox" name="tpl" value="split"><div class="tpl-card"><i class="fas fa-columns"></i><span>Before/After</span><em>Anton</em></div></label>
-                            <label class="tpl-check"><input type="checkbox" name="tpl" value="announcement"><div class="tpl-card"><i class="fas fa-bullhorn"></i><span>Announcement</span><em>Oswald</em></div></label>
-                            <label class="tpl-check"><input type="checkbox" name="tpl" value="testimonial"><div class="tpl-card"><i class="fas fa-star"></i><span>Testimonial</span><em>Montserrat</em></div></label>
-                            <label class="tpl-check"><input type="checkbox" name="tpl" value="product"><div class="tpl-card"><i class="fas fa-tag"></i><span>Product/Offer</span><em>Anton</em></div></label>
-                            <label class="tpl-check"><input type="checkbox" name="tpl" value="minimal"><div class="tpl-card"><i class="fas fa-minus"></i><span>Minimal Dark</span><em>Bebas Neue</em></div></label>
-                        </div>
-                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px;">
-                            <button class="btn" onclick="loadSingleTemplate()" style="font-size:11px;justify-content:center;"><i class="fas fa-arrow-right"></i> Add Single</button>
-                            <button class="btn btn-magic" onclick="loadAllSelectedAsPages()" style="font-size:11px;justify-content:center;"><i class="fas fa-layer-group"></i> Multi-Page</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- ✍️ ACCORDION 3: TYPOGRAPHY & ELEMENTS -->
-                <div class="section" onclick="toggleAccordion(this)">
-                    <h3 class="section-title"><span style="display:flex;align-items:center;gap:8px;"><i class="fas fa-font"></i> Typography & Elements</span><i class="fas fa-chevron-down chevron"></i></h3>
-                    <div class="section-content" onclick="event.stopPropagation()">
-                        <div class="input-group">
-                            <label>Font Family</label>
-                            <select id="font-picker" onchange="applyFontToSelected()">
-                                <option value="Anton">Anton — BOLD IMPACT</option>
-                                <option value="Bebas Neue">Bebas Neue — CINEMATIC</option>
-                                <option value="Oswald">Oswald — EDITORIAL</option>
-                                <option value="Montserrat">Montserrat — Clean Modern</option>
-                                <option value="Playfair Display">Playfair Display — Elegant</option>
-                                <option value="Space Grotesk">Space Grotesk — Tech</option>
-                                <option value="Plus Jakarta Sans">Plus Jakarta Sans — SaaS</option>
-                                <option value="Cinzel">Cinzel — Luxury Premium</option>
-                                <option value="Raleway">Raleway — Fashion</option>
-                                <option value="Poppins">Poppins — Friendly Pro</option>
-                            </select>
-                            <div class="ai-helper-text" id="ai-font-hint" style="cursor:pointer;" onclick="suggestFont()"><i class="fas fa-lightbulb"></i> Click here for AI Font Suggestion</div>
-                        </div>
-                        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:16px;">
-                            <div class="input-group" style="margin:0;">
-                                <label>Size (px)</label>
-                                <input type="number" id="font-size-input" value="80" min="10" max="400" onchange="applyFontSizeToSelected()">
-                            </div>
-                            <div class="input-group" style="margin:0;">
-                                <label>Color</label>
-                                <input type="color" id="font-color-input" value="#ffffff" onchange="applyColorToSelected()" style="height:38px;width:100%;padding:2px;background:var(--panel-bg);border:1px solid var(--border);border-radius:8px;cursor:pointer;">
-                            </div>
-                            <div class="input-group" style="margin:0;">
-                                <label>Align</label>
-                                <select id="text-align-input" onchange="applyAlignToSelected()">
-                                    <option value="left">Left</option>
-                                    <option value="center">Center</option>
-                                    <option value="right">Right</option>
-                                </select>
-                            </div>
-                        </div>
-                        <h4 style="font-size:10px;color:var(--muted);text-transform:uppercase;margin:0 0 10px;">Insert Elements</h4>
-                        <div class="row">
-                            <button class="btn" style="flex:1; justify-content:center;" onclick="addElement('text')"><i class="fas fa-heading"></i> Heading</button>
-                            <button class="btn" style="flex:1; justify-content:center;" onclick="addElement('card')"><i class="fas fa-align-left"></i> Body Text</button>
-                        </div>
-                        <div class="upload-wrapper" style="margin-top:8px;">
-                            <button class="btn" style="width:100%; justify-content:center;background:rgba(255,255,255,0.05);"><i class="fas fa-image"></i> Local Image Upload</button>
-                            <input type="file" accept="image/*" onchange="uploadLocalImage(event)">
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 🔌 ACCORDION 4: INTEGRATIONS & LIBRARIES -->
-                <div class="section" onclick="toggleAccordion(this)">
-                    <h3 class="section-title"><span style="display:flex;align-items:center;gap:8px;"><i class="fas fa-plug"></i> Libraries & Integrations</span><i class="fas fa-chevron-down chevron"></i></h3>
-                    <div class="section-content" onclick="event.stopPropagation()">
-                        <h4 style="font-size:10px;color:var(--muted);text-transform:uppercase;margin:0 0 10px;">Offline Pillar Images</h4>
-                        <div class="input-group" style="margin-bottom: 10px;">
-                            <select id="pillar-category" onchange="loadPillars()">
-                                <option value="finance">Finance &amp; Wealth</option>
-                                <option value="tech">Technology &amp; AI</option>
-                                <option value="ecom">E-Commerce &amp; Retail</option>
-                                <option value="fitness">Health &amp; Fitness</option>
-                                <option value="abstract">Cinematic / Abstract</option>
-                            </select>
-                        </div>
-                        <div class="gallery" id="pillar-gallery" style="max-height: 200px;"></div>
-
-                        <div style="border-top:1px dashed var(--border);margin-top:16px;padding-top:16px;">
-                            <h4 style="font-size:10px;color:#00c4cc;text-transform:uppercase;margin:0 0 10px;"><i class="fas fa-paintbrush"></i> Canva Connect</h4>
-                            <button class="btn" style="width: 100%; justify-content: center; background:#1c1f2b; border:1px solid #00c4cc; color: #00c4cc; margin-bottom: 8px;" onclick="startCanvaAuth()"><i class="fas fa-link"></i> Link Account</button>
-                            <button class="btn" style="width: 100%; justify-content: center; background:#00c4cc; color: white; border: none; font-weight: bold;" onclick="exportToCanva()"><i class="fas fa-cloud-upload-alt"></i> Send to Canva</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-
-
-            <!-- TAB 2: STRATEGIST -->
-            <div id="tab-strategist" class="tab-content">
+            <!-- TAB SETTINGS -->
+            <div id="tab-settings" class="tab-content">
                 <div class="section">
-                    <h3 class="section-title" style="color:var(--accent);"><i class="fas fa-key"></i> API Configuration</h3>
-                    <div class="api-key-box">
-                        <label>OpenRouter API Key (Free at openrouter.ai)</label>
-                        <div style="display:flex;gap:6px;">
-                            <input type="password" id="or-key-input" placeholder="sk-or-v1-..." style="flex:1;padding:10px;background:#0c0e1d;border:1px solid #2d3057;color:#fff;border-radius:8px;font-size:12px;outline:none;">
-                            <button class="btn" onclick="saveORKey()" style="background:var(--accent2);color:#000;border:none;padding:10px 14px;"><i class="fas fa-save"></i></button>
-                        </div>
-                        <p style="font-size:10px;color:var(--muted);margin-top:6px;">Free key → openrouter.ai/keys — Ghost fallback activates if blank.</p>
-                    </div>
-                </div>
-                <div class="section" style="border-bottom:none;flex:1;">
-                    <h3 class="section-title" style="color:var(--accent);"><i class="fas fa-brain"></i> AI Campaign Generator</h3>
+                    <h3 class="section-title">API Configuration</h3>
                     <div class="input-group">
-                        <label>Campaign Topic</label>
-                        <textarea id="ai-topic-strategy" placeholder="e.g. Freelancing in Pakistan 2026, Weight Loss for Busy Moms, E-Commerce Automation..." style="height:90px;"></textarea>
+                        <label>OpenRouter Key (Qwen-72B)</label>
+                        <input type="password" id="or-key-input" placeholder="sk-or-v1-..." onchange="localStorage.setItem('qf_or_key', this.value); showToast('Key Saved!')">
                     </div>
-                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">
-                        <button class="btn" style="justify-content:center;font-size:11px;" onclick="setAIStyle('viral')"><i class="fas fa-fire"></i> Viral Hook</button>
-                        <button class="btn" style="justify-content:center;font-size:11px;" onclick="setAIStyle('authority')"><i class="fas fa-award"></i> Authority</button>
-                        <button class="btn" style="justify-content:center;font-size:11px;" onclick="setAIStyle('story')"><i class="fas fa-book-open"></i> Story</button>
-                        <button class="btn" style="justify-content:center;font-size:11px;" onclick="setAIStyle('pain')"><i class="fas fa-exclamation"></i> Pain Point</button>
-                    </div>
-                    <button class="btn-ai" onclick="triggerAICampaign()"><i class="fas fa-wand-magic-sparkles"></i> Generate AI Campaign</button>
-                    <div id="ai-results" class="ai-result-box"></div>
+                    <p style="font-size:10px; color:#666;">Get your key at openrouter.ai/keys. This key enables AI Strategy & Copy generation.</p>
                 </div>
             </div>
 
-            <!-- TAB 3: AI BUSINESS KIT (E-BOOK) -->
-            <div id="tab-ebook" class="tab-content">
-                <div class="section" style="border-bottom: 2px solid var(--qwen); background: rgba(171, 104, 255, 0.05);">
-                    <h3 class="section-title" style="color: var(--qwen);"><i class="fas fa-robot"></i> QWEN AI GENERATOR</h3>
-                    
-                    <button class="btn-ai-secondary" onclick="suggestTopicsEbook()"><i class="fas fa-lightbulb"></i> Suggest Trending Topics</button>
-                    <div id="suggestions-box" class="ai-suggestions">
-                        <div style="font-weight: bold; margin-bottom: 5px; color: white;">Top Niches for Pakistan:</div>
-                        <ul id="suggestions-list"></ul>
-                    </div>
+            <!-- TAB 1: FULL KIT GENERATOR -->
+            <div id="tab-kit" class="tab-content active">
+                <div class="section" style="background: rgba(185, 0, 255, 0.05); border-left: 4px solid var(--magic);">
+                    <h3 class="section-title" style="color: var(--magic);">AI Campaign Strategist</h3>
+                    <p style="font-size: 12px; color: #aaa; margin-bottom: 20px;">Type a topic. Qwen-72B will fetch
+                        cinematic Pexels backgrounds, write copy, and render designs in all dimensions.</p>
 
                     <div class="input-group">
-                        <label style="color: var(--qwen);">Enter Your Business Kit Topic</label>
-                        <textarea id="ai-topic-ebook" placeholder="e.g., Freelancing, Weight Loss, WhatsApp Commerce..."></textarea>
+                        <textarea id="kit-topic"
+                            placeholder="e.g., E-commerce Dropshipping without inventory in Pakistan..."></textarea>
                     </div>
-                    
-                    <button class="btn-ai" onclick="generateEbook()"><i class="fas fa-magic"></i> Auto-Generate Business Kit</button>
-                    <p style="font-size: 10px; color: #888; text-align: center; margin: 0;">Powered by Qwen-72B via OpenRouter</p>
+
+                    <h3 class="section-title" style="margin-top: 15px;">Select Deliverables</h3>
+                    <label class="check-item"><input type="checkbox" id="chk-cover" checked><span>A5 E-Book Cover
+                            (1748x2480)</span></label>
+                    <label class="check-item"><input type="checkbox" id="chk-post" checked><span>Square Meta Post
+                            (1080x1080)</span></label>
+                    <label class="check-item"><input type="checkbox" id="chk-reel" checked><span>TikTok Reel / Story
+                            (1080x1920)</span></label>
+                    <label class="check-item"><input type="checkbox" id="chk-adcopy" checked><span>Meta Ad Copy
+                            Framework (.txt)</span></label>
+                    <label class="check-item"><input type="checkbox" id="chk-script" checked><span>Viral Video Script
+                            (.txt)</span></label>
+
+                    <button class="btn btn-magic"
+                        style="width: 100%; justify-content:center; padding:18px; margin-top: 10px;"
+                        onclick="generateFullKit()">
+                        <i class="fas fa-rocket"></i> GENERATE FULL KIT
+                    </button>
                 </div>
+            </div>
 
+            <!-- TAB 2: MANUAL EDITOR -->
+            <div id="tab-manual" class="tab-content">
                 <div class="section">
-                    <h3 class="section-title">Design Settings</h3>
+                    <h3 class="section-title">Canvas Settings</h3>
                     <div class="input-group">
-                        <label>Kit Theme Color</label>
-                        <select id="theme-selector" onchange="changeThemeEbook()">
-                            <option value="#00F0FF">Cyan (Tech / Freelancing)</option>
-                            <option value="#FFD700">Gold (Finance / Religion)</option>
-                            <option value="#FF0050">Pink (E-Commerce / Social)</option>
-                            <option value="#39FF14">Green (Health / Wellness)</option>
-                            <option value="#FF7B00">Orange (Parenting / Safety)</option>
+                        <select id="preset-size" onchange="applyPresetSize()">
+                            <option value="1080x1080">Instagram Post (1:1)</option>
+                            <option value="1080x1920">Story / Reel (9:16)</option>
+                            <option value="1748x2480">E-Book Cover (A5)</option>
                         </select>
+                    </div>
+                    <div style="display:flex; gap:10px;">
+                        <button class="btn" style="flex:1; justify-content:center;" onclick="addText()"><i
+                                class="fas fa-font"></i> Add Text</button>
+                        <button class="btn" style="flex:1; justify-content:center;" onclick="addCard()"><i
+                                class="fas fa-square"></i> Add Card</button>
                     </div>
                 </div>
 
                 <div class="section" style="flex:1;">
-                    <h3 class="section-title">Pexels Visuals API</h3>
+                    <h3 class="section-title">Pexels Backgrounds</h3>
                     <div class="search-bar">
-                        <input type="text" id="pexels-search-ebook" placeholder="Search Cover image...">
-                        <button onclick="fetchPexelsEbook()"><i class="fas fa-search"></i></button>
+                        <input type="text" id="manual-pexels" placeholder="Search..." value="Dark business">
+                        <button onclick="searchManualPexels()"><i class="fas fa-search"></i></button>
                     </div>
-                    <div class="gallery" id="pexels-gallery-ebook"></div>
-                    <p style="font-size: 10px; color: #666; text-align: center;">Click 'SET COVER' to update Page 1.<br>Click 'SET OUTRO' to update last page.</p>
+                    <div id="manual-gallery" class="gallery"></div>
                 </div>
             </div>
         </div>
 
-        <!-- MAIN WORKSPACE -->
+        <!-- WORKSPACE -->
         <div class="workspace" id="workspace">
-            <!-- PAGES PANEL (Canva-style) -->
-            <div id="pages-panel-wrap">
-                <div id="pages-panel"></div>
+
+            <!-- RESULTS DASHBOARD FOR AUTO KIT -->
+            <div id="kit-dashboard">
+                <div
+                    style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; padding-bottom: 20px;">
+                    <h1 style="font-size: 30px; margin: 0; color: var(--accent);">YOUR ASSETS ARE READY</h1>
+                    <button class="btn btn-primary" onclick="closeDashboard()"><i class="fas fa-paint-brush"></i> Back
+                        to Manual Editor</button>
+                </div>
+                <div class="kit-grid" id="kit-grid-container"></div>
             </div>
 
-            <!-- CANVAS WRAPPER -->
+            <!-- MANUAL FABRIC.JS ARTBOARD -->
             <div id="artboard-wrapper">
-                <div id="artboard">
-                    <img id="bg-img" class="layer-bg" src="https://images.unsplash.com/photo-1628156108169-f815598fb28c?q=80&w=1920&auto=format&fit=crop" crossorigin="anonymous" draggable="false">
-                    <div id="bg-overlay" class="layer-overlay" style="background: linear-gradient(to top, rgba(0,0,0,0.9), rgba(0,0,0,0.3));"></div>
-                    
-                    <div class="element el-text" id="el-default" style="top: 300px; left: 80px; width: 900px; color: #fff; z-index: 10; font-family: 'Anton', sans-serif; font-size: 130px;">QUICKFAIR<br><span style="color:#00F0FF;">V12 ALIVE.</span></div>
-                    
-                    <div class="element el-card" id="el-sub" style="top: 600px; left: 80px; width: 850px; background: rgba(20,20,25,0.7); backdrop-filter:blur(20px); border-radius:20px; padding:40px; border:1px solid rgba(255,255,255,0.2); color: white; font-family: 'Montserrat', sans-serif; font-size: 38px; font-weight:700;">Zero font overlaps during rendering.<br>Auto Magic creator available in Left Menu. Drag to customize perfectly.</div>
-                </div>
-            </div>
-
-            <!-- E-BOOK WRAPPER -->
-            <div id="business-kit-wrapper">
-                <!-- GENERATE PROMPT BANNER -->
-                <div id="kit-generate-banner" style="width:100%;max-width:680px;background:linear-gradient(135deg,rgba(138,92,246,.15),rgba(236,72,153,.1));border:1px solid var(--accent);border-radius:14px;padding:24px 30px;text-align:center;margin-bottom:0;">
-                    <div style="font-size:28px;margin-bottom:10px;">✨</div>
-                    <h3 style="color:var(--accent);font-size:16px;text-transform:uppercase;letter-spacing:1px;margin:0 0 8px;">Business Kit is Empty</h3>
-                    <p style="color:var(--muted);font-size:13px;margin:0 0 16px;line-height:1.6;">Go to <strong style="color:var(--text);">Business Kit tab → Enter your topic → Click Generate</strong><br>AI will fill all 17 pages automatically.</p>
-                    <button class="btn btn-primary" onclick="switchTab('ebook')" style="margin:0 auto;"><i class="fas fa-wand-magic-sparkles"></i> Generate Business Kit</button>
-                </div>
-
-                <!-- PAGE 1: COVER -->
-                <div class="page">
-                    <img id="cover-bg" src="" class="bg-img" crossorigin="anonymous" alt="Cover BG" style="display:none;">
-                    <div class="gradient-overlay"></div>
-                    <div class="page-content" style="justify-content: center; align-items: center; text-align: center;">
-                        <div id="c-badge" contenteditable="true" style="background: var(--danger); color: white; padding: 5px 20px; font-family: 'Oswald', sans-serif; letter-spacing: 5px; font-size: 16px; margin-bottom: 30px; border-radius: 3px; font-weight: bold;">YOUR BRAND NAME</div>
-                        <div id="c-title" class="h-title" contenteditable="true" style="font-size: 80px; margin-bottom: 10px;">YOUR <span>TITLE</span></div>
-                        <div id="c-sub" class="h-sub" contenteditable="true" style="color: white; font-size: 22px; letter-spacing: 2px; margin-bottom: 40px; opacity: 0.9;">YOUR SUBTITLE HERE</div>
-                        <div style="margin-top: 50px; border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.6); padding: 25px; border-radius: 15px; backdrop-filter: blur(10px); width: 80%;">
-                            <div id="c-tag" contenteditable="true" style="color: var(--accent); font-size: 18px; margin-bottom: 5px; font-weight: 700; font-family: 'Montserrat', sans-serif;">TARGET AUDIENCE</div>
-                            <div id="c-desc" class="p-text" contenteditable="true" style="margin: 0; color: #ccc;">Book description will appear here after AI generation.</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- PAGE 2: WARNING -->
-                <div class="page">
-                    <div class="page-content" style="justify-content: center; align-items: center; text-align: center;">
-                        <div style="width: 80px; height: 80px; border: 4px solid var(--danger); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 30px;">
-                            <span id="w-badge" contenteditable="true" style="color: var(--danger); font-size: 30px; font-weight: bold; font-family: 'Oswald', sans-serif;">!</span>
-                        </div>
-                        <div class="h-title" contenteditable="true" style="color: var(--danger); font-size: 50px;">WARNING</div>
-                        <div id="w-sub" class="h3" contenteditable="true" style="margin-bottom: 30px; font-size: 24px;">AI will write this title for your topic.</div>
-                        <div id="w-p1" class="p-text" contenteditable="true" style="font-size: 16px; max-width: 80%; line-height: 1.8; margin: 0 auto 20px auto;">Paragraph 1 — AI generated content will appear here.</div>
-                        <div id="w-p2" class="p-text" contenteditable="true" style="font-size: 16px; max-width: 80%; line-height: 1.8; margin: 0 auto 20px auto;">Paragraph 2 — AI generated content will appear here.</div>
-                        <div class="cinematic-box" style="margin-top: 40px; text-align: left; max-width: 80%;">
-                            <p id="w-quote" contenteditable="true">"AI generated motivational quote will appear here."</p>
-                        </div>
-                    </div>
-                    <div class="footer-num">02</div>
-                </div>
-
-                <!-- PAGE 3: TABLE OF CONTENTS -->
-                <div class="page">
-                    <div class="page-content">
-                        <div class="ep-badge" contenteditable="true">Season 1: The Episodes</div>
-                        <div class="h-title" contenteditable="true" style="color: white; margin-bottom: 10px;">BINGE READ THIS</div>
-                        <div class="p-text" contenteditable="true">Jaise aap Netflix par season dekhte hain, is e-book ko bhi wese hi step-by-step parhein.</div>
-
-                        <div class="mac-window" style="margin-top: 30px;">
-                            <div class="mac-header">
-                                <div class="mac-dot" style="background:#ff5f56;"></div><div class="mac-dot" style="background:#ffbd2e;"></div><div class="mac-dot" style="background:#27c93f;"></div>
-                                <div style="color: white; font-size: 12px; margin-left: 10px; opacity: 0.5;">index.html</div>
-                            </div>
-                            <div class="mac-body" style="padding: 30px;">
-                                <div style="display: flex; justify-content: space-between; margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 10px;">
-                                    <span id="t-1" style="color: white; font-weight: 700; font-size: 15px; font-family: 'Montserrat', sans-serif;" contenteditable="true">EP 01. The Matrix (Data vs Reality)</span> <span style="color: var(--accent); font-weight: bold;">Page 04</span>
-                                </div>
-                                <div style="display: flex; justify-content: space-between; margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 10px;">
-                                    <span id="t-2" style="color: white; font-weight: 700; font-size: 15px; font-family: 'Montserrat', sans-serif;" contenteditable="true">EP 02. The Characters (Two Mindsets)</span> <span style="color: var(--accent); font-weight: bold;">Page 05</span>
-                                </div>
-                                <div style="display: flex; justify-content: space-between; margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 10px;">
-                                    <span id="t-3" style="color: white; font-weight: 700; font-size: 15px; font-family: 'Montserrat', sans-serif;" contenteditable="true">EP 03. The Ecosystem Collapse</span> <span style="color: var(--accent); font-weight: bold;">Page 06</span>
-                                </div>
-                                <div style="display: flex; justify-content: space-between; margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 10px;">
-                                    <span id="t-4" style="color: white; font-weight: 700; font-size: 15px; font-family: 'Montserrat', sans-serif;" contenteditable="true">EP 04. Systems Architect Blueprint</span> <span style="color: var(--accent); font-weight: bold;">Page 07</span>
-                                </div>
-                                <div style="display: flex; justify-content: space-between; margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 10px;">
-                                    <span id="t-5" style="color: white; font-weight: 700; font-size: 15px; font-family: 'Montserrat', sans-serif;" contenteditable="true">EP 05. Voice Search Hacking</span> <span style="color: var(--accent); font-weight: bold;">Page 08</span>
-                                </div>
-                                <div style="display: flex; justify-content: space-between; margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 10px;">
-                                    <span id="t-6" style="color: white; font-weight: 700; font-size: 15px; font-family: 'Montserrat', sans-serif;" contenteditable="true">EP 06. The Digital Robots</span> <span style="color: var(--accent); font-weight: bold;">Page 09</span>
-                                </div>
-                                <div style="display: flex; justify-content: space-between; margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 10px;">
-                                    <span id="t-7" style="color: white; font-weight: 700; font-size: 15px; font-family: 'Montserrat', sans-serif;" contenteditable="true">EP 07. The Pre-Qualify Funnel</span> <span style="color: var(--accent); font-weight: bold;">Page 10</span>
-                                </div>
-                                <div style="display: flex; justify-content: space-between; margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 10px;">
-                                    <span id="t-8" style="color: white; font-weight: 700; font-size: 15px; font-family: 'Montserrat', sans-serif;" contenteditable="true">EP 08. Automated Social Commerce</span> <span style="color: var(--accent); font-weight: bold;">Page 11</span>
-                                </div>
-                                <div style="display: flex; justify-content: space-between; margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 10px;">
-                                    <span id="t-9" style="color: white; font-weight: 700; font-size: 15px; font-family: 'Montserrat', sans-serif;" contenteditable="true">EP 09. Digital Payment Gateways</span> <span style="color: var(--accent); font-weight: bold;">Page 12</span>
-                                </div>
-                                <div style="display: flex; justify-content: space-between;">
-                                    <span id="t-10" style="color: white; font-weight: 700; font-size: 15px; font-family: 'Montserrat', sans-serif;" contenteditable="true">EP 10. The 30-Day Escape Plan</span> <span style="color: var(--accent); font-weight: bold;">Page 14</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="footer-num">03</div>
-                </div>
-
-                <!-- PAGE 4: THE DATA (CHART) -->
-                <div class="page">
-                    <div class="page-content">
-                        <div class="ep-header"><span>Episode 01</span><span>The Matrix</span></div>
-                        <div id="d-title" class="h-title" contenteditable="true" style="color: white;">THE SURGE</div>
-                        <div id="d-desc" class="p-text" contenteditable="true">Yeh reality check hai jise ignore nahi kiya ja sakta.</div>
-
-                        <div class="chart-container" style="margin-top: 40px;">
-                            <div id="d-chart" class="h3" style="text-align: center; margin-top: 0; margin-bottom: 20px;" contenteditable="true">Stats Overview</div>
-                            
-                            <div class="bar-wrap">
-                                <div class="bar-label"><span id="d-l1" contenteditable="true">Old Stat</span><span id="d-v1" contenteditable="true">50%</span></div>
-                                <div class="bar-bg"><div class="bar-fill fill-accent" style="width: 50%;"></div></div>
-                            </div>
-                            <div class="bar-wrap">
-                                <div class="bar-label"><span id="d-l2" contenteditable="true">Cost</span><span id="d-v2" contenteditable="true">45%</span></div>
-                                <div class="bar-bg"><div class="bar-fill fill-danger" style="width: 45%;"></div></div>
-                            </div>
-                            <div style="height: 30px;"></div>
-                            <div class="bar-wrap">
-                                <div class="bar-label"><span id="d-l3" contenteditable="true">New Stat</span><span id="d-v3" contenteditable="true">55%</span></div>
-                                <div class="bar-bg"><div class="bar-fill fill-accent" style="width: 55%;"></div></div>
-                            </div>
-                            <div class="bar-wrap">
-                                <div class="bar-label"><span id="d-l4" style="color: var(--danger);" contenteditable="true">Danger Stat</span><span id="d-v4" style="color: var(--danger);" contenteditable="true">85%</span></div>
-                                <div class="bar-bg"><div class="bar-fill fill-danger" style="width: 85%;"></div></div>
-                            </div>
-                        </div>
-
-                        <div class="glow-box">
-                            <div id="d-qtitle" class="h3" contenteditable="true" style="margin-top: 0; color: white;">The Brutal Reality</div>
-                            <div id="d-qdesc" class="p-text" contenteditable="true" style="margin: 0;">Scaling effectively requires high-ticket automated systems. Manual effort alone will fail.</div>
-                        </div>
-                    </div>
-                    <div class="footer-num">04</div>
-                </div>
-
-                <!-- PAGE 5: CHARACTERS -->
-                <div class="page">
-                    <div class="page-content">
-                        <div class="ep-header"><span>Episode 02</span><span>The Two Personas</span></div>
-                        <div class="h-title" contenteditable="true" style="color: white;">PERSONA A VS PERSONA B</div>
-                        <div class="p-text" contenteditable="true">Two mindsets — one wins, one struggles. Which one are you?</div>
-                        <div style="margin-top: 30px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-                            <div class="mac-window">
-                                <div class="mac-body" style="padding-top: 40px;">
-                                    <div id="char1-title" class="h3" style="color: var(--danger); margin-top: 0;" contenteditable="true">PERSONA A</div>
-                                    <div id="char1-desc" class="p-text" style="font-size: 13px;" contenteditable="true">AI generated persona description will appear here.</div>
-                                    <div id="char1-traits" class="p-text" style="font-size: 13px; color: var(--muted); margin-bottom: 0;" contenteditable="true"><b>Traits:</b> Will be filled by AI</div>
-                                </div>
-                            </div>
-                            <div class="mac-window" style="border-color: var(--accent);">
-                                <div class="mac-body" style="padding-top: 40px;">
-                                    <div id="char2-title" class="h3" style="color: var(--accent); margin-top: 0;" contenteditable="true">PERSONA B</div>
-                                    <div id="char2-desc" class="p-text" style="font-size: 13px;" contenteditable="true">AI generated persona description will appear here.</div>
-                                    <div id="char2-traits" class="p-text" style="font-size: 13px; color: var(--muted); margin-bottom: 0;" contenteditable="true"><b>Traits:</b> Will be filled by AI</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="footer-num">05</div>
-                </div>
-
-                <!-- PAGE 14: ROADMAP -->
-                <div class="page">
-                    <div class="page-content">
-                        <div class="ep-header"><span>Action</span><span>The Roadmap</span></div>
-                        <div class="h-title" contenteditable="true" style="color: white;">30-DAY ESCAPE PLAN</div>
-                        <div class="p-text" contenteditable="true">Knowledge without immediate action is mere overhead. This is your definitive blueprint:</div>
-
-                        <div style="border-left: 2px solid var(--accent); padding-left: 25px; margin-top: 40px; margin-left: 10px;">
-                            <div style="position: relative; margin-bottom: 35px;">
-                                <div style="position: absolute; left: -34px; top: 0; width: 14px; height: 14px; background: var(--bg-dark); border: 2px solid var(--accent); border-radius: 50%;"></div>
-                                <div id="rm1-title" class="h3" style="color: var(--accent); margin: 0 0 8px 0;" contenteditable="true">Days 1-10: Phase 1</div>
-                                <div id="rm1-desc" class="p-text" style="margin: 0;" contenteditable="true">Setup your initial systems.</div>
-                            </div>
-                            
-                            <div style="position: relative; margin-bottom: 35px;">
-                                <div style="position: absolute; left: -34px; top: 0; width: 14px; height: 14px; background: var(--bg-dark); border: 2px solid var(--accent); border-radius: 50%;"></div>
-                                <div id="rm2-title" class="h3" style="color: var(--accent); margin: 0 0 8px 0;" contenteditable="true">Days 11-20: Phase 2</div>
-                                <div id="rm2-desc" class="p-text" style="margin: 0;" contenteditable="true">Build the automation pipeline.</div>
-                            </div>
-
-                            <div style="position: relative; margin-bottom: 35px;">
-                                <div style="position: absolute; left: -34px; top: 0; width: 14px; height: 14px; background: var(--bg-dark); border: 2px solid var(--accent); border-radius: 50%;"></div>
-                                <div id="rm3-title" class="h3" style="color: var(--accent); margin: 0 0 8px 0;" contenteditable="true">Days 21-25: Phase 3</div>
-                                <div id="rm3-desc" class="p-text" style="margin: 0;" contenteditable="true">Connect gateways and finalize.</div>
-                            </div>
-
-                            <div style="position: relative;">
-                                <div style="position: absolute; left: -34px; top: 0; width: 14px; height: 14px; background: var(--accent); border: 2px solid var(--accent); border-radius: 50%; box-shadow: 0 0 15px var(--accent);"></div>
-                                <div id="rm4-title" class="h3" style="color: var(--accent); margin: 0 0 8px 0;" contenteditable="true">Days 26-30: The Launch</div>
-                                <div id="rm4-desc" class="p-text" style="margin: 0;" contenteditable="true">Drive traffic and scale.</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="footer-num">14</div>
-                </div>
-
-                <!-- PAGE 15: OUTRO -->
-                <div class="page">
-                    <img id="outro-bg" src="https://images.unsplash.com/photo-1618045952959-1582e219736e?q=80&w=1200&auto=format&fit=crop" class="bg-img" crossorigin="anonymous" alt="Outro">
-                    <div class="gradient-overlay"></div>
-                    <div class="page-content" style="justify-content: center; text-align: center;">
-                        
-                        <div id="o-title" class="h-title" contenteditable="true" style="font-size: 50px;">WELCOME TO THE 1%</div>
-                        <div id="o-desc" class="p-text" contenteditable="true" style="font-size: 18px; max-width: 80%; margin: 0 auto 40px auto; color: white;">Aapne yeh eBook parh li hai. Ab aapke paas 2 raste hain. Ya toh wapis ja kar manual hustle karein, ya is System ko aaj hi build karna shuru karein.</div>
-
-                        <div style="background: rgba(0,0,0,0.8); border: 1px solid var(--accent); padding: 40px; border-radius: 15px; display: inline-block;">
-                            <div id="o-box" class="h3" contenteditable="true" style="color: var(--accent); margin-top: 0; font-size: 24px; text-transform:uppercase;">JOIN THE EXCLUSIVE CLUB</div>
-                            <div class="p-text" contenteditable="true" style="font-size: 14px; margin-bottom: 20px;">Humari private community join karein jahan hum live automations banate hain.</div>
-                            <div contenteditable="true" style="font-size: 12px; color: var(--danger); margin-bottom: 0; font-weight: bold; font-family: 'Montserrat', sans-serif;">(LIMITED SEATS AVAILABLE)</div>
-                        </div>
-                    </div>
-                    <div class="footer-num">15</div>
-                </div>
-
-                <!-- PAGE 16: MARKETING POSTS & STRATEGY -->
-                <div class="page">
-                    <div class="page-content">
-                        <div class="ep-header"><span>Bonus</span><span>Marketing Kit</span></div>
-                        <div class="h-title" style="color: white;">LAUNCH STRATEGY & POSTS</div>
-                        
-                        <div class="h3" style="color: var(--accent); margin-top: 20px;"><i class="fas fa-users"></i> Target Audience</div>
-                        <div id="strategy-audience" class="p-text" contenteditable="true">Define who you are targeting here...</div>
-
-                        <div class="h3" style="color: var(--danger);"><i class="fas fa-bullseye"></i> Core Hook</div>
-                        <div id="strategy-hook" class="p-text" contenteditable="true">Write the main hook that grabs attention...</div>
-
-                        <div class="h3" style="color: #1877F2; margin-top: 20px;"><i class="fab fa-facebook"></i> Facebook Post</div>
-                        <div class="glass-panel" id="post-fb" contenteditable="true" style="font-size:14px;">Facebook post copy will appear here...</div>
-
-                        <div class="h3" style="color: #E1306C;"><i class="fab fa-instagram"></i> Instagram Post</div>
-                        <div class="glass-panel" id="post-ig" contenteditable="true" style="font-size:14px;">Instagram post copy will appear here...</div>
-                    </div>
-                    <div class="footer-num">16</div>
-                </div>
-
-                <!-- PAGE 17: VIRAL REEL SCRIPT -->
-                <div class="page">
-                    <div class="page-content">
-                        <div class="ep-header"><span>Bonus</span><span>Video Marketing</span></div>
-                        <div class="h-title" style="color: white;">VIRAL REEL SCRIPT</div>
-                        <div class="p-text" contenteditable="true">A 20-30 second short-form video script to drive massive traffic to your offer.</div>
-                        
-                        <div class="glow-box">
-                            <div class="h3" style="color: var(--danger); margin-top: 0;">[0:00 - 0:03] THE HOOK</div>
-                            <div id="reel-hook" class="p-text" contenteditable="true" style="margin: 0; font-size: 16px; font-weight: bold;">Hook script goes here...</div>
-                        </div>
-
-                        <div class="glow-box" style="border-color: var(--accent);">
-                            <div class="h3" style="color: var(--accent); margin-top: 0;">[0:03 - 0:15] THE VALUE (BODY)</div>
-                            <div id="reel-body" class="p-text" contenteditable="true" style="margin: 0; line-height: 1.8;">Provide value, share the core concept, build tension...</div>
-                        </div>
-
-                        <div class="glow-box" style="border-color: var(--qwen);">
-                            <div class="h3" style="color: var(--qwen); margin-top: 0;">[0:15 - 0:20] THE CALL TO ACTION</div>
-                            <div id="reel-cta" class="p-text" contenteditable="true" style="margin: 0; font-weight: bold; color: white;">Tell them exactly what to do next (e.g., Click the link in bio)...</div>
-                        </div>
-                    </div>
-                    <div class="footer-num">17</div>
-                </div>
+                <canvas id="artboard" width="1080" height="1080"></canvas>
             </div>
         </div>
 
+        <!-- PROPERTIES PANEL (For Manual Editing) -->
         <div class="properties-panel" id="properties-panel">
-            <div class="section">
-                <h3 class="section-title">Background Filters</h3>
-                <div class="input-group">
-                    <label>Blur</label>
-                    <input type="range" id="filter-blur" min="0" max="20" value="0" oninput="applyFilters()">
-                </div>
-                <div class="input-group">
-                    <label>Brightness</label>
-                    <input type="range" id="filter-brightness" min="0" max="200" value="100" oninput="applyFilters()">
-                </div>
-                <div class="input-group">
-                    <label>Grayscale</label>
-                    <input type="range" id="filter-grayscale" min="0" max="100" value="0" oninput="applyFilters()">
-                </div>
-            </div>
-            <div id="layer-properties" style="border-top: 1px solid var(--border); margin-top: 10px;">
-                <div style="text-align: center; color: #555; margin-top: 80px; font-size: 12px; line-height: 1.6;">
-                    <i class="fas fa-mouse-pointer" style="font-size: 40px; margin-bottom: 20px; color:var(--accent); opacity:0.5;"></i><br>Select Layer Matrix on Canvas<br>To Open Config Panel.
-                </div>
+            <div style="text-align: center; color: #555; margin-top: 80px; font-size: 12px; line-height: 1.6;">
+                <i class="fas fa-mouse-pointer"
+                    style="font-size: 40px; margin-bottom: 20px; color:var(--accent); opacity:0.5;"></i><br>Select a
+                Layer on Canvas<br>To Open Config Panel.
             </div>
         </div>
     </div>
@@ -543,395 +608,287 @@
     <!-- LOADER -->
     <div id="loader">
         <div class="spinner"></div>
-        <div id="loader-text" style="color: var(--qwen); font-family: 'Montserrat'; font-weight: 900; font-size: 20px; letter-spacing: 2px;">QWEN IS WRITING YOUR BUSINESS KIT...</div>
-        <div style="color: #888; font-size: 12px; margin-top: 10px;">Please wait 10-30 seconds. Generating E-Book, Strategy, Posts, and Reel Scripts.</div>
+        <div id="loader-text" style="color: var(--accent); font-weight: 900; font-size: 24px; letter-spacing: 2px;">
+            INITIALIZING...</div>
+        <div id="loader-sub" style="color: #888; font-size: 14px; margin-top: 10px;">Please wait.</div>
     </div>
+    <div id="toast">Ready</div>
 
-    <div id="toast">SYSTEM INITIALIZATION SUCCESSFUL</div>
+    <script>
+        // ==========================================
+        // SYSTEM CORE & API KEYS
+        // ==========================================
+        const CONFIG = {
+            PEXELS_KEY: 'c56L0l6NiI8lQhFccTdyyNwFg75mqhtaXKvWvimcSQVS00wqP1xdoftW',
+            get QWEN_KEY() { return localStorage.getItem('qf_or_key') || ''; },
+            FALLBACK_BGS: [
+                "https://images.unsplash.com/photo-1618045952959-1582e219736e?q=80&w=1920",
+                "https://images.unsplash.com/photo-1555949963-aa79dcee981c?q=80&w=1920"
+            ]
+        };
 
-    <!-- MAIN APP BOOTSTRAP -->
-    <script type="module">
-        import appState from './js/appState.js';
-        import canvasManager from './js/CanvasManager.js';
-        import { showToast, sEl, switchTab, toggleTheme } from './js/ui.js';
-        import './js/api.js';
-        
-        window.canvasManager = canvasManager;
-        window.appState = appState;
+        // State & Zip
+        let generatedAssets = {};
+        let jszip = new JSZip();
 
-        document.addEventListener('DOMContentLoaded', () => {
+        // Main Manual Canvas
+        const canvas = new fabric.Canvas('artboard', { preserveObjectStacking: true, backgroundColor: '#000000' });
 
-            // ── Mobile Sidebar ─────────────────────────────────────────────
-            const sidebar = document.querySelector('.sidebar');
-            const overlay = document.getElementById('sidebar-overlay');
-            const menuBtn = document.getElementById('mobile-menu-btn');
+        // Utils
+        function showToast(msg, err = false) {
+            const t = document.getElementById('toast'); t.innerText = msg;
+            t.style.background = err ? "var(--danger)" : "var(--accent)"; t.style.color = err ? "#fff" : "#000";
+            t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 3000);
+        }
+        function updateLoader(title, sub) { document.getElementById('loader').style.display = 'flex'; document.getElementById('loader-text').innerText = title; document.getElementById('loader-sub').innerText = sub; }
+        function hideLoader() { document.getElementById('loader').style.display = 'none'; }
 
-            function isMobile() { return window.innerWidth <= 900; }
-            function updateMobileUI() {
-                if (menuBtn) menuBtn.style.display = isMobile() ? 'flex' : 'none';
-            }
-            window.toggleSidebar = () => {
-                sidebar.classList.toggle('open');
-                overlay.classList.toggle('open');
+        function switchTab(t) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.querySelector(`.tab-btn[onclick="switchTab('${t}')"]`).classList.add('active');
+            document.getElementById('tab-' + t).classList.add('active');
+
+            // Toggle Export button visibility based on tab
+            document.getElementById('manual-btn').style.display = t === 'design' ? 'flex' : 'none';
+            document.getElementById('zip-btn').style.display = t === 'kit' && Object.keys(generatedAssets).length > 0 ? 'flex' : 'none';
+        }
+
+        function fitArtboard() {
+            const wrapper = document.getElementById('artboard-wrapper');
+            const ws = document.getElementById('workspace');
+            const scale = Math.min((ws.clientWidth - 100) / canvas.width, (ws.clientHeight - 100) / canvas.height);
+            wrapper.style.transform = `scale(${scale})`;
+        }
+        window.addEventListener('resize', fitArtboard);
+
+        // ==========================================
+        // AUTO-KIT GENERATOR (QWEN + FABRIC OFF-SCREEN)
+        // ==========================================
+        async function generateFullKit() {
+            const topic = document.getElementById('kit-topic').value;
+            if (!topic) return showToast("Enter a topic first!", true);
+
+            const checks = {
+                cover: document.getElementById('chk-cover').checked,
+                post: document.getElementById('chk-post').checked,
+                reel: document.getElementById('chk-reel').checked,
+                adcopy: document.getElementById('chk-adcopy').checked,
+                script: document.getElementById('chk-script').checked
             };
-            window.addEventListener('resize', updateMobileUI);
-            updateMobileUI();
+            if (!Object.values(checks).some(v => v)) return showToast("Select at least one asset.", true);
 
-            // ── Accordion & UI Logic ───────────────────────────────────────
-            window.toggleAccordion = (element) => {
-                const isActive = element.classList.contains('active');
-                // Optional: Collapse others
-                // document.querySelectorAll('.sidebar .section').forEach(el => el.classList.remove('active'));
-                if (!isActive) element.classList.add('active');
-                else element.classList.remove('active');
-            };
+            generatedAssets = {}; jszip = new JSZip();
+            const imgFolder = jszip.folder("Designs");
+            const docFolder = jszip.folder("Marketing_Strategy");
 
-            window.rotateAIPromptHint = (val) => {
-                const hint = document.getElementById('ai-prompt-hint');
-                if (!hint) return;
-                const ideas = [
-                    "AI will find the perfect background for this...",
-                    "Adding dark cinematic grading...",
-                    "AI is parsing your topic...",
-                    "Structuring typography based on context..."
-                ];
-                if (val.length > 5) hint.innerHTML = `<i class="fas fa-robot"></i> ${ideas[Math.floor(Math.random()*ideas.length)]}`;
-            };
+            try {
+                // 1. QWEN AI CALL
+                updateLoader("ANALYZING NICHE WITH QWEN-72B...", "Generating professional marketing copy.");
 
-            window.suggestFont = () => {
-                const select = document.getElementById('font-picker');
-                const fonts = Array.from(select.options).map(o => o.value);
-                const random = fonts[Math.floor(Math.random() * fonts.length)];
-                select.value = random;
-                window.applyFontToSelected();
-                const hint = document.getElementById('ai-font-hint');
-                if (hint) {
-                    hint.innerHTML = `<i class="fas fa-check-circle" style="color:var(--accent)"></i> AI picked ${random}!`;
-                    setTimeout(() => hint.innerHTML = `<i class="fas fa-lightbulb"></i> Click here for AI Font Suggestion`, 3000);
+                const schema = `{
+                    "pexels_query": "2 word dark cinematic visual description",
+                    "cover": { "title": "Main Title", "subtitle": "Punchy subtitle" },
+                    "post": { "hook": "Aggressive short hook", "subtext": "A strong sentence elaborating the hook" },
+                    "reel": { "hook": "STOP SCROLLING style hook", "cta": "Call to action" },
+                    "meta_ad": "Full PAS formatted facebook ad copy",
+                    "video_script": "A 30-second TikTok/Reel script"
+                }`;
+
+                const prompt = `Act as an elite digital marketer. I need a launch kit for: "${topic}". Return ONLY a valid JSON object matching this schema. No markdown: ${schema}`;
+
+                const qwenRes = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+                    method: "POST", headers: { "Authorization": `Bearer ${CONFIG.QWEN_KEY}`, "Content-Type": "application/json" },
+                    body: JSON.stringify({ model: "qwen/qwen-2.5-72b-instruct", messages: [{ "role": "user", "content": prompt }] })
+                });
+
+                if (!qwenRes.ok) throw new Error("Qwen API Failed");
+                const qwenData = await qwenRes.json();
+                const aiData = JSON.parse(qwenData.choices[0].message.content.replace(/```json/g, '').replace(/```/g, '').trim());
+
+                // 2. PEXELS FETCH
+                updateLoader("SOURCING CINEMATIC VISUALS...", `Searching Pexels for: ${aiData.pexels_query}`);
+                let bgUrl = CONFIG.FALLBACK_BGS[0];
+                try {
+                    const pexRes = await fetch(`https://api.pexels.com/v1/search?query=${aiData.pexels_query}&per_page=5`, { headers: { Authorization: CONFIG.PEXELS_KEY } });
+                    const pexData = await pexRes.json();
+                    if (pexData.photos && pexData.photos.length > 0) bgUrl = pexData.photos[0].src.large2x;
+                } catch (e) { }
+
+                // 3. RENDER VISUALS (OFF-SCREEN FABRIC)
+                if (checks.cover) {
+                    updateLoader("RENDERING E-BOOK COVER...", "Applying Typography...");
+                    const coverData = await renderKitAsset(1748, 2480, bgUrl, aiData.cover, 'cover');
+                    generatedAssets.cover = coverData; imgFolder.file("Ebook_Cover_A5.png", coverData.split('base64,')[1], { base64: true });
                 }
-            };
-
-            // ── State helpers ──────────────────────────────────────────────
-            let saveTimeout;
-            window.debounceSave = () => { clearTimeout(saveTimeout); saveTimeout = setTimeout(saveState, 600); };
-            function saveState() {
-                canvasManager.updateState && canvasManager.updateState();
-                appState.pushHistory(); appState.saveToLocal();
-            }
-            window.saveState = saveState;
-
-            // ── Font & Element Controls ────────────────────────────────────
-            window.applyFontToSelected = () => {
-                const el = document.querySelector('.element.active');
-                if (!el) { showToast('Select an element first!', true); return; }
-                el.style.fontFamily = document.getElementById('font-picker').value;
-                debounceSave();
-            };
-            window.applyFontSizeToSelected = () => {
-                const el = document.querySelector('.element.active');
-                if (!el) return;
-                el.style.fontSize = document.getElementById('font-size-input').value + 'px';
-                debounceSave();
-            };
-            window.applyColorToSelected = () => {
-                const el = document.querySelector('.element.active');
-                if (!el) return;
-                el.style.color = document.getElementById('font-color-input').value;
-                debounceSave();
-            };
-            window.applyAlignToSelected = () => {
-                const el = document.querySelector('.element.active');
-                if (!el) return;
-                el.style.textAlign = document.getElementById('text-align-input').value;
-                debounceSave();
-            };
-
-            // ── Template Loading ───────────────────────────────────────────
-            window.loadSingleTemplate = () => {
-                const checked = Array.from(document.querySelectorAll('input[name="tpl"]:checked')).map(cb => cb.value);
-                if (!checked.length) { showToast('Select a template first!', true); return; }
-                const topic = document.getElementById('magic-topic')?.value?.trim() || '';
-                canvasManager.loadTemplate(checked[0], topic);
-                if (isMobile()) toggleSidebar();
-            };
-            window.loadAllSelectedAsPages = () => {
-                const checked = Array.from(document.querySelectorAll('input[name="tpl"]:checked')).map(cb => cb.value);
-                if (!checked.length) { showToast('Select templates first!', true); return; }
-                const topic = document.getElementById('magic-topic')?.value?.trim() || '';
-                canvasManager.loadSelectedTemplates(checked, topic);
-                if (isMobile()) toggleSidebar();
-            };
-
-            // ── Download Wrapper ───────────────────────────────────────────
-            window.downloadAllPages = () => {
-                canvasManager.downloadAllPages();
-            };
-
-            window.generatePDF = async () => {
-                showToast('Generating PDF... Please wait.');
-                const { jsPDF } = window.jspdf;
-                const pdf = new jsPDF('p', 'mm', 'a4');
-                const pages = document.querySelectorAll('#business-kit-wrapper .page');
-                if (!pages || pages.length === 0) return showToast('No pages to generate.', true);
-
-                for (let i = 0; i < pages.length; i++) {
-                    const canvas = await html2canvas(pages[i], { scale: 2, useCORS: true });
-                    const imgData = canvas.toDataURL('image/jpeg', 0.8);
-                    if (i > 0) pdf.addPage();
-                    const pdfWidth = pdf.internal.pageSize.getWidth();
-                    const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-                    pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
+                if (checks.post) {
+                    updateLoader("RENDERING SQUARE POST...", "Optimizing for Feed...");
+                    const postData = await renderKitAsset(1080, 1080, bgUrl, aiData.post, 'post');
+                    generatedAssets.post = postData; imgFolder.file("Social_Post_1x1.png", postData.split('base64,')[1], { base64: true });
                 }
-                pdf.save('QuickFare_Business_Kit.pdf');
-                showToast('PDF Downloaded!');
-            };
+                if (checks.reel) {
+                    updateLoader("RENDERING REEL/STORY...", "Formatting 9:16...");
+                    const reelData = await renderKitAsset(1080, 1920, bgUrl, aiData.reel, 'reel');
+                    generatedAssets.reel = reelData; imgFolder.file("Reel_Story_9x16.png", reelData.split('base64,')[1], { base64: true });
+                }
 
-            // ── Pexels Auto Wrapper ────────────────────────────────────────
-            let pexelsDebounce;
-            window.debouncePexelsLive = (val) => {
-                clearTimeout(pexelsDebounce);
-                pexelsDebounce = setTimeout(() => {
-                    const el = document.getElementById('pexels-search');
-                    if (el && val.length > 3) {
-                        el.value = val + ' dark abstract';
-                        if (window.fetchPexels) window.fetchPexels(false);
+                // 4. TEXT FILES
+                if (checks.adcopy) { generatedAssets.adcopy = aiData.meta_ad; docFolder.file("Meta_Ad_Copy.txt", aiData.meta_ad); }
+                if (checks.script) { generatedAssets.script = aiData.video_script; docFolder.file("Reel_Video_Script.txt", aiData.video_script); }
+
+                showDashboard(); hideLoader(); showToast("Kit Generated Successfully!");
+
+            } catch (err) {
+                hideLoader(); console.error(err); showToast("Process Failed. Model output might be malformed.", true);
+            }
+        }
+
+        // OFF-SCREEN FABRIC.JS RENDERER (NO HTML2CANVAS BUGS)
+        async function renderKitAsset(w, h, bgUrl, texts, type) {
+            return new Promise((resolve) => {
+                let tempCanvas = new fabric.StaticCanvas(null, { width: w, height: h });
+                fabric.Image.fromURL(bgUrl, function (img) {
+                    let scale = Math.max(w / img.width, h / img.height);
+                    img.set({ scaleX: scale, scaleY: scale, originX: 'center', originY: 'center', left: w / 2, top: h / 2 });
+                    tempCanvas.add(img);
+
+                    let overlay = new fabric.Rect({
+                        width: w, height: h, left: 0, top: 0,
+                        fill: new fabric.Gradient({
+                            type: 'linear', coords: { x1: 0, y1: h, x2: 0, y2: 0 },
+                            colorStops: [{ offset: 0, color: 'rgba(0,0,0,0.9)' }, { offset: 1, color: 'rgba(0,0,0,0.4)' }]
+                        })
+                    });
+                    tempCanvas.add(overlay);
+
+                    // Dynamic Typography Scaling
+                    if (type === 'cover') {
+                        let t = new fabric.Textbox(texts.title.toUpperCase(), { width: w - 200, left: 100, top: h * 0.15, fontSize: w * 0.12, fontFamily: 'Anton', fill: '#00F0FF', shadow: new fabric.Shadow({ color: 'rgba(0,0,0,0.9)', blur: 20, offsetY: 10 }) });
+                        let s = new fabric.Textbox(texts.subtitle, { width: w - 200, left: 100, top: t.top + t.height + 50, fontSize: w * 0.04, fontFamily: 'Montserrat', fill: '#fff' });
+                        tempCanvas.add(t, s);
+                    } else if (type === 'post') {
+                        let hook = new fabric.Textbox(texts.hook.toUpperCase(), { width: w - 160, left: 80, top: 150, fontSize: 110, fontFamily: 'Anton', fill: '#FF0050', shadow: new fabric.Shadow({ color: 'rgba(0,0,0,0.9)', blur: 20, offsetY: 10 }) });
+                        let box = new fabric.Rect({ width: w - 160, height: 400, left: 80, top: hook.top + hook.height + 50, fill: 'rgba(15,17,26,0.85)', rx: 20, ry: 20 });
+                        let sub = new fabric.Textbox(texts.subtext, { width: w - 240, left: 120, top: hook.top + hook.height + 100, fontSize: 40, fontFamily: 'Montserrat', fill: '#fff', lineHeight: 1.4 });
+                        tempCanvas.add(hook, box, sub);
+                    } else if (type === 'reel') {
+                        let hook = new fabric.Textbox(texts.hook.toUpperCase(), { width: w - 160, left: 80, top: h * 0.2, fontSize: 140, fontFamily: 'Anton', fill: '#00F0FF', textAlign: 'center', shadow: new fabric.Shadow({ color: 'rgba(0,0,0,0.9)', blur: 30, offsetY: 15 }) });
+                        let ctaBox = new fabric.Rect({ width: w - 200, height: 150, left: 100, top: h * 0.8, fill: '#FF0050', rx: 75, ry: 75 });
+                        let ctaText = new fabric.Textbox(texts.cta.toUpperCase(), { width: w - 200, left: 100, top: h * 0.8 + 40, fontSize: 60, fontFamily: 'Montserrat', fill: '#fff', textAlign: 'center', fontWeight: 'bold' });
+                        tempCanvas.add(hook, ctaBox, ctaText);
                     }
-                }, 1500);
-            };
 
-            // ── Canvas wrappers ────────────────────────────────────────────
-            function restoreFromState(s) {
-                if (!s) return;
-                canvasManager.artboard.querySelectorAll('.element').forEach(e => e.remove());
-                canvasManager.restoreElements(s.canvas.elements);
-                const bg = document.getElementById('bg-img');
-                if (bg && s.canvas.background.src) { bg.src = s.canvas.background.src; bg.style.filter = s.canvas.background.filter || ''; }
-                canvasManager.elementCount = s.canvas.elementCount;
-                canvasManager.maxZIndex = s.canvas.maxZIndex;
-            }
-            window.undo = () => restoreFromState(appState.undo());
-            window.redo = () => restoreFromState(appState.redo());
-            window.clearCanvasElements = () => canvasManager.clearAll();
-            window.exportDesign = () => canvasManager.downloadAsImage();
-            window.applyPresetSize = () => canvasManager.applyPresetSize();
-            window.loadTemplate = t => { canvasManager.loadTemplate(t); if(isMobile()) toggleSidebar(); };
-            window.addElement = t => { canvasManager.addElement(t); if(isMobile()) toggleSidebar(); };
-            window.uploadLocalImage = e => canvasManager.uploadLocalImage(e);
-            window.bg = url => canvasManager.setBackground(url);
-            window.addImage = (url, tp, lft, wd) => canvasManager.addImage(url, { top: tp||'50px', left: lft||'50px', width: wd||'400px' });
-            window.addTextObj = (html, tp, lft, wd, fs, fm, cl) => canvasManager.addText({ text:html, top:tp, left:lft, width:wd, fontSize:fs, fontFamily:fm, color:cl||'#fff' });
-            window.addCardObj = (html, tp, lft, wd) => canvasManager.addCard({ content:html, top:tp, left:lft, width:wd });
-            window.applyFilters = () => canvasManager.applyFilters();
-            window.bringForward = () => { const a=document.querySelector('.element.active'); if(a){a.style.zIndex=++canvasManager.maxZIndex;saveState();} };
-            window.sendBackward = () => { const a=document.querySelector('.element.active'); if(a&&parseInt(a.style.zIndex)>10){a.style.zIndex=parseInt(a.style.zIndex)-1;saveState();} };
+                    tempCanvas.renderAll();
+                    resolve(tempCanvas.toDataURL({ format: 'png', quality: 1 }));
+                }, { crossOrigin: 'anonymous' });
+            });
+        }
 
-            // ── UI ─────────────────────────────────────────────────────────
-            window.toggleTheme = toggleTheme;
-            window.switchTab = switchTab;
-            window.showToast = showToast;
-            window.sEl = sEl;
+        // ==========================================
+        // DASHBOARD & ZIP LOGIC
+        // ==========================================
+        function showDashboard() {
+            document.getElementById('kit-dashboard').style.display = 'block';
+            document.getElementById('zip-btn').style.display = 'flex';
+            const grid = document.getElementById('kit-grid-container');
+            grid.innerHTML = '';
 
-            // ── AI: API Key Management ─────────────────────────────────────
-            const savedKey = localStorage.getItem('qf_or_key');
-            if (savedKey && document.getElementById('or-key-input')) {
-                document.getElementById('or-key-input').value = savedKey;
-            }
-            window.saveORKey = () => {
-                const k = document.getElementById('or-key-input')?.value?.trim();
-                if (k) { localStorage.setItem('qf_or_key', k); showToast('API Key Saved!'); }
-                else { localStorage.removeItem('qf_or_key'); showToast('Key cleared — Ghost AI active', false); }
-            };
-
-            // AI style prompt prefixes
-            const AI_STYLES = {
-                viral: 'Write in a VIRAL, shocking, scroll-stopping style. Use pattern interrupts. ',
-                authority: 'Write with expert authority, cite statistics, build credibility. ',
-                story: 'Use a compelling personal story arc: struggle → revelation → transformation. ',
-                pain: 'Focus on the burning pain point, agitate the problem deeply, then offer the solution. '
-            };
-            let currentAIStyle = '';
-            window.setAIStyle = (style) => {
-                currentAIStyle = AI_STYLES[style] || '';
-                document.querySelectorAll('[onclick^="setAIStyle"]').forEach(b => b.style.borderColor = '');
-                event.currentTarget.style.borderColor = 'var(--accent)';
-                showToast(`Style: ${style.toUpperCase()}`);
-            };
-
-            // ── AI Campaign (with real OpenRouter + Ghost fallback) ────────
-            window.triggerAICampaign = async () => {
-                const topic = document.getElementById('ai-topic-strategy')?.value?.trim();
-                if (!topic) { showToast('Enter a topic first!', true); return; }
-                const resultsBox = document.getElementById('ai-results');
-                resultsBox.style.display = 'block';
-                resultsBox.innerHTML = `<div style="text-align:center;padding:20px;"><div class="spinner" style="margin:0 auto 12px;width:40px;height:40px;border-width:3px;"></div><p style="color:var(--muted);font-size:12px;">AI generating campaign...</p></div>`;
-                showToast('AI is thinking...');
-
-                const orKey = localStorage.getItem('qf_or_key') || '';
-                let hook = '', frame = '', cta = '', visualQuery = topic + ' dark cinematic';
-
-                if (orKey) {
-                    try {
-                        const prompt = `${currentAIStyle}Generate a premium marketing campaign for: "${topic}".
-Return ONLY a JSON object with these keys:
-{
-  "hook": "viral attention-grabbing hook (max 12 words)",
-  "headline": "powerful headline for a graphic design (max 8 words, ALL CAPS)",
-  "frame": "2-3 sentence marketing framework / value proposition",
-  "cta": "call to action (max 8 words)",
-  "visualQuery": "Pexels search query for background image (3-5 words)",
-  "hashtags": ["tag1","tag2","tag3","tag4","tag5"]
-}`;
-                        const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-                            method: 'POST',
-                            headers: { 'Authorization': `Bearer ${orKey}`, 'Content-Type': 'application/json', 'HTTP-Referer': location.href, 'X-Title': 'QuickFare Studio' },
-                            body: JSON.stringify({ model: 'meta-llama/llama-3.1-8b-instruct:free', messages: [{ role: 'user', content: prompt }], max_tokens: 500 })
-                        });
-                        if (!res.ok) throw new Error('API error ' + res.status);
-                        const data = await res.json();
-                        const text = data.choices[0].message.content;
-                        const jsonMatch = text.match(/\{[\s\S]*\}/);
-                        if (jsonMatch) {
-                            const parsed = JSON.parse(jsonMatch[0]);
-                            hook = parsed.hook; frame = parsed.frame; cta = parsed.cta;
-                            visualQuery = parsed.visualQuery || visualQuery;
-                            if (parsed.headline) canvasManager.artboard.querySelector('.el-text') ? null : canvasManager.addText({ text: parsed.headline, top: '200px', left: '60px', fontSize: '120px' });
-                        }
-                    } catch(e) { console.warn('OpenRouter failed, using Ghost AI:', e.message); }
-                }
-
-                // Ghost fallback (always works)
-                if (!hook) {
-                    const ghosts = [
-                        { hook: `Most people NEVER discover this ${topic} secret`, frame: `The ${topic} industry is being disrupted. Those who adapt now will dominate the next 3 years while everyone else struggles.`, cta: `Start Your ${topic} Journey Today` },
-                        { hook: `I made $5,000 from ${topic} in 30 days`, frame: `You don't need years of experience. You need the right system. ${topic} has created more millionaires this decade than any other field.`, cta: `Get The Free ${topic} Blueprint` },
-                        { hook: `Warning: ${topic} will change everything`, frame: `The window of opportunity for ${topic} is closing fast. Early movers are already seeing 10x results while late adopters scramble.`, cta: `Claim Your Spot Now` }
-                    ];
-                    const g = ghosts[Math.floor(Math.random() * ghosts.length)];
-                    hook = g.hook; frame = g.frame; cta = g.cta;
-                }
-
-                // Render results
-                resultsBox.innerHTML = `
-                    <h4>🔥 Viral Hook</h4><p style="font-weight:700;color:#f1f5f9;font-size:14px;">"${hook}"</p>
-                    <h4>🧠 Framework</h4><p>${frame}</p>
-                    <h4>🎯 Call to Action</h4><p style="color:var(--accent2);font-weight:700;">${cta}</p>
-                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px;">
-                        <button class="btn btn-magic" style="justify-content:center;font-size:11px;" onclick="applyHookToCanvas('${hook.replace(/'/g,"\\'")}','${cta.replace(/'/g,"\\'")}')"><i class="fas fa-plus-circle"></i> Apply to Canvas</button>
-                        <button class="btn" style="justify-content:center;font-size:11px;" onclick="copyToClipboard('${(hook+' '+frame+' '+cta).replace(/'/g,"\\'")}')"><i class="fas fa-copy"></i> Copy All</button>
-                    </div>`;
-                showToast('Campaign Generated!');
-
-                // Auto-fetch visual from Pexels
-                try {
-                    const pKey = 'c56L0l6NiI8lQhFccTdyyNwFg75mqhtaXKvWvimcSQVS00wqP1xdoftW';
-                    const pr = await fetch(`https://api.pexels.com/v1/search?query=${encodeURIComponent(visualQuery)}&per_page=1`, { headers: { Authorization: pKey } });
-                    if (pr.ok) { const pd = await pr.json(); if (pd.photos?.length) canvasManager.setBackground(pd.photos[0].src.large2x); }
-                } catch(e) {}
-            };
-
-            window.applyHookToCanvas = (hook, cta) => {
-                canvasManager.addText({ text: hook.toUpperCase(), top: '180px', left: '60px', fontSize: '90px', color: '#fff' });
-                canvasManager.addCard({ content: cta, top: '700px', left: '60px', width: '960px' });
-                showToast('Applied to Canvas!');
-                if (isMobile()) { switchTab('design'); toggleSidebar(); }
-            };
-            window.copyToClipboard = (text) => { navigator.clipboard.writeText(text).then(() => showToast('Copied!')); };
-
-            // Magic Auto Create
-            window.magicAutoCreate = async () => {
-                const topic = document.getElementById('magic-topic')?.value?.trim() || 'Digital Marketing 2026';
-                const colors = ['#8a5cf6','#f59e0b','#ef4444','#10b981','#ec4899','#00f0ff','#39ff14'];
-                const color = colors[Math.floor(Math.random()*colors.length)];
-                
-                // Adaptive font scaling
-                let fs = '120px';
-                if (topic.length > 20) fs = '90px';
-                if (topic.length > 40) fs = '70px';
-                if (topic.length > 60) fs = '50px';
-
-                canvasManager.clearAll();
-                const mainEl = canvasManager.addText({ text: topic.toUpperCase().replace(/ /g,'<br>'), top: '150px', left: '60px', fontSize: fs, color });
-                
-                showToast('Generating AI Copy...');
-                let subtitle = '✦ AI-Generated Design\nCustomize each layer by clicking it.';
-                try {
-                    const apiKey = localStorage.getItem('qf_or_key') || '';
-                    if (apiKey) {
-                        const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
-                            body: JSON.stringify({
-                                model: 'meta-llama/llama-3.1-8b-instruct:free',
-                                messages: [{ role: 'user', content: `Write a short, punchy 2-line subtitle for a social media post about: ${topic}. No quotes, no intro.` }]
-                            })
-                        });
-                        if (response.ok) {
-                            const data = await response.json();
-                            if (data.choices && data.choices[0]) {
-                                subtitle = data.choices[0].message.content.trim();
-                            }
-                        }
-                    }
-                } catch(e) { console.error('AI text fetch failed', e); }
-
-                canvasManager.addCard({ content: subtitle, top: '750px', left: '60px', width: '960px' });
-                try {
-                    const pKey = 'c56L0l6NiI8lQhFccTdyyNwFg75mqhtaXKvWvimcSQVS00wqP1xdoftW';
-                    const pr = await fetch(`https://api.pexels.com/v1/search?query=${encodeURIComponent(topic+' dark')}&per_page=1`, { headers: { Authorization: pKey } });
-                    if (pr.ok) { const pd = await pr.json(); if (pd.photos?.length) canvasManager.setBackground(pd.photos[0].src.large2x); }
-                } catch(e) {}
-                
-                // Auto-select the main heading
-                setTimeout(() => sEl(mainEl), 500);
-                
-                showToast('Magic Canvas Created!');
-                if (isMobile()) toggleSidebar();
-            };
-
-            // ── Zoom / fit ─────────────────────────────────────────────────
-            function fitArtboard() {
-                const ws = document.getElementById('workspace');
-                const wr = document.getElementById('artboard-wrapper');
-                const ab = document.getElementById('artboard');
-                if (!ws || !wr || !ab) return;
-                window.currScale = Math.min((ws.clientWidth - 60) / ab.offsetWidth, (ws.clientHeight - 60) / ab.offsetHeight, 1);
-                wr.style.transform = `scale(${window.currScale})`;
-            }
-            window.fitArtboard = fitArtboard;
-            window.addEventListener('resize', fitArtboard);
-            document.getElementById('workspace').addEventListener('wheel', e => {
-                if (!e.ctrlKey && !e.metaKey) return;
-                e.preventDefault();
-                window.currScale = Math.max(0.1, Math.min((window.currScale||1)+(e.deltaY>0?-0.05:0.05), 3));
-                document.getElementById('artboard-wrapper').style.transform = `scale(${window.currScale})`;
-            }, { passive: false });
-            document.getElementById('workspace').addEventListener('click', e => {
-                const ws = document.getElementById('workspace');
-                const wr = document.getElementById('artboard-wrapper');
-                const ab = document.getElementById('artboard');
-                if (e.target===ws||e.target===wr||e.target===ab) {
-                    document.querySelectorAll('.element').forEach(el=>el.classList.remove('active'));
-                    const lp = document.getElementById('layer-properties');
-                    if (lp) lp.innerHTML = '<div style="text-align:center;color:#475569;margin-top:60px;font-size:12px;line-height:2;"><i class="fas fa-mouse-pointer" style="font-size:32px;display:block;margin-bottom:12px;color:var(--accent);opacity:0.4;"></i>Select a layer<br>to edit properties</div>';
+            ['cover', 'post', 'reel'].forEach(type => {
+                if (generatedAssets[type]) {
+                    grid.innerHTML += `<div class="kit-card"><h3 style="margin:0; color:var(--accent); text-transform:uppercase;">${type} Asset</h3><img src="${generatedAssets[type]}"></div>`;
                 }
             });
 
-            // ── Load state ─────────────────────────────────────────────────
-            const loaded = appState.loadFromLocal();
-            if (loaded && appState.state.canvas.elements?.length > 0) {
-                const bg = document.getElementById('bg-img');
-                if (bg && appState.state.canvas.background?.src) { bg.src = appState.state.canvas.background.src; bg.style.filter = appState.state.canvas.background.filter||''; }
-                canvasManager.elementCount = appState.state.canvas.elementCount || 1000;
-                canvasManager.maxZIndex = appState.state.canvas.maxZIndex || 20;
-                canvasManager.restoreElements(appState.state.canvas.elements);
-            } else {
-                canvasManager.addText({ text: '⚡ QUICKFARE<br><span style="color:#8a5cf6;">STUDIO V12</span>', top:'260px', left:'60px', fontSize:'120px' });
-                canvasManager.addCard({ content:'AI-Powered Design Studio\nClick Magic Auto-Create or add elements from the sidebar.', top:'620px', left:'60px', width:'960px' });
-                saveState();
+            if (generatedAssets.adcopy) {
+                grid.innerHTML += `<div class="kit-card"><h3 style="margin:0; color:var(--accent);">Meta Ad Copy</h3><pre>${generatedAssets.adcopy}</pre></div>`;
             }
-            setTimeout(fitArtboard, 120);
-            showToast('⚡ QuickFare Studio Ready');
+            if (generatedAssets.script) {
+                grid.innerHTML += `<div class="kit-card"><h3 style="margin:0; color:var(--accent);">Video Script</h3><pre>${generatedAssets.script}</pre></div>`;
+            }
+        }
+
+        function closeDashboard() { document.getElementById('kit-dashboard').style.display = 'none'; document.getElementById('zip-btn').style.display = 'none'; }
+
+        function downloadZipKit() {
+            updateLoader("PACKAGING ASSETS...", "Generating .ZIP file");
+            jszip.generateAsync({ type: "blob" }).then(function (content) {
+                saveAs(content, "QuickFare_LaunchKit.zip");
+                hideLoader(); showToast("ZIP Downloaded!");
+            });
+        }
+
+        // ==========================================
+        // MANUAL EDITOR LOGIC
+        // ==========================================
+        function applyPresetSize() {
+            let v = document.getElementById('preset-size').value;
+            if (v === 'custom') return;
+            let parts = v.split('x');
+            canvas.setWidth(parseInt(parts[0]));
+            canvas.setHeight(parseInt(parts[1]));
+            fitArtboard();
+        }
+        function updateCanvasSize() {
+            canvas.setWidth(parseInt(document.getElementById('canvas-w').value));
+            canvas.setHeight(parseInt(document.getElementById('canvas-h').value));
+            fitArtboard();
+        }
+
+        function addText() {
+            let text = new fabric.Textbox("NEW TEXT", { left: 100, top: 100, width: 600, fontSize: 80, fontFamily: 'Anton', fill: '#ffffff' });
+            canvas.add(text); canvas.setActiveObject(text);
+        }
+        function addCard() {
+            let rect = new fabric.Rect({ width: 600, height: 200, fill: 'rgba(15,17,26,0.85)', rx: 20, ry: 20, left: 100, top: 100 });
+            canvas.add(rect); canvas.setActiveObject(rect);
+        }
+
+        async function searchManualPexels() {
+            const query = document.getElementById('manual-pexels').value;
+            const gallery = document.getElementById('manual-gallery');
+            try {
+                const res = await fetch(`https://api.pexels.com/v1/search?query=${query}&per_page=10`, { headers: { Authorization: CONFIG.PEXELS_KEY } });
+                const data = await res.json();
+                gallery.innerHTML = '';
+                data.photos.forEach(photo => {
+                    gallery.innerHTML += `<div class="img-card"><img src="${photo.src.medium}" onclick="setManualBg('${photo.src.large2x}')"></div>`;
+                });
+            } catch (e) { gallery.innerHTML = '<div style="color:red; font-size:12px;">API Error</div>'; }
+        }
+
+        function setManualBg(url) {
+            fabric.Image.fromURL(url, function (img) {
+                let scale = Math.max(canvas.width / img.width, canvas.height / img.height);
+                img.set({ scaleX: scale, scaleY: scale, originX: 'center', originY: 'center', left: canvas.width / 2, top: canvas.height / 2, selectable: false });
+                canvas.insertAt(img, 0);
+            }, { crossOrigin: 'anonymous' });
+        }
+
+        function exportManualCanvas() {
+            const dataUrl = canvas.toDataURL({ format: 'png', quality: 1 });
+            let link = document.createElement('a');
+            link.download = `QuickFare_Design.png`;
+            link.href = dataUrl;
+            link.click();
+        }
+
+        // Init Editor Elements
+        setTimeout(() => {
+            applyPresetSize();
+            setManualBg(CONFIG.FALLBACK_BGS[0]);
+            let t = new fabric.Textbox("MANUAL\nEDITOR", { left: 100, top: 100, width: 800, fontSize: 120, fontFamily: 'Anton', fill: '#00F0FF', shadow: new fabric.Shadow({ color: 'rgba(0,0,0,0.9)', blur: 20, offsetY: 10 }) });
+            canvas.add(t);
+        }, 500);
+
+        // Init UI States
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedKey = localStorage.getItem('qf_or_key');
+            if (savedKey) {
+                const input = document.getElementById('or-key-input');
+                if (input) input.value = savedKey;
+            }
         });
     </script>
 </body>
+
 </html>
